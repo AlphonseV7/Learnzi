@@ -19,24 +19,100 @@
 :root[data-shape="silver"] h1 { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
 :root[data-shape="silver"] :is(h1, h2, h3) :is(.py, rt, .hz) { -webkit-text-fill-color: initial; }
 :root[data-shape="silver"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✦ "; color: var(--aurora, #5fe6ff); }
-/* frosted glass with a starlit rim */
-:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .lu-card, .pv-box) {
+/* Cut crystal: every big panel is frosted glass cut into an uneven shard, with long shallow cuts (not
+   Cyberedge's 45° chamfers). Three shapes take turns so neighbours never match. Layers on each panel:
+   the glass (see-through, blurring the sky), a lighter facet just under the top cut, a sheen of light
+   that now and then slides across (silverSheen in 05-look.js picks one panel at a time), the starlit
+   rim in ::before (the same shape with a hole in it, so the rim follows the slanted cuts) and a
+   four-point star glinting on the tip of the cut in ::after. */
+@property --sx { syntax: "<percentage>"; inherits: false; initial-value: -40%; }
+:root[data-shape="silver"] { --facet: rgb(255 255 255 / .09); --sheen: rgb(255 255 255 / .075); }
+:root[data-shape="silver"][data-mode="light"] { --facet: color-mix(in srgb, var(--accent) 13%, transparent); --sheen: rgb(255 255 255 / .75); }
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box) {
+  /* shape 1: a long shallow cut across the top left, a steeper one at the bottom right */
+  --clip: polygon(0 16px, 30% 0, 100% 0, 100% calc(100% - 24px), calc(100% - 52px) 100%, 0 100%);
+  --ring: polygon(evenodd, 0 16px, 30% 0, 100% 0, 100% calc(100% - 24px), calc(100% - 52px) 100%, 0 100%, 0 16px,
+    1.3px 16.8px, 30% 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - 24.6px), calc(100% - 52.4px) calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px 16.8px);
+  --facet-img: linear-gradient(to bottom right, transparent 50%, var(--facet) 50%, transparent);
+  --facet-at: 0 0 / 30% 16px;
+  position: relative; isolation: isolate; border: 0; border-radius: 0; clip-path: var(--clip);
+  background: linear-gradient(110deg, transparent calc(var(--sx) - 14%), var(--sheen) var(--sx), transparent calc(var(--sx) + 14%)),
+    var(--facet-img) var(--facet-at) no-repeat, var(--glass);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .05);
+}
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box):nth-child(3n + 2) {
+  /* shape 2: the mirror, cut across the top right and the bottom left */
+  --clip: polygon(0 0, calc(100% - 70px) 0, 100% 14px, 100% 100%, 20px 100%, 0 calc(100% - 44px));
+  --ring: polygon(evenodd, 0 0, calc(100% - 70px) 0, 100% 14px, 100% 100%, 20px 100%, 0 calc(100% - 44px), 0 0,
+    1.3px 1.3px, calc(100% - 70.3px) 1.3px, calc(100% - 1.3px) 14.8px, calc(100% - 1.3px) calc(100% - 1.3px), 20.5px calc(100% - 1.3px), 1.3px calc(100% - 44.6px), 1.3px 1.3px);
+  --facet-img: linear-gradient(to bottom left, transparent 50%, var(--facet) 50%, transparent);
+  --facet-at: right 0 top 0 / 70px 14px;
+}
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box):nth-child(3n) {
+  /* shape 3: a small steep cut at the top left and a slanted bottom edge, like a shard of ice */
+  --clip: polygon(14px 0, 100% 0, 100% calc(100% - 10px), 62% 100%, 0 100%, 0 34px);
+  --ring: polygon(evenodd, 14px 0, 100% 0, 100% calc(100% - 10px), 62% 100%, 0 100%, 0 34px, 14px 0,
+    14.6px 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - 11px), 62% calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px 34.6px, 14.6px 1.3px);
+  --facet-img: linear-gradient(to bottom right, transparent 50%, var(--facet) 50%, transparent);
+  --facet-at: 0 0 / 14px 34px;
+}
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box)::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; clip-path: var(--ring); background: var(--rim);
+}
+/* the top bar: a smaller cut on phones; on a computer it spans the screen, so just a starlit bottom edge */
+:root[data-shape="silver"] .topbar.card {
+  --clip: polygon(0 10px, 24% 0, 100% 0, 100% calc(100% - 14px), calc(100% - 34px) 100%, 0 100%);
+  --ring: polygon(evenodd, 0 10px, 24% 0, 100% 0, 100% calc(100% - 14px), calc(100% - 34px) 100%, 0 100%, 0 10px,
+    1.3px 10.8px, 24% 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - 14.6px), calc(100% - 34.4px) calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px 10.8px);
+  --facet-at: 0 0 / 24% 10px;
+}
+:root.desk[data-shape="silver"] .topbar.card {
+  --clip: inset(0); --facet-img: none;
+  --ring: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 0 0, 100% 0, 100% calc(100% - 1.3px), 0 calc(100% - 1.3px), 0 0);
+}
+/* the four-point star on the tip of the cut (main panels only) */
+:root[data-shape="silver"] :is(.view > .card, .action)::after {
+  content: ""; position: absolute; left: calc(30% - 6px); top: 1px; width: 12px; height: 12px; pointer-events: none;
+  background: var(--ink); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  animation: silverGlint 4.5s ease-in-out infinite;
+}
+:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n + 2)::after { left: auto; right: 64px; animation-delay: -1.5s; }
+:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n)::after { left: auto; right: 22px; top: 2px; animation-delay: -3s; }
+:root[data-shape="silver"][data-mode="light"] :is(.view > .card, .action)::after { background: var(--accent); }
+@keyframes silverGlint { 0%, 100% { opacity: .3; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
+/* a sheen of light sliding across one panel (class added for a moment by silverSheen) */
+:root[data-shape="silver"] .sheen { animation: silverSheen 1.8s cubic-bezier(.45, 0, .3, 1); }
+@keyframes silverSheen { from { --sx: -30%; } to { --sx: 130%; } }
+/* the level-up card keeps soft corners: its seal sits over the top edge */
+:root[data-shape="silver"] .lu-card {
   position: relative; border: 1px solid transparent; border-radius: 18px;
   background: linear-gradient(var(--glass), var(--glass)) padding-box, var(--rim) border-box;
-  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
-  box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / .05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2); box-shadow: var(--shadow);
 }
-/* a four-point star glinting on the corner of each main panel */
-:root[data-shape="silver"] :is(.view > .card, .action)::after {
-  content: ""; position: absolute; right: 12px; top: -6px; width: 12px; height: 12px; pointer-events: none;
-  background: var(--ink); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
-  filter: drop-shadow(0 0 4px var(--aurora, #5fe6ff)); animation: silverGlint 4.5s ease-in-out infinite;
+/* smaller pieces: one short shallow cut on the top left corner */
+:root[data-shape="silver"] :is(.stat, .swatch, .av-tile, .tone-opt, .grade) {
+  border-radius: 6px; clip-path: polygon(0 9px, 20px 0, 100% 0, 100% 100%, 0 100%);
 }
-:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n)::after { animation-delay: -1.5s; right: 30px; }
-:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n+1)::after { animation-delay: -3s; right: 20%; }
-@keyframes silverGlint { 0%, 100% { opacity: .25; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
-:root[data-shape="silver"] :is(.btn, .chip, .seg, .lvl, .stat, .swatch, .av-tile, .tone-opt, .grade) { border-radius: 999px; }
-:root[data-shape="silver"] :is(.stat, .swatch, .av-tile, .tone-opt, .grade) { border-radius: 16px; }
+/* coming into focus: a new page's boxes start soft and sharpen, one after another, like a telescope */
+:root[data-shape="silver"] .view.enter { animation: none; }
+:root[data-shape="silver"] .view.enter > * { animation: silverFocus .6s var(--ease) backwards; }
+:root[data-shape="silver"] .view.enter > :nth-child(2) { animation-delay: .06s; }
+:root[data-shape="silver"] .view.enter > :nth-child(3) { animation-delay: .12s; }
+:root[data-shape="silver"] .view.enter > :nth-child(4) { animation-delay: .18s; }
+:root[data-shape="silver"] .view.enter > :nth-child(n + 5) { animation-delay: .24s; }
+@keyframes silverFocus { from { opacity: 0; filter: blur(5px); transform: scale(.985); } to { opacity: 1; filter: blur(0); transform: none; } }
+/* starlight in the filled part of the XP bar and the level bars */
+:root[data-shape="silver"] :is(.xpbar, .bar) > i { position: relative; overflow: hidden; }
+:root[data-shape="silver"] :is(.xpbar, .bar) > i::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 3px 2px, #fff 0 .6px, transparent 1.2px) 0 0 / 13px 100%,
+    radial-gradient(circle at 9px 5px, #fff 0 .5px, transparent 1px) 0 0 / 17px 100%;
+  opacity: .5; animation: silverBarStars 3.2s ease-in-out infinite alternate;
+}
+:root[data-shape="silver"] .xpbar > i::before { background-size: 13px 100%, 17px 100%; }
+@keyframes silverBarStars { from { opacity: .15; } to { opacity: .75; } }
+:root[data-shape="silver"] :is(.btn, .chip, .seg, .lvl) { border-radius: 999px; }
 :root[data-shape="silver"] .btn { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--surface-2) 80%, transparent); }
 :root[data-shape="silver"] .btn.primary {
   border-color: transparent; color: #0d0626; font-weight: 700;
@@ -51,8 +127,12 @@
 /* the scene's moving parts */
 .zen-magpies { animation: silverBob 6s ease-in-out infinite alternate; }
 @keyframes silverBob { to { transform: translateY(-6px); } }
-.zen-star { animation: silverGlint 5s ease-in-out infinite; }
-@keyframes silverGlint { 50% { opacity: .65; } }
+.zen-star { animation: silverStar 5s ease-in-out infinite; }
+@keyframes silverStar { 50% { opacity: .65; } }
+.zen-river { animation: silverRiver 11s ease-in-out infinite alternate; will-change: opacity; }
+@keyframes silverRiver { from { opacity: .72; } to { opacity: 1; } }
+.zen-far { animation: silverDrift 70s ease-in-out infinite alternate; will-change: transform; }
+@keyframes silverDrift { from { transform: translate(-6px, 4px); } to { transform: translate(8px, -5px); } }
 .zen-shoot { opacity: 0; animation: silverShoot 11s linear infinite 2s; }
 @keyframes silverShoot { 0% { opacity: 0; transform: translate(1150px, 60px); } 2% { opacity: 1; } 9% { opacity: 0; transform: translate(760px, 210px); } 100% { opacity: 0; transform: translate(760px, 210px); } }
 
@@ -69,4 +149,4 @@
 @keyframes drawLine { to { stroke-dashoffset: 0; } }
 @keyframes starOn { to { opacity: 1; } }
 .levelup[data-fx="warp"] .lu-seal { background: linear-gradient(135deg, var(--accent), var(--aurora, #5fe6ff)); color: #0d0626; box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 60%, transparent); }
-@media (prefers-reduced-motion: reduce) { .zen-shoot { display: none; } }
+@media (prefers-reduced-motion: reduce) { .zen-shoot { display: none; } .zen-river, .zen-far { animation: none; } }

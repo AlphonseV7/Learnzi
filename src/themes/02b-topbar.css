@@ -1,6 +1,6 @@
 /* ---------- top bar: XP bar, flying characters, and following you down the page on phones ---------- */
 .app .main > .topbar.card { position: relative; }
-/* the XP bar sits in the row, between the level pill and the sync dot */
+/* the XP bar sits in the row, just after the level pill */
 .xpbar {
   flex: none; align-self: center; width: 52px; height: 8px; border-radius: 999px; pointer-events: none; overflow: hidden;
   background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);

@@ -106,7 +106,7 @@ function cardView({ k, e }) {
     h("div", { class: "row" }, pyEl(e.p, "py fc-py"), listen(), starBtn(e)),
     h("ol", { class: "defs" }, senses.map(s => h("li", null, s))),
     h("button", { class: "plain-btn build-link small", type: "button", onclick: () => openWord(e.s, e) }, "More about this word")),
-    clipBlock(e));
+    clipBlock(e) || "");
   const labels = SRS.preview(progress.cards[k], clock());
   let suggest = 0;
   if (type === "w") {

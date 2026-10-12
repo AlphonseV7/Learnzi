@@ -73,6 +73,7 @@ function start() {
   }, { passive: true, capture: true });
   armIdle();
   setupTopbar();
+  silverSheen();
   firstRun();
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeTour() && !closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }

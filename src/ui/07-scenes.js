@@ -150,5 +150,9 @@ function renderScene() {
   sceneKey = kind;
   host.replaceChildren();
   if (!kind) return;
-  host.append(sv("svg", { viewBox: "0 0 1200 800", preserveAspectRatio: "xMidYMax slice", class: "zen-svg", "data-scene": kind }, SCENES[kind]()));
+  // A scene is a list of shapes, or { layers: [[class, shapes], …] }: separate pictures stacked up, so
+  // one can glow or drift on its own without the phone redrawing the whole sky every frame.
+  const made = SCENES[kind]();
+  for (const [cls, kids] of Array.isArray(made) ? [["", made]] : made.layers)
+    host.append(sv("svg", { viewBox: "0 0 1200 800", preserveAspectRatio: "xMidYMax slice", class: "zen-svg" + (cls ? " " + cls : ""), "data-scene": kind }, kids));
 }

@@ -121,3 +121,21 @@ function speakTTS(text, rate) {
   speechSynthesis.speak(u);
   if (voicesKnown && !zhVoice) toast("No Chinese voice on this device yet. See Settings → Voice.");
 }
+
+/* Silver River: every nine seconds or so a sheen of light slides across one panel on screen, never two
+ * at once (the sweep itself is CSS: the .sheen class in 38-silver.css). Not with reduced motion. */
+let sheenTimer = 0;
+function silverSheen() {
+  clearTimeout(sheenTimer);
+  sheenTimer = setTimeout(silverSheen, 8000 + Math.random() * 3000);
+  if (document.documentElement.dataset.shape !== "silver" || document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const vh = window.innerHeight;
+  const seen = [...document.querySelectorAll(".view > .card, .view .action")].filter(el => {
+    const r = el.getBoundingClientRect();
+    return r.height > 0 && r.bottom > 60 && r.top < vh - 60 && !el.getAnimations().length;
+  });
+  if (!seen.length) return;
+  const el = seen[Math.floor(Math.random() * seen.length)];
+  el.classList.add("sheen");
+  setTimeout(() => el.classList.remove("sheen"), 1900);
+}

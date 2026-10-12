@@ -151,6 +151,8 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["13 Oct", "Silver River: cut-crystal boxes, a sheen of light, pages that come into focus, a breathing Milky Way and starlit XP bars"],
+  ["13 Oct", "Fixed: flashcard answers sometimes showed the word \"null\""],
   ["13 Oct", "New theme at level 40: Silver River (银河), the Milky Way with the Weaver Girl and Cowherd stars"],
   ["13 Oct", "Night Market, Retro Arcade and Cyberedge now unlock at levels 12, 18 and 25"],
   ["13 Oct", "Pinyin and tone colours start off; the tour shows what they do. Ink uses the Lexend font"],
