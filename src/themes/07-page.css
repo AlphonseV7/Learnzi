@@ -1,0 +1,42 @@
+/* ---------- page header boxes, removing boxes, greeting, clock layouts ---------- */
+.page-head { display: grid; gap: 6px; }
+.page-head-top { flex-wrap: nowrap; align-items: center; gap: 10px; }
+.page-head h1 { flex: 1; min-width: 0; margin: 0; flex-wrap: wrap; }
+.page-tools { flex: none; gap: 6px; flex-wrap: nowrap; margin-left: auto; }
+.page-desc { margin: 0; }
+.page-back { flex: none; }
+.btn.small.page-restore { padding-inline: 10px; gap: 2px; }
+.btn.small.page-restore svg { width: 14px; height: 14px; transform: rotate(-30deg); }
+@media (max-width: 480px) { .page-head h1 { font-size: 1.5rem; } }
+.me-tabs { justify-content: flex-end; }
+/* the remove button on each box's title bar */
+.fold-remove {
+  flex: none; display: grid; place-items: center; width: 28px; height: 32px; margin-right: -6px; padding: 0;
+  border: 0; background: none; color: var(--ink-soft); opacity: .45;
+}
+.fold-remove svg { width: 13px; height: 13px; }
+.fold-remove:hover, .fold-remove:focus-visible { opacity: 1; color: var(--t1); }
+.fold-head .fold-grip + .fold-remove { margin-left: -4px; }
+/* undo message */
+.toast.with-action { pointer-events: auto; display: flex; align-items: center; gap: 14px; }
+.toast-undo { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 800; padding: 2px 4px; text-transform: uppercase; letter-spacing: .05em; }
+:root.desk .toast { bottom: 24px; }
+/* greeting */
+.greeting-zh { margin: 0; font-size: 1.9rem; line-height: 1.6; }
+.greeting-zh .rz { font-size: 1em; }
+.greeting-name { font-family: var(--font-display); font-weight: 700; font-size: .8em; }
+.greeting-card p { margin: 0; }
+/* clock: stacked or side by side, time or date only */
+.clock-body { display: grid; gap: 10px; justify-items: center; }
+.clock-body.layout-side.show-both { grid-template-columns: auto auto; align-items: center; justify-content: center; column-gap: 26px; }
+.clock-body.layout-side.show-both .cl-date { justify-items: start; text-align: left; }
+@media (max-width: 380px) { .clock-body.layout-side.show-both { grid-template-columns: 1fr; } .clock-body.layout-side.show-both .cl-date { justify-items: center; text-align: center; } }
+.clock-body.show-date .cl-zhdate .rz { font-size: 1.9rem; }
+.clock-body.show-date .cl-date .muted { font-size: 1rem; }
+.box-layout .row { gap: 8px; }
+.clock-body.layout-side .cl-zhdate { display: grid; justify-items: start; white-space: nowrap; }
+.clock-body.layout-side .cl-hm { font-size: 3rem; }
+.clock-body.layout-side .cl-date .muted { white-space: nowrap; }
+/* Debug → Updates */
+.updates { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.updates li { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 10px; align-items: baseline; }

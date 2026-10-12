@@ -1,0 +1,130 @@
+/* ---------- Light and dark: every theme's other look ----------
+ * Each theme has the look it was made with (in styles.css or its own file). Settings → Look → Light or dark
+ * sets data-mode on <html>; when that is not the theme's own look, the colours below take over.
+ * Ink's dark look is the plain dark set in styles.css. */
+
+/* themes made light, at night */
+:root[data-preset="jade"][data-mode="dark"] {
+  --bg: #0d1613; --surface: #14201c; --surface-2: #1c2b26; --ink: #e3f0ea; --ink-soft: #9cb3a9;
+  --line: #2a3d36; --accent: #5cc4a4; --accent-ink: #04150f; --accent-soft: #173a30;
+  --t1: #ff6b5f; --t2: #f5a344; --t3: #4cc477; --t4: #6b9bff; --t5: #93a39c;
+  --shadow: 0 1px 2px rgb(0 0 0 / .35), 0 8px 24px rgb(0 0 0 / .4);
+  color-scheme: dark;
+}
+:root[data-preset="porcelain"][data-mode="dark"] {
+  --bg: #0c111f; --surface: #131a2d; --surface-2: #1b243d; --ink: #e6ebf8; --ink-soft: #9da9c6;
+  --line: #28335a; --accent: #86a3ff; --accent-ink: #08112c; --accent-soft: #1e2a55;
+  --t1: #ff6f66; --t2: #f2a94a; --t3: #52c983; --t4: #86a3ff; --t5: #969eb4;
+  --shadow: 0 1px 2px rgb(0 0 0 / .35), 0 8px 24px rgb(0 0 0 / .4);
+  color-scheme: dark;
+}
+:root[data-preset="peach"][data-mode="dark"] {
+  --bg: #1b1115; --surface: #26191e; --surface-2: #322129; --ink: #f8e6eb; --ink-soft: #c7a2ad;
+  --line: #472f39; --accent: #ff8db0; --accent-ink: #2a0915; --accent-soft: #4a2333;
+  --t1: #ff6f66; --t2: #f2a94a; --t3: #9ccc5a; --t4: #7ea8ff; --t5: #a8979c;
+  --shadow: 0 1px 2px rgb(0 0 0 / .35), 0 8px 24px rgb(0 0 0 / .4);
+  color-scheme: dark;
+}
+
+/* themes made dark, by day */
+:root[data-preset="lantern"][data-mode="light"] {
+  --bg: #fbf3e7; --surface: #fffaf2; --surface-2: #f3e4cf; --ink: #2b1a12; --ink-soft: #765a48;
+  --line: #e6d0b5; --accent: #a85a12; --accent-ink: #ffffff; --accent-soft: #f5dfc0;
+  --t1: #c8352b; --t2: #b86a0a; --t3: #2f8a3e; --t4: #2f5fc4; --t5: #8a7d74;
+  --shadow: 0 1px 2px rgb(80 40 10 / .06), 0 8px 24px rgb(80 40 10 / .1);
+  color-scheme: light;
+}
+:root[data-preset="nightmarket"][data-mode="light"] {
+  --bg: #f6f4fb; --surface: #ffffff; --surface-2: #ebe7f5; --ink: #1b1930; --ink-soft: #5a5676;
+  --line: #d9d3ea; --accent: #d3205f; --accent-ink: #ffffff; --accent-soft: #fbd8e5;
+  --t1: #d22f2b; --t2: #c27410; --t3: #1d8a4f; --t4: #2a5fc8; --t5: #807d94;
+  --shadow: 0 1px 2px rgb(30 20 60 / .06), 0 8px 24px rgb(30 20 60 / .08);
+  color-scheme: light;
+}
+:root[data-preset="imperial"][data-mode="light"] {
+  --bg: #f8f0e0; --surface: #fffaef; --surface-2: #f0e2c6; --ink: #2a160e; --ink-soft: #785840;
+  --line: #e0cca4; --accent: #946512; --accent-ink: #ffffff; --accent-soft: #f1deb3;
+  --t1: #c0392b; --t2: #b8700c; --t3: #2f7d3a; --t4: #2f5bb8; --t5: #8c7c6c;
+  --shadow: 0 1px 2px rgb(80 40 10 / .06), 0 8px 24px rgb(80 40 10 / .1);
+  color-scheme: light;
+}
+:root[data-preset="arcade"][data-mode="light"] {
+  --bg: #eceeff; --surface: #ffffff; --surface-2: #dde0ff; --ink: #10103a; --ink-soft: #4a4c88;
+  --line: #4040b8; --accent: #c8155f; --accent-ink: #ffffff; --accent-soft: #fbd6e5;
+  --t1: #d81b3c; --t2: #c26a00; --t3: #12894a; --t4: #1d6fd0; --t5: #7c7ea8;
+  --shadow: none;
+  color-scheme: light;
+}
+:root[data-preset="cyber"][data-mode="light"] {
+  --bg: #edf2f6; --surface: #fbfdff; --surface-2: #dfe8ef; --ink: #07131e; --ink-soft: #465e70;
+  --line: #b6cad8; --accent: #007f9e; --accent-ink: #ffffff; --accent-soft: #cfeaf2; --accent-2: #c0168f;
+  --t1: #d0193a; --t2: #b07000; --t3: #0d8446; --t4: #1e5fc4; --t5: #6c7a88;
+  --shadow: none;
+  color-scheme: light;
+}
+/* MLE mode by day: pale concrete, the same hazard-yellow buttons */
+:root[data-preset="ends"][data-mode="light"] {
+  --bg: #e4e3df; --surface: #fbfaf6; --surface-2: #ecebe6; --ink: #111216; --ink-soft: #50535c;
+  --line: #b9bac0; --accent: #8f6c00; --accent-ink: #ffffff; --accent-soft: #fff1b0; --hazard: #ffd21f;
+  --t1: #d42c2c; --t2: #b86e00; --t3: #148a4a; --t4: #1c6fc4; --t5: #6f747e;
+  --spray: #d0207f; --spray2: #0a6fae;
+  --shadow: 4px 4px 0 #000;
+  --e-sky: #fff3c4; --e-block: #b7bac2; --e-wall: #c9cacf; --e-mortar: #b2b4ba; --e-win: .3; --e-lamp: #6f737c; --e-glow: 0;
+  color-scheme: light;
+}
+
+/* ---------- the shapes' own touches, adjusted for the other look ---------- */
+/* Jade at night: a softer sheen, so the pebbles don't glow */
+:root[data-shape="jade"][data-mode="dark"] :is(.card, .action, .deck-row, .deck-mini, .lu-card) {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .07), inset 0 -4px 10px color-mix(in srgb, var(--accent) 10%, transparent), 0 2px 4px rgb(0 0 0 / .3), 0 16px 34px rgb(0 0 0 / .35);
+}
+:root[data-shape="jade"][data-mode="dark"] .action:hover { box-shadow: inset 0 1px 0 rgb(255 255 255 / .09), 0 22px 40px rgb(0 0 0 / .45); }
+:root[data-shape="jade"][data-mode="dark"] :is(.btn, .chip) {
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 6%, var(--surface)), var(--surface));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 2px 6px rgb(0 0 0 / .3);
+}
+:root[data-shape="jade"][data-mode="dark"] .stat { box-shadow: inset 0 1px 0 rgb(255 255 255 / .06); }
+:root[data-shape="jade"][data-mode="dark"] .nav button[aria-current="page"] .ico { background: radial-gradient(circle at 35% 30%, color-mix(in srgb, #fff 12%, var(--accent-soft)), var(--accent-soft)); }
+
+/* Porcelain at night: the glaze line on the main button follows the dark plate */
+:root[data-shape="porcelain"][data-mode="dark"] .btn.primary { box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 0 3.5px var(--surface); }
+
+/* Night Market by day: painted signboards, the neon tubes switched off but still coloured */
+:root[data-shape="nightmarket"][data-mode="light"] :is(h1, .brand-name, .me-name) {
+  color: var(--accent); text-shadow: 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent), 0 3px 10px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+:root[data-shape="nightmarket"][data-mode="light"] :is(h1, .brand-name, .me-name) .hz { text-shadow: none; }
+:root[data-shape="nightmarket"][data-mode="light"] h1 { animation: none; }
+:root[data-shape="nightmarket"][data-mode="light"] .h-card { color: var(--t4); text-shadow: none; }
+:root[data-shape="nightmarket"][data-mode="light"] :is(.card, .action, .deck-row, .lu-card) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--t4) 18%, transparent), 0 6px 18px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+:root[data-shape="nightmarket"][data-mode="light"] .card:nth-child(even) {
+  border-color: var(--t4); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent), 0 6px 18px color-mix(in srgb, var(--t4) 14%, transparent);
+}
+:root[data-shape="nightmarket"][data-mode="light"] .btn.primary { box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 40%, transparent); text-shadow: none; }
+:root[data-shape="nightmarket"][data-mode="light"] .cl-hm { color: var(--accent); text-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* Lantern by day: the glow is warm shade rather than light */
+:root[data-shape="lantern"][data-mode="light"] h1 { text-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 25%, transparent); }
+:root[data-shape="lantern"][data-mode="light"] .bar > i { box-shadow: none; }
+
+/* Imperial by day: carved lettering rather than shadowed */
+:root[data-shape="imperial"][data-mode="light"] h1 { text-shadow: 0 1px 0 color-mix(in srgb, #fff 80%, transparent); }
+
+/* Retro Arcade by day: white screens in the frames, lighter scanlines */
+:root[data-shape="arcade"][data-mode="light"] :is(.search input, textarea, input[type="text"], select, input[type="color"]) { background: var(--surface); }
+:root[data-shape="arcade"][data-mode="light"] .bar { background: var(--surface-2); }
+:root[data-shape="arcade"][data-mode="light"] body::after {
+  background: repeating-linear-gradient(to bottom, rgb(16 16 58 / .05) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 70%, rgb(16 16 58 / .1));
+}
+:root[data-shape="arcade"][data-mode="light"] .flip-card { background: linear-gradient(#20205a 0 49%, #15153a 51%); color: #ffd23f; }
+
+/* MLE by day: the yellow stays for buttons, darker gold for words */
+:root[data-shape="ends"][data-mode="light"] body {
+  background-image: radial-gradient(rgb(0 0 0 / .05) 1px, transparent 1.4px), radial-gradient(rgb(0 0 0 / .07) 1px, transparent 1.4px);
+}
+:root[data-shape="ends"][data-mode="light"] .view > .card::before { background: rgb(214 196 140 / .55); border-color: rgb(0 0 0 / .08); }
+:root[data-shape="ends"][data-mode="light"] h1 { color: var(--hazard); text-shadow: 3px 3px 0 #000; }
+:root[data-shape="ends"][data-mode="light"] :is(.mle-big, .mle-term.huge) { color: var(--hazard); }

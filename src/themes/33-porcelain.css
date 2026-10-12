@@ -1,0 +1,38 @@
+/* ---------- Porcelain: scalloped plate rims, cobalt double lines, elegant italic serif ---------- */
+:root[data-shape="porcelain"] { --font-display: "Cormorant Garamond", Georgia, serif; --font-body: "Literata", Georgia, serif; --zen-k: 1.9; }
+:root[data-shape="porcelain"] body { font-size-adjust: ex-height 0.5; }
+:root[data-shape="porcelain"] :is(.hz, .rz, .lu-seal, .nav .ico, .random) { font-size-adjust: none; }
+:root[data-shape="porcelain"] :is(h1, h2, h3, .brand-name, .me-name) { font-style: italic; font-weight: 700; letter-spacing: 0; color: color-mix(in srgb, var(--accent) 72%, var(--ink)); }
+:root[data-shape="porcelain"] h1 { font-size: 2.3rem; }
+:root[data-shape="porcelain"] .h-card { font-size: 1.35rem; }
+:root[data-shape="porcelain"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); font-style: normal; }
+:root[data-shape="porcelain"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❀ "; color: var(--accent); font-style: normal; }
+/* plates: scalloped top and bottom edges, two fine cobalt rims inside, a flower knot at the top */
+:root[data-shape="porcelain"] :is(.card, .action, .deck-row, .deck-mini, .lu-card) {
+  position: relative; border: 0; border-radius: 22px; padding: 22px;
+  -webkit-mask: radial-gradient(circle at 50% 0, #0000 4.5px, #000 5px) 0 0 / 14px 51% repeat-x, radial-gradient(circle at 50% 100%, #0000 4.5px, #000 5px) 0 100% / 14px 51% repeat-x;
+  mask: radial-gradient(circle at 50% 0, #0000 4.5px, #000 5px) 0 0 / 14px 51% repeat-x, radial-gradient(circle at 50% 100%, #0000 4.5px, #000 5px) 0 100% / 14px 51% repeat-x;
+  background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%), var(--surface);
+  box-shadow: inset 0 0 0 7px var(--surface), inset 0 0 0 8.5px color-mix(in srgb, var(--accent) 55%, transparent),
+    inset 0 0 0 10.5px var(--surface), inset 0 0 0 11.5px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+:root[data-shape="porcelain"] .lu-card { -webkit-mask: none; mask: none; padding-top: 70px; }
+:root[data-shape="porcelain"] :is(.card, .action, .deck-row)::after {
+  content: "❁"; position: absolute; top: 1px; left: 50%; transform: translateX(-50%); padding: 0 6px;
+  font-size: .8rem; line-height: 1; color: var(--accent); background: var(--surface); pointer-events: none;
+}
+:root[data-shape="porcelain"] .pv .pv-box { padding: 15px 18px; }
+:root[data-shape="porcelain"] .tip { background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%), var(--surface-2); box-shadow: inset 0 0 0 7px var(--surface-2), inset 0 0 0 8.5px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 0 10.5px var(--surface-2), inset 0 0 0 11.5px color-mix(in srgb, var(--accent) 28%, transparent); }
+:root[data-shape="porcelain"] .tip::after { background: var(--surface-2); }
+/* buttons: glazed tiles with a white inner line */
+:root[data-shape="porcelain"] :is(.btn, .chip, .stat, .grade, .swatch, .av-tile, .tone-opt) { border-radius: 10px; border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+:root[data-shape="porcelain"] :is(.btn, .chip) { box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+:root[data-shape="porcelain"] .btn.primary { box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 0 3.5px rgb(255 255 255 / .8); }
+:root[data-shape="porcelain"] .bar { border-radius: 2px; }
+:root[data-shape="porcelain"] .bar > i { border-radius: 2px; background: repeating-linear-gradient(-45deg, var(--accent) 0 4px, color-mix(in srgb, var(--accent) 65%, #fff) 4px 8px); }
+
+/* scene: waves rolling gently, clouds drifting */
+.zen-wave { animation: pcWave 9s ease-in-out infinite alternate; }
+@keyframes pcWave { from { transform: translateX(-25px); } to { transform: translateX(25px); } }
+/* level-up: cobalt ink blooms */
+.levelup[data-fx="blue"] .blot { background: var(--accent); border-radius: 50% 44% 56% 40% / 46% 56% 44% 54%; }

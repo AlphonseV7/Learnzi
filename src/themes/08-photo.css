@@ -1,0 +1,42 @@
+/* ---------- Photo to words ---------- */
+.photo-pick { gap: 8px; }
+.photo-tips { margin: 0; padding-left: 1.2em; display: grid; gap: 2px; }
+.desk-only { display: none; }
+:root.desk .desk-only { display: block; }
+.photo-drop.drag, .photo-card.drag { outline: 3px dashed var(--accent); outline-offset: 4px; }
+.photo-go { flex: none; }
+
+/* the photo and its box */
+.crop-wrap { position: relative; overflow: hidden; border-radius: 10px; background: var(--surface-2); touch-action: none; user-select: none; -webkit-user-select: none; width: fit-content; max-width: 100%; margin-inline: auto; }
+.crop-img { display: block; max-width: 100%; max-height: 62vh; width: auto; height: auto; }
+.crop-box {
+  position: absolute; cursor: move; touch-action: none;
+  border: 2px solid #fff; outline: 1px solid rgb(0 0 0 / .45);
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / .45);
+}
+.crop-h { position: absolute; width: 28px; height: 28px; margin: -14px; touch-action: none; }
+.crop-h::after { content: ""; position: absolute; inset: 7px; background: #fff; border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 1px 4px rgb(0 0 0 / .4); }
+.crop-h.nw { left: 0; top: 0; cursor: nwse-resize; } .crop-h.ne { right: 0; top: 0; cursor: nesw-resize; }
+.crop-h.sw { left: 0; bottom: 0; cursor: nesw-resize; } .crop-h.se { right: 0; bottom: 0; cursor: nwse-resize; }
+.photo-progress .bar > i { transition: width .25s var(--ease); }
+
+/* the text it found */
+.photo-text { padding: 6px 2px; font-size: 1.5rem; }
+.photo-text .unsure, .unsure-key { text-decoration: underline dotted var(--t2); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.photo-text .w.unsure { border-bottom-color: transparent; }
+.unsure-key { font-family: var(--font-hanzi); font-weight: 700; }
+.photo-edit { width: 100%; min-height: 9rem; font-family: var(--font-hanzi); font-size: 1.25rem; line-height: 1.7; }
+
+/* the words, with ticks */
+.photo-words { display: grid; gap: 6px; max-height: 60vh; overflow-y: auto; padding: 2px; }
+.photo-word { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.photo-word.off { opacity: .62; }
+.photo-word input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+.pw-main { display: grid; gap: 2px; min-width: 0; cursor: pointer; }
+.pw-main .def { color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pw-tags { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.photo-deck-make .row { flex-wrap: nowrap; }
+.photo-deck-make input, .photo-deck-make select { flex: 1; min-width: 0; }
+@media (max-width: 420px) { .pw-tags .badge:not(.hsk) { display: none; } }
+.pw-main > :first-child { font-size: 1.3rem; justify-self: start; }
+.photo-deck-make { margin-top: 6px; }

@@ -1,0 +1,62 @@
+/* ---------- Ink: torn rice paper outlined in ink, brush lettering, red seals ---------- */
+/* Torn edges come from tools/gen_deckle.py */
+:root[data-shape="ink"] {
+  --font-display: "LXGW WenKai TC", "Bricolage Grotesque", serif;
+  --zen-k: 2.2;
+  --ink-edge: color-mix(in srgb, var(--ink) 46%, var(--surface));
+--deckle-a: polygon(0.0% 0.3px, 5.6% 2.2px, 11.1% 2.0px, 16.7% 0.7px, 22.2% 1.3px, 27.8% 1.2px, 33.3% 1.7px, 38.9% 2.1px, 44.4% 0.2px, 50.0% 0.1px, 55.6% 2.2px, 61.1% 1.1px, 66.7% 2.0px, 72.2% 0.0px, 77.8% 1.2px, 83.3% 1.9px, 88.9% 0.6px, 94.4% 2.5px, calc(100% - 2.3px) 0.0%, calc(100% - 0.1px) 5.6%, calc(100% - 0.1px) 11.1%, calc(100% - 1.4px) 16.7%, calc(100% - 2.4px) 22.2%, calc(100% - 1.0px) 27.8%, calc(100% - 0.6px) 33.3%, calc(100% - 1.1px) 38.9%, calc(100% - 0.1px) 44.4%, calc(100% - 0.6px) 50.0%, calc(100% - 1.1px) 55.6%, calc(100% - 1.3px) 61.1%, calc(100% - 0.6px) 66.7%, calc(100% - 0.6px) 72.2%, calc(100% - 0.6px) 77.8%, calc(100% - 1.2px) 83.3%, calc(100% - 0.8px) 88.9%, calc(100% - 0.1px) 94.4%, 100.0% calc(100% - 2.2px), 94.4% calc(100% - 1.4px), 88.9% calc(100% - 1.7px), 83.3% calc(100% - 0.5px), 77.8% calc(100% - 2.6px), 72.2% calc(100% - 2.2px), 66.7% calc(100% - 0.3px), 61.1% calc(100% - 0.9px), 55.6% calc(100% - 1.9px), 50.0% calc(100% - 1.8px), 44.4% calc(100% - 2.4px), 38.9% calc(100% - 1.1px), 33.3% calc(100% - 2.2px), 27.8% calc(100% - 1.7px), 22.2% calc(100% - 0.8px), 16.7% calc(100% - 1.5px), 11.1% calc(100% - 2.3px), 5.6% calc(100% - 2.2px), 1.3px 100.0%, 1.5px 94.4%, 0.1px 88.9%, 0.6px 83.3%, 2.1px 77.8%, 1.1px 72.2%, 0.4px 66.7%, 1.4px 61.1%, 1.8px 55.6%, 1.8px 50.0%, 1.0px 44.4%, 1.1px 38.9%, 1.3px 33.3%, 2.0px 27.8%, 1.4px 22.2%, 1.0px 16.7%, 1.3px 11.1%, 0.1px 5.6%);
+  --deckle-b: polygon(0.0% 2.5px, 5.6% 2.5px, 11.1% 0.1px, 16.7% 0.2px, 22.2% 2.2px, 27.8% 1.9px, 33.3% 1.7px, 38.9% 0.8px, 44.4% 1.6px, 50.0% 1.6px, 55.6% 1.5px, 61.1% 0.4px, 66.7% 1.1px, 72.2% 1.0px, 77.8% 1.9px, 83.3% 2.6px, 88.9% 2.5px, 94.4% 1.4px, calc(100% - 1.2px) 0.0%, calc(100% - 0.7px) 5.6%, calc(100% - 0.1px) 11.1%, calc(100% - 0.1px) 16.7%, calc(100% - 1.2px) 22.2%, calc(100% - 0.8px) 27.8%, calc(100% - 1.0px) 33.3%, calc(100% - 2.3px) 38.9%, calc(100% - 1.4px) 44.4%, calc(100% - 1.5px) 50.0%, calc(100% - 0.6px) 55.6%, calc(100% - 0.1px) 61.1%, calc(100% - 0.8px) 66.7%, calc(100% - 0.4px) 72.2%, calc(100% - 1.3px) 77.8%, calc(100% - 2.6px) 83.3%, calc(100% - 1.8px) 88.9%, calc(100% - 0.5px) 94.4%, 100.0% calc(100% - 2.3px), 94.4% calc(100% - 2.1px), 88.9% calc(100% - 1.9px), 83.3% calc(100% - 2.4px), 77.8% calc(100% - 2.0px), 72.2% calc(100% - 2.1px), 66.7% calc(100% - 0.9px), 61.1% calc(100% - 2.6px), 55.6% calc(100% - 2.5px), 50.0% calc(100% - 0.4px), 44.4% calc(100% - 2.0px), 38.9% calc(100% - 1.9px), 33.3% calc(100% - 1.2px), 27.8% calc(100% - 1.4px), 22.2% calc(100% - 1.3px), 16.7% calc(100% - 2.4px), 11.1% calc(100% - 1.3px), 5.6% calc(100% - 2.2px), 0.9px 100.0%, 2.3px 94.4%, 2.3px 88.9%, 1.2px 83.3%, 1.5px 77.8%, 2.4px 72.2%, 1.9px 66.7%, 1.3px 61.1%, 0.6px 55.6%, 0.8px 50.0%, 1.8px 44.4%, 0.4px 38.9%, 2.4px 33.3%, 0.7px 27.8%, 2.4px 22.2%, 0.8px 16.7%, 2.5px 11.1%, 1.8px 5.6%);
+  --deckle-c: polygon(0.0% 0.6px, 5.6% 1.4px, 11.1% 1.0px, 16.7% 1.6px, 22.2% 1.6px, 27.8% 0.2px, 33.3% 0.0px, 38.9% 2.2px, 44.4% 0.7px, 50.0% 0.6px, 55.6% 2.6px, 61.1% 1.2px, 66.7% 2.2px, 72.2% 1.2px, 77.8% 1.7px, 83.3% 0.4px, 88.9% 1.7px, 94.4% 2.3px, calc(100% - 1.4px) 0.0%, calc(100% - 1.9px) 5.6%, calc(100% - 1.7px) 11.1%, calc(100% - 0.2px) 16.7%, calc(100% - 2.0px) 22.2%, calc(100% - 1.5px) 27.8%, calc(100% - 0.8px) 33.3%, calc(100% - 0.1px) 38.9%, calc(100% - 2.3px) 44.4%, calc(100% - 1.2px) 50.0%, calc(100% - 1.9px) 55.6%, calc(100% - 2.3px) 61.1%, calc(100% - 1.9px) 66.7%, calc(100% - 2.4px) 72.2%, calc(100% - 1.0px) 77.8%, calc(100% - 2.1px) 83.3%, calc(100% - 1.2px) 88.9%, calc(100% - 2.4px) 94.4%, 100.0% calc(100% - 2.3px), 94.4% calc(100% - 0.3px), 88.9% calc(100% - 0.4px), 83.3% calc(100% - 0.6px), 77.8% calc(100% - 2.5px), 72.2% calc(100% - 1.1px), 66.7% calc(100% - 1.6px), 61.1% calc(100% - 0.8px), 55.6% calc(100% - 1.3px), 50.0% calc(100% - 1.0px), 44.4% calc(100% - 0.9px), 38.9% calc(100% - 1.5px), 33.3% calc(100% - 1.5px), 27.8% calc(100% - 2.4px), 22.2% calc(100% - 1.8px), 16.7% calc(100% - 2.4px), 11.1% calc(100% - 2.2px), 5.6% calc(100% - 2.6px), 1.7px 100.0%, 0.4px 94.4%, 2.2px 88.9%, 2.5px 83.3%, 2.4px 77.8%, 1.5px 72.2%, 1.9px 66.7%, 0.5px 61.1%, 2.2px 55.6%, 1.5px 50.0%, 0.7px 44.4%, 0.2px 38.9%, 2.2px 33.3%, 2.6px 27.8%, 0.2px 22.2%, 2.1px 16.7%, 1.1px 11.1%, 0.4px 5.6%);
+  --deckle-btn: polygon(0.0% 1.0px, 16.7% 0.8px, 33.3% 0.3px, 50.0% 1.9px, 66.7% 0.0px, 83.3% 1.1px, calc(100% - 2.0px) 0.0%, calc(100% - 0.2px) 16.7%, calc(100% - 1.2px) 33.3%, calc(100% - 1.4px) 50.0%, calc(100% - 0.1px) 66.7%, calc(100% - 0.8px) 83.3%, 100.0% calc(100% - 1.5px), 83.3% calc(100% - 1.0px), 66.7% calc(100% - 1.6px), 50.0% calc(100% - 0.3px), 33.3% calc(100% - 0.5px), 16.7% calc(100% - 0.2px), 1.1px 100.0%, 2.0px 83.3%, 1.3px 66.7%, 1.7px 50.0%, 0.8px 33.3%, 1.6px 16.7%);
+}
+:root[data-shape="ink"] body {
+  background-image:
+    radial-gradient(color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1.6px),
+    radial-gradient(color-mix(in srgb, var(--ink) 3%, transparent) 1px, transparent 1.6px);
+  background-size: 9px 11px, 13px 7px; background-position: 0 0, 4px 5px;
+}
+:root[data-shape="ink"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: 0; }
+:root[data-shape="ink"] h1 { font-size: 2rem; width: fit-content; padding-right: 14px;
+  background: linear-gradient(177deg, transparent 64%, color-mix(in srgb, var(--accent) 30%, transparent) 66% 84%, transparent 87%); }
+:root[data-shape="ink"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); }
+/* card headings: a brush stroke under the words and a little red seal after them */
+:root[data-shape="ink"] :is(.h-card .fold-label, .h-card:not(.fold-title)) {
+  padding-inline: 2px 8px;
+  background: linear-gradient(176deg, transparent 58%, color-mix(in srgb, var(--accent) 26%, transparent) 60% 82%, transparent 85%);
+}
+:root[data-shape="ink"] :is(.h-card .fold-label, .h-card:not(.fold-title))::after {
+  content: "印"; display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; margin-left: .5em; vertical-align: .15em;
+  font-family: var(--font-hanzi); font-size: .6em; font-weight: 400; color: var(--accent-ink); background: var(--accent);
+  border-radius: 3px 1px 4px 2px; transform: rotate(-7deg); opacity: .92;
+}
+
+/* panels: torn paper with an ink outline that follows every rough edge */
+:root[data-shape="ink"] :is(.card, .action, .deck-row, .deck-mini, .empty) {
+  --clip: var(--deckle-a);
+  position: relative; isolation: isolate; border: 0; border-radius: 0; box-shadow: none;
+  background: var(--ink-edge); clip-path: var(--clip);
+}
+:root[data-shape="ink"] :is(.card, .action, .deck-row, .deck-mini, .empty):nth-child(3n + 2) { --clip: var(--deckle-b); }
+:root[data-shape="ink"] :is(.card, .action, .deck-row, .deck-mini, .empty):nth-child(3n) { --clip: var(--deckle-c); }
+:root[data-shape="ink"] :is(.card, .action, .deck-row, .deck-mini, .empty)::before {
+  content: ""; position: absolute; inset: 1.5px; z-index: -1; clip-path: var(--clip); pointer-events: none;
+  background: radial-gradient(ellipse at 88% 0%, color-mix(in srgb, var(--ink) 4%, transparent), transparent 55%),
+    radial-gradient(ellipse at 0% 100%, color-mix(in srgb, var(--ink) 3%, transparent), transparent 45%), var(--surface);
+}
+:root[data-shape="ink"] .empty { --ink-edge: color-mix(in srgb, var(--ink) 25%, var(--surface)); }
+:root[data-shape="ink"] .tip::before { background: var(--surface-2); }
+:root[data-shape="ink"] .action:nth-child(odd) { transform: rotate(-.2deg); }
+:root[data-shape="ink"] .action:nth-child(even) { transform: rotate(.2deg); }
+:root[data-shape="ink"] .action:hover { transform: rotate(0) translateY(-2px); --ink-edge: var(--accent); }
+
+/* the main button is a swipe of red ink */
+:root[data-shape="ink"] .btn.primary { border: 0; border-radius: 0; clip-path: var(--deckle-btn); padding-inline: 20px; }
+:root[data-shape="ink"] .btn { border-width: 1.5px; border-color: color-mix(in srgb, var(--ink) 45%, var(--line)); }
+:root[data-shape="ink"] .nav button[aria-current="page"] .ico { border-radius: 52% 44% 56% 42% / 46% 56% 42% 52%; transform: rotate(-4deg); }
+:root[data-shape="ink"] .bar { border-radius: 0; background: color-mix(in srgb, var(--ink) 9%, transparent); }
+:root[data-shape="ink"] .bar > i { border-radius: 0; clip-path: polygon(0 10%, calc(100% - 7px) 0, 100% 35%, calc(100% - 4px) 55%, 100% 85%, calc(100% - 9px) 100%, 0 90%); }
+:root[data-shape="ink"] .seal { border-radius: 6px 3px 7px 4px; }
+
+/* scene: mist drifting between the mountains */
+.zen-mist { animation: inkMist 36s ease-in-out infinite alternate; }
+@keyframes inkMist { from { transform: translateX(-80px); } to { transform: translateX(120px); } }

@@ -1,0 +1,35 @@
+/* ---------- Lantern: glowing paper panels with gold lattice caps and ribs ---------- */
+:root[data-shape="lantern"] { --font-display: "Alegreya", Georgia, serif; --font-body: "Alegreya Sans", "Figtree", sans-serif; --zen-k: 1.7; }
+:root[data-shape="lantern"] body { font-size-adjust: ex-height 0.54; }
+:root[data-shape="lantern"] :is(.hz, .rz, .lu-seal, .nav .ico, .random) { font-size-adjust: none; }
+:root[data-shape="lantern"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 800; letter-spacing: .01em; }
+:root[data-shape="lantern"] h1 { color: var(--accent); text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-shape="lantern"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); }
+:root[data-shape="lantern"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "◆ "; color: var(--accent); font-size: .8em; }
+/* panels: cut corners, a gold lattice cap top and bottom, paper ribs, lit from inside */
+:root[data-shape="lantern"] :is(.card, .action, .deck-row, .deck-mini, .flashcard, .example) {
+  clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+  border-top: 0; padding-block: 24px;
+  --gold: color-mix(in srgb, var(--accent) 65%, transparent);
+  background-image:
+    repeating-linear-gradient(90deg, var(--gold) 0 2px, transparent 2px 12px), linear-gradient(var(--gold), var(--gold)),
+    repeating-linear-gradient(90deg, var(--gold) 0 2px, transparent 2px 12px), linear-gradient(var(--gold), var(--gold)),
+    repeating-linear-gradient(180deg, transparent 0 30px, color-mix(in srgb, var(--accent) 7%, transparent) 30px 31px),
+    radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+  background-size: 100% 8px, 100% 2px, 100% 8px, 100% 2px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 8px, 0 100%, 0 calc(100% - 8px), 0 0, 0 0;
+  background-repeat: no-repeat;
+}
+:root[data-shape="lantern"] .pv .pv-box { padding-block: 18px; }
+:root[data-shape="lantern"] .action:hover { --gold: var(--accent); }
+/* buttons: cut corners, the main one a warm gold */
+:root[data-shape="lantern"] .btn.primary { background-image: linear-gradient(180deg, color-mix(in srgb, #fff 25%, var(--accent)), var(--accent) 55%, color-mix(in srgb, #000 18%, var(--accent))); }
+:root[data-shape="lantern"] .bar > i { background: linear-gradient(90deg, color-mix(in srgb, var(--t1) 70%, var(--accent)), var(--accent)); box-shadow: 0 0 10px var(--accent); }
+:root[data-shape="lantern"] .nav button[aria-current="page"] .ico { box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 50%, transparent); }
+
+/* scene: sky lanterns rising */
+.zen-rise { animation: lnRise linear infinite; }
+@keyframes lnRise { from { transform: translate(0, 0); } to { transform: translate(40px, -1000px); } }
+
+/* the level-up card is never clipped: its seal sits above it */
+:root[data-shape="lantern"] .lu-card { clip-path: none; }

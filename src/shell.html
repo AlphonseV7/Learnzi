@@ -1,0 +1,45 @@
+<title>LearnZì</title>
+<meta name="description" content="Open-source Chinese word-learning app: dictionary, tap-a-word reader, voice and themes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;600;700&family=Noto+Sans+SC:wght@400;600&family=Noto+Sans+TC:wght@400;600&display=swap">
+<style>
+/*@CSS*/
+</style>
+<div class="zen" id="zen" aria-hidden="true"></div>
+<div class="app" id="app">
+  <nav class="nav" aria-label="Main">
+    <button type="button" data-view="home"><span class="ico" aria-hidden="true">家</span>Home</button>
+    <button type="button" data-menu="study" aria-haspopup="menu" aria-expanded="false"><span class="ico" aria-hidden="true">学</span>Study</button>
+    <button type="button" data-menu="tools" aria-haspopup="menu" aria-expanded="false"><span class="ico" aria-hidden="true">具</span>Tools</button>
+    <button type="button" data-view="myzi"><span class="ico" aria-hidden="true">字</span>My Zì</button>
+  </nav>
+  <main class="main">
+    <header class="topbar card">
+      <button type="button" class="me plain-btn" id="me"><span class="seal hz" aria-hidden="true">学</span><span class="me-name" id="me-name">LearnZì</span></button>
+      <div class="top-right">
+        <button type="button" class="btn icon top-search" id="top-search" aria-label="Look up a word" title="Look up a word"></button>
+        <button type="button" class="lvl" id="lvl" aria-label="Zì level 1"><span class="hz" aria-hidden="true">字</span><span class="lvl-num">Lv 1</span></button>
+        <button type="button" class="clock-badge" id="clock-badge" hidden title="The debug clock is ahead of real time. Open Debug settings to change it."></button>
+        <button type="button" class="sync" id="sync" data-s="local"><span class="sync-text">On this device</span></button>
+        <button type="button" class="btn icon gear" id="gear" aria-label="Settings" aria-pressed="false"></button>
+      </div>
+    </header>
+    <div id="view"></div>
+  </main>
+  <aside class="panel" id="panel" aria-label="Word details" tabindex="-1"><div class="grab" aria-hidden="true"></div><div id="pv"></div></aside>
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:16px">LearnZì needs JavaScript turned on.</p></noscript>
+<!-- Hanzi Writer 3.7.3 (MIT), pinned; the integrity fingerprint makes the browser refuse any other file. -->
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js" integrity="sha384-xd6VpwMU5AxPFzG/nyhXrW70SSR2usiUNV8RrA0wlOjYlCrZyzZC6JiR/mT51pm2" crossorigin="anonymous"></script>
+<script>
+/*@ENGINE*/
+</script>
+<script>
+/*@SRS*/
+</script>
+<script>
+/*@UI*/
+</script>

@@ -1,0 +1,46 @@
+/* ---------- desktop with a mouse: full-width top bar, hidden side bars that slide in ---------- */
+.edge { display: none; }
+:root.desk body { margin: 0; }
+:root.desk .app { grid-template-columns: minmax(0, 1fr); }
+:root.desk .main { padding: 0 40px 48px; }
+/* top bar: edge to edge across the top of the page */
+:root.desk .app .main > .topbar.card {
+  max-width: none; margin: 0 -40px 24px; border-radius: 0; border-width: 0 0 1px; padding: 10px 40px;
+}
+:root.desk .app .main > .topbar.card .top-right { gap: 8px; }
+/* left: the menu bar, pinned to the screen edge, hidden until the mouse comes near */
+:root.desk .nav {
+  position: fixed; inset: 0 auto 0 0; width: var(--rail); height: 100vh; z-index: 45; padding-top: 18px;
+  display: grid; grid-template-columns: 1fr; align-content: start; gap: 6px;
+  background: var(--surface); border: 0; border-right: 1px solid var(--line);
+  transform: translateX(-100%); transition: transform .28s var(--ease), box-shadow .28s;
+}
+:root.desk .nav.shown { transform: none; box-shadow: 10px 0 34px rgb(0 0 0 / .2); }
+/* right: word details, the same way */
+:root.desk .panel {
+  position: fixed; inset: 0 0 0 auto; width: min(var(--panel), 92vw); height: 100vh; max-height: none; z-index: 46;
+  overflow-y: auto; visibility: visible; border-radius: 0; border: 0; border-left: 1px solid var(--line);
+  padding: 22px 22px 32px; box-shadow: none; transform: translateX(105%); transition: transform .3s var(--ease), box-shadow .3s;
+}
+:root.desk .panel.shown { transform: none; box-shadow: -10px 0 34px rgb(0 0 0 / .2); }
+:root.desk .scrim, :root.desk .grab { display: none; }
+:root.desk .panel .panel-close { display: inline-flex; }
+/* the hover strips at each edge, with a faint glowing line as a hint */
+:root.desk .edge { display: block; position: fixed; top: 0; bottom: 0; width: 18px; z-index: 44; }
+:root.desk .edge-left { left: 0; }
+:root.desk .edge-right { right: 0; }
+:root.desk .edge::after {
+  content: ""; position: absolute; top: 50%; width: 4px; height: 72px; margin-top: -36px; border-radius: 4px;
+  background: var(--accent); opacity: .35; transition: opacity .2s, height .2s, margin .2s, box-shadow .2s;
+}
+:root.desk .edge-left::after { left: 3px; }
+:root.desk .edge-right::after { right: 3px; }
+:root.desk .edge:hover::after { opacity: .9; height: 120px; margin-top: -60px; box-shadow: 0 0 12px var(--accent); }
+/* menus fly out beside the bar */
+:root.desk .navmenu { z-index: 60; }
+/* theme touches for the side bars */
+:root.desk[data-shape="arcade"] .nav { border-right: 4px solid var(--line); }
+:root.desk[data-shape="arcade"] .panel { border-left: 4px solid var(--line); }
+:root.desk[data-shape="cyber"] .nav, :root.desk[data-shape="cyber"] .panel { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+:root.desk[data-shape="nightmarket"] .nav.shown, :root.desk[data-shape="nightmarket"] .panel.shown { box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 35%, transparent); }
+:root.desk[data-shape="imperial"] .nav, :root.desk[data-shape="imperial"] .panel { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }

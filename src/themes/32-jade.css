@@ -1,0 +1,45 @@
+/* ---------- Jade: polished pebbles, carved discs, glossy stone buttons ---------- */
+:root[data-shape="jade"] { --font-display: "Quicksand", "Figtree", sans-serif; --zen-k: 1.8; }
+:root[data-shape="jade"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: 0; }
+:root[data-shape="jade"] h1 { color: color-mix(in srgb, var(--accent) 75%, var(--ink)); }
+:root[data-shape="jade"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); }
+/* a little jade bead before each card heading */
+:root[data-shape="jade"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before {
+  content: ""; display: inline-block; width: .55em; height: .55em; margin-right: .45em; border-radius: 50%; vertical-align: .08em;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, #fff 60%, var(--accent)), var(--accent) 60%, color-mix(in srgb, #000 25%, var(--accent)));
+}
+/* pebbles: uneven rounded outlines, a stone sheen and a carved jade disc in one corner */
+:root[data-shape="jade"] :is(.card, .action, .deck-row, .deck-mini, .lu-card) {
+  border: 0; border-radius: 46px 30px 50px 28px / 34px 48px 30px 44px;
+  background:
+    radial-gradient(circle at 100% 100%, transparent 0 24px, color-mix(in srgb, var(--accent) 15%, transparent) 24px 33px, transparent 33px 38px, color-mix(in srgb, var(--accent) 9%, transparent) 38px 40px, transparent 40px),
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 11%, var(--surface)), var(--surface) 42%, color-mix(in srgb, var(--accent) 6%, var(--surface)));
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / .7), inset 0 -4px 10px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 2px 4px rgb(20 50 40 / .06), 0 16px 34px rgb(20 50 40 / .12);
+}
+:root[data-shape="jade"] :is(.card, .action, .deck-row, .deck-mini):nth-child(even) { border-radius: 30px 48px 28px 50px / 46px 30px 44px 32px; }
+:root[data-shape="jade"] .pv .pv-box { border-radius: 26px 18px 28px 16px / 20px 28px 18px 26px; }
+:root[data-shape="jade"] .tip { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), var(--surface-2)); }
+:root[data-shape="jade"] .action:hover { transform: translateY(-3px); box-shadow: inset 0 2px 0 rgb(255 255 255 / .7), 0 22px 40px rgb(20 50 40 / .16); }
+/* glossy stone buttons */
+:root[data-shape="jade"] :is(.btn, .chip, .seg, .lvl, button.sync) { border-radius: 999px; }
+:root[data-shape="jade"] :is(.btn, .chip) {
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 55%, var(--surface)), var(--surface));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .8), 0 2px 6px rgb(20 50 40 / .08);
+}
+:root[data-shape="jade"] .btn.primary {
+  border-color: transparent; color: var(--accent-ink);
+  background: radial-gradient(ellipse at 30% 15%, color-mix(in srgb, #fff 38%, var(--accent)), var(--accent) 58%, color-mix(in srgb, #000 22%, var(--accent)));
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / .35), inset 0 -3px 6px rgb(0 0 0 / .18), 0 8px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+:root[data-shape="jade"] :is(.stat, .grade, .swatch, .av-tile, .tone-opt, .char-row, .example) { border-radius: 24px; }
+:root[data-shape="jade"] .stat { background: linear-gradient(170deg, color-mix(in srgb, var(--accent) 10%, var(--surface-2)), var(--surface-2)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .6); }
+:root[data-shape="jade"] .bar { height: 10px; background: color-mix(in srgb, var(--accent) 12%, var(--surface-2)); box-shadow: inset 0 1px 2px rgb(0 0 0 / .12); }
+:root[data-shape="jade"] .bar > i { background: linear-gradient(180deg, color-mix(in srgb, #fff 38%, var(--accent)), var(--accent) 55%, color-mix(in srgb, #000 15%, var(--accent))); }
+:root[data-shape="jade"] :is(.search input, textarea, input[type="text"]) { box-shadow: inset 0 2px 4px color-mix(in srgb, var(--accent) 10%, transparent); }
+:root[data-shape="jade"] .nav button[aria-current="page"] .ico { border-radius: 999px; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, #fff 50%, var(--accent-soft)), var(--accent-soft)); }
+
+/* level-up: ripples spreading over a pond */
+.levelup[data-fx="ripple"] .blot { border-radius: 50%; background: none; border: 3px solid var(--accent); animation: luRipple 1.8s var(--ease) var(--delay) forwards; }
+@keyframes luRipple { 0% { transform: scale(0); opacity: .75; } 100% { transform: scale(2.6); opacity: 0; } }

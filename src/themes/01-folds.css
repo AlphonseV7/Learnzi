@@ -1,0 +1,67 @@
+/* ---------- folding boxes (tap a title bar to minimise or open a box) ---------- */
+.fold { --fold-gap: 12px; row-gap: 0 !important; }
+.fold.set { --fold-gap: 14px; }
+.fold:is(.stack-tight, .chars) { --fold-gap: 6px; }
+.fold.tip { --fold-gap: 4px; }
+.fold.examples { --fold-gap: 8px; }
+.fold.write { --fold-gap: 10px; }
+.fold-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fold-title { flex: 1; min-width: 0; margin: 0; }
+.fold-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 32px; padding: 0; margin: 0;
+  border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left;
+}
+.fold-label { min-width: 0; }
+.fold-chev { display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; flex: none; color: var(--accent); transition: transform .25s var(--ease); }
+.fold-chev svg { width: .95em; height: .95em; }
+.fold:not(.closed) > .fold-head .fold-chev { transform: rotate(90deg); }
+.fold-extras { flex: none; gap: 8px; }
+.fold-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .28s var(--ease); }
+.fold-inner { display: grid; gap: var(--fold-gap); min-height: 0; align-content: start; overflow: clip; overflow-clip-margin: 10px; }
+.fold-inner > :first-child { margin-top: var(--fold-gap); }
+.fold.closed > .fold-body { grid-template-rows: 0fr; }
+.fold.closed > .fold-body > .fold-inner { overflow: hidden; visibility: hidden; transition: visibility 0s .28s; }
+.fold-head:hover .fold-chev { transform: translateX(2px); }
+.fold:not(.closed) > .fold-head:hover .fold-chev { transform: rotate(90deg) translateX(2px); }
+
+/* the word panel: every part sits in its own box */
+.pv { gap: 12px; }
+.pv-tools { gap: 6px; flex-wrap: nowrap; }
+.btn.small.fold-all { padding: 5px 12px; font-size: .8rem; }
+.pv .pv-box { padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.pv .pv-box.tip { background: var(--surface-2); }
+.pv .pv-box.write { justify-items: stretch; }
+.pv .pv-box.write .fold-inner { justify-items: center; }
+.pv .meanings .reading:first-of-type { border-top: 0; padding-top: 0; }
+.pv .fold-title.eyebrow .fold-btn { min-height: 34px; }
+
+/* theme touches */
+:root[data-shape="arcade"] .fold-chev svg { display: none; }
+:root[data-shape="arcade"] .fold-chev::before { content: "▶"; font-size: .75em; }
+:root[data-shape="arcade"] .fold-chev, :root[data-shape="arcade"] .fold-body { transition-timing-function: steps(4); }
+:root[data-shape="cyber"] .fold-chev { background: var(--accent); color: var(--accent-ink); clip-path: polygon(25% 0, 100% 0, 75% 100%, 0 100%); width: 1.6em; }
+:root[data-shape="cyber"] .fold:not(.closed) > .fold-head .fold-chev { transform: none; background: var(--accent-2); }
+:root[data-shape="cyber"] .fold:not(.closed) > .fold-head .fold-chev svg { transform: rotate(90deg); }
+:root[data-shape="cyber"] .fold-head:hover .fold-chev { transform: none; }
+
+/* moving boxes: a grip on each title bar; press, hold and drag */
+.fold-grip {
+  flex: none; display: grid; place-items: center; width: 30px; height: 32px; margin-right: -6px; padding: 0;
+  border: 0; background: none; color: var(--ink-soft); opacity: .55; cursor: grab; touch-action: none;
+}
+.fold-grip:hover, .fold-grip:focus-visible { opacity: 1; color: var(--accent); }
+/* while moving: the box becomes an empty slot showing where it will land, and a ghost copy follows the finger */
+.fold.moving { outline: 2px dashed var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 8%, transparent) !important; box-shadow: none !important; }
+.fold.moving > *, .fold.moving::before, .fold.moving::after { visibility: hidden; }
+.fold-ghost {
+  position: fixed !important; z-index: 120; margin: 0 !important; pointer-events: none; opacity: 1; transform-origin: 50% 30%;
+  box-shadow: 0 18px 40px rgb(0 0 0 / .28), 0 4px 10px rgb(0 0 0 / .18) !important; filter: drop-shadow(0 12px 18px rgb(0 0 0 / .22));
+  transition: none;
+}
+.fold-ghost.landing { transition: transform .2s var(--ease), opacity .2s; opacity: 1; }
+.fold-ghost .fold-grip { opacity: 1; color: var(--accent); }
+body.moving-box { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+/* Home cards that gained a title bar keep their layout inside the box */
+.study-prompt.fold, .wotd.fold { display: grid; grid-template-columns: minmax(0, 1fr); }
+.study-prompt.fold > .fold-body > .fold-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wotd.fold > .fold-body > .fold-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; }

@@ -1,0 +1,85 @@
+/* ---------- tone trainer: layout, smaller play button, hearing options, the water garden ---------- */
+.tones-layout { display: grid; gap: 16px; }
+.tones-layout > .garden-card { order: -1; }                 /* phones: the garden sits above the question */
+.tones-main { display: grid; gap: 14px; min-width: 0; align-content: start; }
+@media (min-width: 900px) {
+  .tones-layout { grid-template-columns: minmax(0, 1fr) 280px; align-items: start; }
+  .tones-layout > .garden-card { order: 0; position: sticky; top: 12px; }
+}
+.tone-card .fc-play { width: 4rem; height: 4rem; }
+.tone-card .fc-play svg { width: 24px; height: 24px; }
+.tone-card { min-height: 0; }
+.tone-opt { position: relative; }
+.tone-opt.hear { cursor: pointer; }
+.tone-opt.hear:hover, .tone-opt.hear:focus-visible { opacity: 1; border-color: var(--accent); }
+.tone-hear { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+.tone-hear svg { width: 11px; height: 11px; }
+
+.garden-card { display: grid; gap: 8px; }
+.garden-screen {
+  position: relative; border-radius: calc(var(--radius) - 2px); overflow: hidden; line-height: 0;
+  border: 3px solid color-mix(in srgb, var(--accent) 70%, var(--ink)); box-shadow: inset 0 0 0 2px rgb(255 255 255 / .35), 0 3px 10px rgb(0 0 0 / .15);
+}
+.garden-svg { width: 100%; height: auto; display: block; }
+@media (max-width: 899px) {
+  .garden-svg { max-height: 190px; }
+  .garden-screen { display: grid; place-items: center; background: #bfe3f2; }
+  /* during a round on a phone the garden shrinks so the question stays in view */
+  .tones-layout.active .garden-svg { max-height: 120px; }
+  .tones-layout.active .garden-line, .tones-layout.active .garden-card > p:last-child { display: none; }
+  .tones-layout.active .garden-card { gap: 6px; padding-block: 12px; }
+}
+.garden-name { display: flex; align-items: baseline; gap: 10px; }
+.garden-name .rz { font-size: 1.3rem; }
+.garden-line { margin: 0; }
+.garden-card p { margin: 0; }
+.garden-card .bar > i { background: linear-gradient(90deg, #5fb2d6, #7cb35a); }
+/* growing: the new part fades and lifts in, and the frame glows */
+.garden-card.grew .garden-screen { animation: gGrewFrame 1.6s var(--ease); }
+@keyframes gGrewFrame { 30% { box-shadow: 0 0 0 4px var(--accent), 0 0 30px var(--accent); } }
+.gs.g-new { animation: gNew 1.4s var(--ease) both; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes gNew { from { opacity: 0; transform: translateY(6px) scale(.85); } }
+.garden-bonus {
+  position: absolute; right: 10px; top: 8px; line-height: 1; padding: 4px 8px; border-radius: 999px; font-weight: 800;
+  background: #f6c445; color: #3a2a00; animation: gBonus 2s var(--ease) both;
+}
+@keyframes gBonus { 0% { opacity: 0; transform: scale(.4); } 15% { opacity: 1; transform: scale(1.15); } 30% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+/* living things */
+.g-fall { animation: gFall 1.1s linear infinite; }
+@keyframes gFall { from { transform: translateY(-44px); } to { transform: translateY(0); } }
+.g-ripple { animation: gRipple 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes gRipple { from { transform: scale(.3); opacity: .9; } to { transform: scale(2.2); opacity: 0; } }
+.g-sway { animation: sway 5s ease-in-out infinite alternate; }
+.g-petal { animation: gPetal 7s linear infinite; }
+@keyframes gPetal { from { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: 1; } to { transform: translate(-150px, 70px) rotate(400deg); opacity: 0; } }
+.g-mist { animation: gMist 7s ease-in-out infinite alternate; }
+@keyframes gMist { from { transform: translateX(-6px); } to { transform: translateX(8px); } }
+.g-fly { animation: gFly 9s ease-in-out infinite alternate; }
+@keyframes gFly { 0% { transform: translate(0, 0); } 50% { transform: translate(16px, -10px); } 100% { transform: translate(-8px, -4px); } }
+.g-wing { animation: gWing .35s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 100% 50%; }
+.g-wing.r { transform-origin: 0% 50%; }
+@keyframes gWing { to { transform: scaleX(.3); } }
+.g-twinkle { animation: twinkle 3s ease-in-out infinite; }
+.g-glow { animation: gGlow 2.4s ease-in-out infinite alternate; }
+@keyframes gGlow { to { opacity: .55; } }
+.g-moonglow { filter: drop-shadow(0 0 6px #fff6c8); }
+.g-firefly { animation: gFirefly 3s ease-in-out infinite alternate; }
+@keyframes gFirefly { 0% { opacity: .1; transform: translate(0, 0); } 100% { opacity: 1; transform: translate(6px, -6px); } }
+/* theme frames around the little screen */
+:root[data-shape="arcade"] .garden-screen { border: 0; box-shadow: 0 0 0 4px var(--accent), 0 0 0 8px #000; margin: 8px; }
+:root[data-shape="arcade"] .garden-svg { image-rendering: pixelated; }
+:root[data-shape="cyber"] .garden-screen { border-color: var(--accent); clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+:root[data-shape="nightmarket"] .garden-screen { border-color: var(--accent); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 50%, transparent); }
+:root[data-shape="imperial"] .garden-screen { border: 3px double var(--accent); border-radius: 3px; }
+:root[data-shape="porcelain"] .garden-screen { border-color: var(--accent); box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 4px var(--accent); }
+:root[data-shape="ink"] .garden-screen { border-radius: 10px 4px 12px 5px / 5px 12px 4px 10px; border-color: var(--ink); }
+:root[data-shape="jade"] .garden-screen { border-radius: 26px; border-color: var(--accent); }
+:root[data-shape="lantern"] .garden-screen { border-color: var(--accent); border-radius: 0; clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px); }
+:root[data-shape="peach"] .garden-screen { border-radius: 28px 28px 28px 6px; border-color: var(--accent); }
+/* the voice switch beside the play button */
+.tone-play-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.tone-src { gap: 6px; }
+.tone-src svg { width: 14px; height: 14px; }
+.tone-src > span { display: inline-flex; gap: 4px; align-items: baseline; }
+.flashcard.tone-card { min-height: 0; }
+.tone-card .fc-front.tone-play-row { min-height: 0; padding-block: 6px; }

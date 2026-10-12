@@ -1,0 +1,67 @@
+/* ---------- Home clock and sentence of the day ---------- */
+.clock-card { display: grid; gap: 10px; justify-items: center; text-align: center; position: relative; }
+.clock-card > .row.spread, .clock-card .fold-head { justify-self: stretch; text-align: left; }
+.clock-card .fold-inner { justify-items: center; text-align: center; }
+.clock-face { position: relative; display: grid; place-items: center; min-height: 92px; padding: 6px 18px; color: var(--ink); }
+.cl-digital { display: flex; align-items: baseline; gap: 6px; font-family: var(--font-display); font-weight: 750; line-height: 1; }
+.cl-hm { font-size: 3.6rem; letter-spacing: -.02em; }
+.cl-sec { font-size: 1.4rem; color: var(--ink-soft); }
+.cl-ampm { font-size: .95rem; color: var(--accent); font-weight: 700; }
+.cl-analogue { width: 150px; height: 150px; }
+.cl-rim { fill: var(--surface-2); stroke: var(--accent); stroke-width: 1.5; }
+.cl-num { font-family: var(--font-hanzi); font-size: 7px; fill: var(--ink); }
+.cl-num.small { font-size: 5.2px; fill: var(--ink-soft); }
+.cl-hour, .cl-min { stroke: var(--ink); }
+.cl-secd { stroke: var(--accent); }
+.cl-pin { fill: var(--accent); }
+.cl-analogue.neon .cl-rim { fill: none; stroke-width: 2; filter: drop-shadow(0 0 3px var(--accent)); }
+.cl-analogue.neon .cl-num { fill: var(--accent); filter: drop-shadow(0 0 2px var(--accent)); }
+.cl-analogue.neon .cl-hour, .cl-analogue.neon .cl-min { stroke: var(--t4); filter: drop-shadow(0 0 3px var(--t4)); }
+.cl-analogue.neon .cl-secd { stroke: var(--t1); filter: drop-shadow(0 0 3px var(--t1)); }
+.cl-analogue.neon { background: radial-gradient(circle, #0a0d1a 0 66%, transparent 68%); border-radius: 50%; }
+.cl-hanzi { display: grid; justify-items: center; gap: 0; }
+.cl-hanzi .cl-part .rz { font-size: 1.2rem; color: var(--ink-soft); }
+.cl-hanzi .cl-zh { white-space: nowrap; }
+.cl-hanzi .cl-zh .rz { font-size: clamp(1.5rem, 7.5vw, 2.2rem); }
+.cl-pixel { height: 64px; width: auto; max-width: 100%; }
+.cl-pixel .led { fill: color-mix(in srgb, var(--accent) 12%, transparent); }
+.cl-pixel .led.on { fill: var(--accent); filter: drop-shadow(0 0 2px color-mix(in srgb, var(--accent) 70%, transparent)); }
+.cl-pixel .led.blink { opacity: .35; }
+.cl-flip { display: flex; align-items: center; gap: 5px; font-family: var(--font-display); font-weight: 800; }
+.flip-card {
+  position: relative; display: grid; place-items: center; width: 2.6rem; height: 3.6rem; font-size: 2.6rem; line-height: 1;
+  border-radius: 8px; color: #f4f4f4; background: linear-gradient(#2b2b2f 0 49%, #1d1d21 51%); box-shadow: 0 3px 8px rgb(0 0 0 / .3); perspective: 200px;
+}
+.flip-card::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgb(0 0 0 / .55); }
+.flip-card.flipping > span { animation: flipIn .45s var(--ease); transform-origin: 50% 50%; }
+@keyframes flipIn { from { transform: rotateX(-90deg); opacity: .2; } to { transform: none; opacity: 1; } }
+.flip-sep { font-size: 2rem; color: var(--ink-soft); }
+.cl-date { display: grid; gap: 2px; justify-items: center; }
+.cl-zhdate .rz { font-size: 1.25rem; }
+/* effects */
+.fx-glow .cl-hm, .fx-glow .cl-zh, .fx-glow .flip-card, .fx-glow .cl-analogue, .fx-glow .cl-pixel { animation: clGlow 3s ease-in-out infinite; }
+@keyframes clGlow { 50% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 70%, transparent)); } }
+.fx-pulse > :first-child { animation: clPulse 1s ease-in-out infinite; }
+@keyframes clPulse { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.045); } 24% { transform: scale(1); } 36% { transform: scale(1.025); } }
+.fx-rainbow { animation: clRainbow 8s linear infinite; }
+@keyframes clRainbow { to { filter: hue-rotate(360deg); } }
+.cl-comet { position: absolute; inset: 0; pointer-events: none; animation: clOrbit 4s linear infinite; }
+.cl-comet::before { content: ""; position: absolute; left: 50%; top: -4px; width: 9px; height: 9px; margin-left: -4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px 2px var(--accent), -10px 2px 8px color-mix(in srgb, var(--accent) 40%, transparent); }
+@keyframes clOrbit { to { transform: rotate(360deg); } }
+.cl-sparks i { position: absolute; width: 10px; height: 10px; background: #f5c542; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: clSpark 2.2s ease-in-out infinite; pointer-events: none; }
+.cl-sparks i:nth-child(1) { left: 2%; top: 8%; } .cl-sparks i:nth-child(2) { right: 4%; top: 2%; animation-delay: .6s; }
+.cl-sparks i:nth-child(3) { right: 0; bottom: 10%; animation-delay: 1.2s; } .cl-sparks i:nth-child(4) { left: 6%; bottom: 0; animation-delay: 1.7s; }
+@keyframes clSpark { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }
+/* tiles in the editor show small live previews */
+.clock-mini { width: 100%; height: 64px; display: grid; place-items: center; overflow: hidden; }
+.clock-mini .clock-face { transform: scale(.42); min-height: 0; padding: 0; }
+.clock-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.clock-preview { padding-block: 18px; }
+/* theme touches */
+:root[data-shape="arcade"] .flip-card { border-radius: 0; background: linear-gradient(#20205a 0 49%, #15153a 51%); color: var(--accent); }
+:root[data-shape="cyber"] .flip-card { border-radius: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); background: linear-gradient(#0b1a28 0 49%, #08121d 51%); color: var(--accent); }
+:root[data-shape="nightmarket"] .cl-hm { color: color-mix(in srgb, var(--accent) 45%, #fff); text-shadow: 0 0 8px var(--accent), 0 0 22px var(--accent); }
+:root[data-shape="imperial"] .flip-card { background: linear-gradient(#5a1d14 0 49%, #45150e 51%); color: var(--accent); border-radius: 3px; }
+/* sentence of the day */
+.daily-zh { font-size: 1.5rem; line-height: 2.1; }
+.daily-en { margin: 0; font-size: 1.05rem; }

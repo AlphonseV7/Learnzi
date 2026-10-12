@@ -1,0 +1,118 @@
+/* ---------- Cyberedge: irregular neon polygons, hard angles, glitchy type ---------- */
+:root[data-shape="cyber"] {
+  --font-body: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Orbitron", "Chakra Petch", system-ui, sans-serif;
+  --accent-2: var(--t1);
+  --edge: color-mix(in srgb, var(--accent) 60%, var(--line));
+  --radius: 0px;
+}
+:root[data-preset="cyber"] {
+  --bg: #05070d; --surface: #0b111c; --surface-2: #132033; --ink: #e8fbff; --ink-soft: #8ba7b9;
+  --line: #1e3a4e; --accent: #00f0ff; --accent-ink: #001417; --accent-soft: #072f38; --accent-2: #ff2bd6;
+  --t1: #ff4d6d; --t2: #ffb000; --t3: #2bff88; --t4: #4da3ff; --t5: #8a98a8;
+  --shadow: none;
+  color-scheme: dark;
+}
+:root[data-shape="cyber"] body {
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 5%, transparent) 1px, transparent 1px) 0 0 / 100% 32px,
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 5%, transparent) 1px, transparent 1px) 0 0 / 32px 100%,
+    var(--bg);
+}
+:root[data-shape="cyber"] :is(h1, h2, h3, .brand-name, .me-name) { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .05em; }
+:root[data-shape="cyber"] h1 { font-size: 1.45rem; text-shadow: -2px 0 color-mix(in srgb, var(--accent-2) 70%, transparent), 2px 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+:root[data-shape="cyber"] h2 { font-size: 1rem; }
+:root[data-shape="cyber"] .h-card { font-size: .95rem; color: var(--accent); }
+:root[data-shape="cyber"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "// "; color: var(--accent-2); }
+:root[data-shape="cyber"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); text-transform: none; }
+:root[data-shape="cyber"] .eyebrow { color: var(--accent-2); letter-spacing: .18em; }
+
+/* Boxes: every big panel is an irregular polygon. Three shapes take turns so no two neighbours match.
+ * The box itself is painted in the edge colour and a slightly smaller copy of the shape covers it,
+ * which leaves a thin neon outline that follows the slanted corners too. */
+:root[data-shape="cyber"] :is(.card, .action, .deck-row, .deck-mini, .empty) {
+  --clip: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 30px 100%, 0 calc(100% - 30px));
+  position: relative; isolation: isolate; border: 0; border-radius: 0; box-shadow: none;
+  background: var(--edge); clip-path: var(--clip);
+}
+:root[data-shape="cyber"] :is(.card, .action, .deck-row, .deck-mini, .empty):nth-child(3n + 2) {
+  --clip: polygon(22px 0, 100% 0, 100% calc(100% - 34px), calc(100% - 34px) 100%, 0 100%, 0 22px);
+}
+:root[data-shape="cyber"] :is(.card, .action, .deck-row, .deck-mini, .empty):nth-child(3n) {
+  --clip: polygon(0 12px, 12px 0, 38% 0, calc(38% + 10px) 7px, calc(100% - 18px) 7px, 100% 25px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
+}
+:root[data-shape="cyber"] :is(.card, .action, .deck-row, .deck-mini, .empty)::before {
+  content: ""; position: absolute; inset: 1.5px; z-index: -1; clip-path: var(--clip); pointer-events: none;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface) 38%);
+}
+/* A short magenta tag on each panel's top edge */
+:root[data-shape="cyber"] :is(.card, .action, .deck-row)::after {
+  content: ""; position: absolute; left: 30px; top: 0; width: 54px; height: 3px; background: var(--accent-2); pointer-events: none;
+}
+:root[data-shape="cyber"] .card:nth-child(3n)::after { left: auto; right: 60px; top: 7px; }
+:root[data-shape="cyber"] .empty { --edge: color-mix(in srgb, var(--accent) 30%, var(--line)); }
+:root[data-shape="cyber"] .action { transition: transform .15s var(--ease), --edge .2s; }
+:root[data-shape="cyber"] .action:hover { --edge: var(--accent-2); transform: translateX(3px); }
+:root[data-shape="cyber"] .flashcard { padding-inline: 24px; }
+:root[data-shape="cyber"] .action { padding-inline: 22px; }
+
+/* Smaller pieces: cut on two opposite corners */
+:root[data-shape="cyber"] .search .mag { z-index: 1; }
+:root[data-shape="cyber"] :is(.btn, .chip, .grade, .tone-opt, .lvl, button.sync, .stat, .swatch, .av-tile, .example, .tip, .char-row, .seg, .phrase-chip, .res) {
+  border-radius: 0;
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+}
+:root[data-shape="cyber"] :is(.btn, .chip, .grade, .tone-opt, .stat, .swatch, .av-tile, .example, .tip, .char-row) {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background-image: linear-gradient(135deg, var(--edge) 0 6.5px, transparent 6.5px), linear-gradient(-45deg, var(--edge) 0 6.5px, transparent 6.5px);
+}
+:root[data-shape="cyber"] .btn { text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+:root[data-shape="cyber"] :is(.btn, .chip, .tone-opt, .grade):hover { border-color: var(--accent); }
+:root[data-shape="cyber"] .btn.primary { background: var(--accent); background-image: none; color: var(--accent-ink); border-color: var(--accent); }
+:root[data-shape="cyber"] .btn.primary:hover { background: color-mix(in srgb, var(--accent) 80%, #fff); }
+:root[data-shape="cyber"] :is(.av-tile, .swatch)[aria-pressed="true"] { --edge: var(--accent-2); border-color: var(--accent-2); box-shadow: inset 0 0 0 1px var(--accent-2); }
+:root[data-shape="cyber"] .btn[aria-pressed="true"] { border-color: var(--accent-2); color: var(--accent-2); }
+:root[data-shape="cyber"] .lvl { font-family: var(--font-display); letter-spacing: .05em; }
+:root[data-shape="cyber"] .seg button { border-radius: 0; }
+:root[data-shape="cyber"] .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+:root[data-shape="cyber"] :is(.search input, textarea, input[type="text"], select) {
+  border-radius: 0; border-color: var(--line); border-bottom: 2px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+:root[data-shape="cyber"] .toggle span, :root[data-shape="cyber"] .toggle span::after { border-radius: 0; }
+:root[data-shape="cyber"] .toggle span::after { clip-path: polygon(30% 0, 100% 0, 70% 100%, 0 100%); }
+:root[data-shape="cyber"] .badge { border-radius: 0; }
+:root[data-shape="cyber"] .bar { border-radius: 0; height: 9px; transform: skewX(-25deg); }
+:root[data-shape="cyber"] .bar > i { border-radius: 0; background: linear-gradient(90deg, var(--accent-2), var(--accent)); box-shadow: 0 0 10px var(--accent); }
+
+/* Shell */
+:root[data-shape="cyber"] .seal { border-radius: 0; transform: none; clip-path: polygon(0 0, 75% 0, 100% 25%, 100% 100%, 25% 100%, 0 75%); }
+:root[data-shape="cyber"] .nav { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+:root[data-shape="cyber"] .nav button[aria-current="page"] .ico { border-radius: 0; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); background: var(--accent); color: var(--accent-ink); }
+:root[data-shape="cyber"] .panel { border-radius: 0; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+@media (max-width: 1099px) { :root[data-shape="cyber"] .panel { clip-path: polygon(0 18px, 18px 0, 60% 0, calc(60% + 12px) 8px, 100% 8px, 100% 100%, 0 100%); } }
+:root[data-shape="cyber"] .grab { border-radius: 0; background: var(--accent); }
+
+/* Level up: the card is a polygon too (the seal sits above it, so it is outlined instead of cut) */
+:root[data-shape="cyber"] .lu-card { border-radius: 0; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-2), 0 0 30px color-mix(in srgb, var(--accent) 35%, transparent); }
+:root[data-shape="cyber"] .lu-seal { border-radius: 0; clip-path: polygon(0 0, 78% 0, 100% 22%, 100% 100%, 22% 100%, 0 78%); }
+:root[data-shape="cyber"] .levelup .lu-card h2 { animation: cyGlitch .7s steps(2) .5s 2; }
+@keyframes cyGlitch {
+  0% { transform: translate(0); text-shadow: -3px 0 var(--accent-2), 3px 0 var(--accent); }
+  25% { transform: translate(-3px, 1px); clip-path: inset(10% 0 55% 0); }
+  50% { transform: translate(3px, -1px); clip-path: inset(50% 0 10% 0); }
+  75% { transform: translate(-1px); clip-path: none; }
+  100% { transform: none; }
+}
+
+/* Background scene */
+.zen-grid-line { animation: cyFloor 3.2s cubic-bezier(.55, 0, 1, .45) infinite; }
+@keyframes cyFloor { from { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } to { transform: translateY(300px); opacity: 1; } }
+.zen-rain { animation: cyRain 1.4s linear infinite; }
+@keyframes cyRain { from { transform: translate(0, -120px); } to { transform: translate(-60px, 900px); } }
+.zen-flicker { animation: cyFlicker 5s steps(1) infinite; }
+@keyframes cyFlicker { 0%, 61%, 66%, 100% { opacity: 1; } 62% { opacity: .2; } 64% { opacity: .6; } 65% { opacity: .1; } }
+/* Orbitron draws zero as a slashed box, so numbers use the body font */
+:root[data-shape="cyber"] :is(.stat b, .study-prompt b, .num) { font-family: var(--font-body); font-weight: 700; }
+/* Deck rows keep their left corners clear for the text */
+:root[data-shape="cyber"] :is(.deck-row, .deck-mini):nth-child(n) { --clip: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }

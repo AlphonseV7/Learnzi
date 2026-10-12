@@ -1,0 +1,126 @@
+/* ---------- Retro Arcade: pixel frames, pixel fonts, scanlines, chunky everything ---------- */
+:root[data-preset="arcade"] {
+  --bg: #07071a; --surface: #12123a; --surface-2: #1d1d56; --ink: #f4f4ff; --ink-soft: #a8abe8;
+  --line: #4040b8; --accent: #ffd23f; --accent-ink: #1a1300; --accent-soft: #3b3416;
+  --t1: #ff4f64; --t2: #ffa53d; --t3: #3ef07a; --t4: #4fc3ff; --t5: #9a9cc8;
+  --shadow: none;
+  color-scheme: dark;
+}
+:root[data-shape="arcade"] {
+  --font-body: "Tiny5", ui-monospace, "Courier New", monospace;
+  --font-display: "Press Start 2P", "Tiny5", ui-monospace, monospace;
+  --px: 4px;
+  --radius: 0px;
+}
+/* Pixel fonts look small at the same size, so the English text is scaled up to match. */
+:root[data-shape="arcade"] body { font-size-adjust: ex-height 0.56; letter-spacing: .02em; }
+:root[data-shape="arcade"] :is(.hz, .rz, .lu-seal, .nav .ico, .random) { font-size-adjust: none; letter-spacing: 0; }
+/* Nothing is round in an arcade: every corner is square. */
+:root[data-shape="arcade"] *, :root[data-shape="arcade"] *::before, :root[data-shape="arcade"] *::after { border-radius: 0 !important; }
+:root[data-shape="arcade"] :is(h1, h2, h3, .brand-name, .me-name) { font-family: var(--font-display); font-size-adjust: none; letter-spacing: 0; line-height: 1.5; text-transform: uppercase; }
+:root[data-shape="arcade"] h1 { font-size: 1.05rem; text-shadow: 3px 3px 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-shape="arcade"] h2 { font-size: .8rem; }
+:root[data-shape="arcade"] .h-card { font-size: .78rem; color: var(--accent); }
+:root[data-shape="arcade"] :is(.brand-name, .me-name) { font-size: .78rem; }
+:root[data-shape="arcade"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); text-transform: none; }
+:root[data-shape="arcade"] .eyebrow { letter-spacing: .14em; }
+:root[data-shape="arcade"] h1::after { content: "_"; margin-left: 4px; color: var(--accent); animation: arcBlink 1s steps(1) infinite; }
+@keyframes arcBlink { 50% { opacity: 0; } }
+
+/* Pixel frames: four hard shadows draw a border with the corners knocked out, plus a stepped drop shadow. */
+:root[data-shape="arcade"] :is(.card, .action, .deck-row, .deck-mini, .empty, .lu-card, .av-tile, .swatch, .stat, .example, .tip, .char-row, .custom-editor) {
+  --frame: var(--line);
+  border: 0; outline: 0;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame), 0 var(--px) 0 0 var(--frame),
+    calc(-1 * var(--px)) 0 0 0 var(--frame), var(--px) 0 0 0 var(--frame),
+    inset var(--px) var(--px) 0 0 rgb(255 255 255 / .05), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 0 rgb(0 0 0 / .28);
+}
+:root[data-shape="arcade"] :is(.card, .action, .deck-row, .lu-card) {
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame), 0 var(--px) 0 0 var(--frame),
+    calc(-1 * var(--px)) 0 0 0 var(--frame), var(--px) 0 0 0 var(--frame),
+    var(--px) calc(2 * var(--px)) 0 0 rgb(0 0 0 / .55), calc(2 * var(--px)) var(--px) 0 0 rgb(0 0 0 / .55),
+    inset var(--px) var(--px) 0 0 rgb(255 255 255 / .05), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 0 rgb(0 0 0 / .28);
+}
+:root[data-shape="arcade"] .empty { --frame: color-mix(in srgb, var(--line) 60%, transparent); }
+:root[data-shape="arcade"] :is(.av-tile, .swatch)[aria-pressed="true"], :root[data-shape="arcade"] .action:hover { --frame: var(--accent); }
+:root[data-shape="arcade"] .action:active { transform: translate(var(--px), var(--px)); }
+
+/* Buttons: chunky, uppercase, with a dark lower-right edge that disappears when pressed. */
+:root[data-shape="arcade"] :is(.btn, .chip, .grade, .tone-opt, .lvl, button.sync, .seg, .phrase-chip) {
+  --frame: var(--line);
+  border: 0;
+  box-shadow: 0 -3px 0 0 var(--frame), 0 3px 0 0 var(--frame), -3px 0 0 0 var(--frame), 3px 0 0 0 var(--frame), inset -3px -3px 0 0 rgb(0 0 0 / .35);
+  transition: none;
+}
+:root[data-shape="arcade"] .btn { text-transform: uppercase; letter-spacing: .06em; }
+:root[data-shape="arcade"] :is(.btn, .chip, .grade, .tone-opt):hover { --frame: var(--accent); }
+:root[data-shape="arcade"] :is(.btn, .chip, .grade, .tone-opt):active { transform: translateY(3px); box-shadow: 0 -3px 0 0 var(--frame), 0 3px 0 0 var(--frame), -3px 0 0 0 var(--frame), 3px 0 0 0 var(--frame), inset 3px 3px 0 0 rgb(0 0 0 / .35); }
+:root[data-shape="arcade"] .btn.primary { --frame: color-mix(in srgb, var(--accent) 55%, #000); background: var(--accent); color: var(--accent-ink); }
+:root[data-shape="arcade"] .btn[aria-pressed="true"], :root[data-shape="arcade"] .btn.star[aria-pressed="true"] { --frame: var(--accent); }
+:root[data-shape="arcade"] .grade.suggested { --frame: var(--accent); background: var(--accent-soft); }
+:root[data-shape="arcade"] .tone-opt.right { --frame: var(--t3); }
+:root[data-shape="arcade"] .tone-opt.wrong { --frame: var(--t1); }
+:root[data-shape="arcade"] .grade { border-bottom: 0; }
+:root[data-shape="arcade"] .grade.g1 { --frame: var(--t1); } :root[data-shape="arcade"] .grade.g2 { --frame: var(--t2); }
+:root[data-shape="arcade"] .grade.g3 { --frame: var(--t3); } :root[data-shape="arcade"] .grade.g4 { --frame: var(--t4); }
+:root[data-shape="arcade"] .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+:root[data-shape="arcade"] .lvl { --frame: var(--accent); }
+/* Text boxes and menus */
+:root[data-shape="arcade"] :is(.search input, textarea, input[type="text"], select, input[type="color"]) {
+  border: 0; background: #000; box-shadow: 0 -3px 0 0 var(--line), 0 3px 0 0 var(--line), -3px 0 0 0 var(--line), 3px 0 0 0 var(--line);
+}
+:root[data-shape="arcade"] :is(.search input, textarea, input[type="text"]):focus { box-shadow: 0 -3px 0 0 var(--accent), 0 3px 0 0 var(--accent), -3px 0 0 0 var(--accent), 3px 0 0 0 var(--accent); caret-color: var(--accent); }
+:root[data-shape="arcade"] .toggle span { border: 0; box-shadow: 0 -3px 0 0 var(--line), 0 3px 0 0 var(--line), -3px 0 0 0 var(--line), 3px 0 0 0 var(--line); }
+:root[data-shape="arcade"] .toggle span::after { transition: transform .15s steps(3); }
+:root[data-shape="arcade"] .badge { box-shadow: 0 0 0 2px var(--line); }
+/* Progress bars fill in blocks, like an energy meter */
+:root[data-shape="arcade"] .bar { height: 12px; background: #000; box-shadow: 0 0 0 3px var(--line); }
+:root[data-shape="arcade"] .bar > i { background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent 8px 11px); transition: width .4s steps(6); }
+
+/* Shell: thick pixel lines, square tabs */
+:root[data-shape="arcade"] .nav { border-top: 4px solid var(--line); backdrop-filter: none; background: var(--surface); }
+:root[data-shape="arcade"] .nav button { text-transform: uppercase; letter-spacing: .08em; }
+:root[data-shape="arcade"] .nav button[aria-current="page"] .ico { background: var(--accent); color: var(--accent-ink); }
+@media (min-width: 760px) { :root[data-shape="arcade"] .nav { border-top: 0; border-right: 4px solid var(--line); } }
+:root[data-shape="arcade"] .panel { border: 0; box-shadow: 0 -4px 0 0 var(--line), -4px 0 0 0 var(--line); }
+:root[data-shape="arcade"] .grab { height: 4px; background: var(--accent); }
+:root[data-shape="arcade"] .seal { transform: none; }
+:root[data-shape="arcade"] .toast { box-shadow: 0 0 0 4px var(--accent); }
+
+/* Moves happen in steps, like an old game */
+:root[data-shape="arcade"] .view.enter { animation: viewIn .3s steps(4); }
+:root[data-shape="arcade"] .panel { transition: transform .25s steps(5); }
+
+/* The CRT screen: faint scanlines and darker corners over everything (taps pass straight through). */
+:root[data-shape="arcade"] body::after {
+  content: ""; position: fixed; inset: 0; z-index: 300; pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgb(0 0 0 / .16) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 62%, rgb(0 0 0 / .32));
+}
+:root[data-shape="arcade"] body::before {
+  content: ""; position: fixed; left: 0; right: 0; top: -20%; height: 18%; z-index: 300; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgb(255 255 255 / .025), transparent);
+  animation: arcRoll 7s linear infinite;
+}
+@keyframes arcRoll { to { transform: translateY(700%); } }
+
+/* Background scene */
+.zen-svg[data-scene="arcade"] { shape-rendering: crispEdges; }
+.zen-blink { animation: arcStar 2.4s steps(1) infinite; }
+@keyframes arcStar { 50% { opacity: .1; } }
+.zen-ship { animation: arcShip 26s steps(52) infinite; }
+@keyframes arcShip { from { transform: translateX(-120px); } to { transform: translateX(1320px); } }
+
+/* Level up: square confetti, blocky sparks and a blinking LEVEL UP */
+.levelup[data-fx="pixel"] .blot { border-radius: 0; background: var(--accent); animation-timing-function: steps(4); }
+.levelup[data-fx="pixel"] .blot:nth-child(2n) { background: var(--t4); }
+.levelup[data-fx="pixel"] .blot:nth-child(3n) { background: var(--t1); }
+.levelup[data-fx="pixel"] .lu-spark { width: 8px; height: 8px; margin: -4px; border-radius: 0; animation-timing-function: steps(6); }
+.levelup[data-fx="pixel"] .lu-card h2 { animation: arcBlink .5s steps(1) .6s 4; color: var(--accent); }
+.levelup[data-fx="pixel"] .lu-seal { transform: none; animation: arcPop .5s steps(4) .15s both; box-shadow: 0 0 0 4px var(--accent-ink), 0 0 0 8px var(--accent); }
+@keyframes arcPop { from { transform: scale(3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+:root[data-shape="arcade"] .search .mag { z-index: 1; }

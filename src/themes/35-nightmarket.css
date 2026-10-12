@@ -1,0 +1,30 @@
+/* ---------- Night Market: neon tube signs, chasing marquee bulbs, signboard lettering ---------- */
+:root[data-shape="nightmarket"] { --font-display: "Bungee", "Figtree", sans-serif; --zen-k: 1.5; }
+:root[data-shape="nightmarket"] :is(h2, h3) { font-weight: 400; letter-spacing: .02em; }
+:root[data-shape="nightmarket"] :is(h1, .brand-name, .me-name) {
+  font-family: "Monoton", "Bungee", sans-serif; font-weight: 400; letter-spacing: .03em;
+  color: color-mix(in srgb, var(--accent) 45%, #fff);
+  text-shadow: 0 0 4px var(--accent), 0 0 14px var(--accent), 0 0 30px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+:root[data-shape="nightmarket"] h1 { font-size: 1.9rem; animation: flicker 7s steps(1) 1.5s infinite; }
+:root[data-shape="nightmarket"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); text-shadow: none; }
+:root[data-shape="nightmarket"] :is(h1, .brand-name, .me-name) .hz { text-shadow: 0 0 10px var(--accent); }
+:root[data-shape="nightmarket"] .h-card { color: color-mix(in srgb, var(--t4) 40%, #fff); text-shadow: 0 0 6px var(--t4), 0 0 18px color-mix(in srgb, var(--t4) 50%, transparent); }
+/* signs: a double neon tube and a row of chasing bulbs along the top */
+:root[data-shape="nightmarket"] :is(.card, .action, .deck-row, .lu-card) {
+  border: 2px solid color-mix(in srgb, var(--accent) 80%, #fff); border-radius: 16px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--t4) 35%, transparent), 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent) 16%, transparent);
+  background-image: radial-gradient(circle, var(--t2) 0 2px, color-mix(in srgb, var(--t2) 40%, transparent) 2.5px, transparent 4px);
+  background-size: 16px 10px; background-repeat: repeat-x; background-position: 0 4px;
+  animation: nmMarquee 1s steps(2) infinite;
+}
+@keyframes nmMarquee { to { background-position: 16px 4px; } }
+:root[data-shape="nightmarket"] .card:nth-child(even) { border-color: color-mix(in srgb, var(--t4) 80%, #fff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent), 0 0 18px color-mix(in srgb, var(--t4) 40%, transparent), inset 0 0 18px color-mix(in srgb, var(--t4) 14%, transparent); }
+:root[data-shape="nightmarket"] .pv .pv-box { padding-top: 16px; }
+:root[data-shape="nightmarket"] .deck-mini { border-radius: 12px; border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+/* buttons: neon outlines; the main one lit up */
+:root[data-shape="nightmarket"] :is(.btn, .chip) { box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 25%, transparent), inset 0 0 8px color-mix(in srgb, var(--accent) 12%, transparent); }
+:root[data-shape="nightmarket"] .btn.primary { box-shadow: 0 0 6px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 65%, transparent); text-shadow: 0 0 2px rgb(255 255 255 / .6); }
+:root[data-shape="nightmarket"] .nav button[aria-current="page"] .ico { box-shadow: 0 0 12px var(--accent); }
+:root[data-shape="nightmarket"] .bar > i { background: linear-gradient(90deg, var(--t4), var(--accent)); }

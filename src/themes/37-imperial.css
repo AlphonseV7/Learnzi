@@ -1,0 +1,46 @@
+/* ---------- Imperial: palace eaves, gold trim and corner ornaments, carved Roman capitals ---------- */
+:root[data-shape="imperial"] { --font-display: "Cinzel", Georgia, serif; --font-body: "EB Garamond", Georgia, serif; --zen-k: 1.7; --gold: color-mix(in srgb, var(--accent) 85%, transparent); }
+:root[data-shape="imperial"] body { font-size-adjust: ex-height 0.5; }
+:root[data-shape="imperial"] :is(.hz, .rz, .lu-seal, .nav .ico, .random) { font-size-adjust: none; }
+:root[data-shape="imperial"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: .06em; color: var(--accent); }
+:root[data-shape="imperial"] h1 { text-shadow: 0 2px 0 color-mix(in srgb, #000 40%, transparent); }
+:root[data-shape="imperial"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); letter-spacing: 0; }
+:root[data-shape="imperial"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❖ "; }
+/* panels: upturned eaves on top, notched base, a gold outline that follows the shape */
+:root[data-shape="imperial"] :is(.card, .action, .deck-row, .deck-mini, .empty) {
+  --clip: polygon(0 0, 18px 9px, calc(100% - 18px) 9px, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
+  position: relative; isolation: isolate; border: 0; border-radius: 0; box-shadow: none; padding-top: 24px;
+  background: var(--gold); clip-path: var(--clip);
+}
+:root[data-shape="imperial"] :is(.card, .action, .deck-row, .deck-mini, .empty)::before {
+  content: ""; position: absolute; inset: 1.5px; z-index: -1; clip-path: var(--clip); pointer-events: none;
+  background-image:
+    linear-gradient(var(--gold), var(--gold)), linear-gradient(var(--gold), var(--gold)),
+    linear-gradient(var(--gold), var(--gold)), linear-gradient(var(--gold), var(--gold)),
+    linear-gradient(var(--gold), var(--gold)), linear-gradient(var(--gold), var(--gold)),
+    linear-gradient(var(--gold), var(--gold)), linear-gradient(var(--gold), var(--gold)),
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--t1) 14%, transparent), transparent 65%),
+    linear-gradient(var(--surface), var(--surface));
+  background-size: 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px, 16px 2px, 2px 16px, 100% 100%, 100% 100%;
+  background-position: 8px 15px, 8px 15px, calc(100% - 8px) 15px, calc(100% - 8px) 15px, 8px calc(100% - 8px), 8px calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), 0 0, 0 0;
+  background-repeat: no-repeat;
+}
+:root[data-shape="imperial"] .empty { --gold: color-mix(in srgb, var(--accent) 35%, transparent); }
+:root[data-shape="imperial"] .tip::before { background-color: var(--surface-2); }
+:root[data-shape="imperial"] .pv .pv-box { padding-top: 18px; }
+:root[data-shape="imperial"] .action:hover { --gold: color-mix(in srgb, var(--accent) 100%, #fff 20%); }
+:root[data-shape="imperial"] .lu-card { border-radius: 4px; border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 4px var(--gold), 0 0 40px color-mix(in srgb, var(--accent) 25%, transparent); }
+/* buttons: lacquered plaques with gold trim */
+:root[data-shape="imperial"] :is(.btn, .chip, .stat, .grade, .seg, .lvl, .swatch, .av-tile, .tone-opt) { border-radius: 3px; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+:root[data-shape="imperial"] .btn:not(.random) { font-family: var(--font-display); letter-spacing: .04em; font-size: .9em; }
+:root[data-shape="imperial"] .btn.primary { background: linear-gradient(180deg, color-mix(in srgb, #fff 28%, var(--accent)), var(--accent) 55%, color-mix(in srgb, #000 20%, var(--accent))); border-color: color-mix(in srgb, #000 25%, var(--accent)); }
+:root[data-shape="imperial"] .bar { border-radius: 1px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent); }
+:root[data-shape="imperial"] .bar > i { border-radius: 0; background: linear-gradient(180deg, color-mix(in srgb, #fff 30%, var(--accent)), var(--accent)); }
+
+/* level-up: gold coins spinning upwards */
+.levelup[data-fx="gold"] .blot {
+  width: 26px; height: 26px; margin: -13px; border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 4px, color-mix(in srgb, #000 35%, var(--accent)) 4px 5.5px, var(--accent) 6px);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent); animation: luCoin 1.5s var(--ease) var(--delay) forwards;
+}
+@keyframes luCoin { 0% { opacity: 0; transform: translateY(40px) rotateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-140px) rotateY(720deg); } }
