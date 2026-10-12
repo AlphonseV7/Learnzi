@@ -6,8 +6,6 @@
   background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 :root.desk .xpbar { width: 120px; }
-@media (min-width: 430px) { .xpbar { width: 76px; } }
-@media (max-width: 360px) { .xpbar { width: 40px; } }
 .xpbar > i {
   position: relative; display: block; height: 100%; width: 0; border-radius: inherit;
   background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--surface)), var(--accent));
@@ -78,3 +76,12 @@
 .av-tile.is-secret .avatar { background: none; }
 .rank-ladder .is-secret .rank-zh { color: var(--ink-soft); opacity: .35; letter-spacing: .1em; }
 .rank-ladder .is-secret .rank-row:disabled { cursor: default; }
+#reader-input::placeholder { font-family: var(--font-body); font-size: 1rem; letter-spacing: 0; }
+/* XP numbers, e.g. 430/1150: printed on a taller bar on phones, beside the bar on a computer */
+.xp-num { display: none; flex: none; font-size: .8rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+:root.desk .xp-num { display: inline; }
+.xpbar { position: relative; }
+.xpbar-num { position: absolute; inset: 0; display: grid; place-items: center; font-size: .6rem; font-weight: 800; line-height: 1; letter-spacing: -.01em;
+  color: var(--ink); text-shadow: 0 0 3px var(--surface), 0 0 2px var(--surface); pointer-events: none; }
+:root:not(.desk) .xpbar { width: 78px; height: 16px; }
+:root.desk .xpbar-num { display: none; }

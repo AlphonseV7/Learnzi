@@ -128,3 +128,14 @@
 :root[data-shape="ends"][data-mode="light"] .view > .card::before { background: rgb(214 196 140 / .55); border-color: rgb(0 0 0 / .08); }
 :root[data-shape="ends"][data-mode="light"] h1 { color: var(--hazard); text-shadow: 3px 3px 0 #000; }
 :root[data-shape="ends"][data-mode="light"] :is(.mle-big, .mle-term.huge) { color: var(--hazard); }
+
+/* Silver River by day: dawn sky, pale lavender with the last stars fading */
+:root[data-preset="silver"][data-mode="light"] {
+  --bg: #f3f0fb; --surface: #fdfcff; --surface-2: #ebe6f8; --ink: #1d1a3a; --ink-soft: #5d5880;
+  --line: #dcd5f0; --accent: #5b46c9; --accent-ink: #ffffff; --accent-soft: #e4ddfa; --aurora: #0b7894;
+  --t1: #c8323f; --t2: #a85d06; --t3: #1a7a48; --t4: #2560c4; --t5: #6c6886;
+  --shadow: 0 1px 2px rgb(40 20 90 / .06), 0 8px 24px rgb(40 20 90 / .08);
+  color-scheme: light;
+}
+:root[data-shape="silver"][data-mode="light"] .btn.primary { color: #ffffff; }
+:root[data-shape="silver"][data-mode="light"] .seal, :root[data-shape="silver"][data-mode="light"] .levelup[data-fx="warp"] .lu-seal { color: #ffffff; }

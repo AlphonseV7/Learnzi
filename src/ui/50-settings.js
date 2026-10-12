@@ -30,7 +30,16 @@ function viewSettings() {
   const v = h("section", { class: "view" });
   const row = setRow, toggleCtl = setToggle, seg = setSeg, select = setSelect;
 
-  // Profile
+  // Profile (with sync: the button shows how syncing is going, tap it for the details)
+  const syncInfo = h("div", { class: "stack-tight sync-info", hidden: true },
+    h("p", { class: "muted", id: "sync-note" }, PILL[Sync.status][1]),
+    h("p", { class: "muted small" }, "Synced: your nickname, My Zì, flashcard progress and XP, badges, recent lookups, reader text and these settings. Stored privately for your account; nobody else can read them."));
+  const syncBtn = () => {
+    const b = h("button", { class: "btn sync", id: "sync", type: "button", "aria-expanded": "false", onclick: () => { syncInfo.hidden = !syncInfo.hidden; b.setAttribute("aria-expanded", String(!syncInfo.hidden)); } },
+      h("span", { class: "sync-text" }, PILL[Sync.status][0]));
+    b.dataset.s = Sync.status;
+    return b;
+  };
   const nick = h("input", { type: "text", id: "nickname", maxlength: "24", placeholder: "Your name", autocomplete: "nickname", spellcheck: "false" });
   nick.value = state.nickname;
   let nickTimer = 0;
@@ -40,7 +49,8 @@ function viewSettings() {
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Profile"),
     row("nickname", "Nickname", nick),
     row("level", "My Chinese", select("level", LEVELS, state.level, k => { commit({ level: k }); }), "Sets the word of the day and the Reader's sample text. Decks and new words a day are under Flashcards."),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => { closePanel(); startTour(); } }, "Replay the tour"))));
+    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => { closePanel(); startTour(); } }, "Replay the tour"), syncBtn()),
+    syncInfo));
 
   // Reading
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Reading"),
@@ -99,11 +109,6 @@ function viewSettings() {
     row("rate", "Browser voice speed", h("div", { class: "row" }, rate, rateOut)),
     h("div", { class: "row" }, withVoice(h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"), { text: "你好，我在学习汉语。" }),
       h("span", { class: "muted small", id: "voice-note" }, voiceNote()))));
-
-  // Sync
-  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Sync"),
-    h("p", { class: "muted", id: "sync-note" }, PILL[Sync.status][1]),
-    h("p", { class: "muted small" }, "Synced: your nickname, My Zì, flashcard progress and XP, recent lookups, reader text and these settings. Stored privately for your account; nobody else can read them.")));
 
   // Reset: box layout and factory reset (51-reset)
   v.append(resetBox());
@@ -206,7 +211,7 @@ function customEditor() {
     return h("label", { class: "custom-pick", for: "custom-" + key }, inp, h("span", { class: "small" }, label));
   };
   const base = h("select", { id: "custom-base" });
-  for (const k of SHAPE_BASES) { const o = h("option", { value: k }, PRESETS[k].label); if (k === state.custom.base) o.selected = true; base.append(o); }
+  for (const k of SHAPE_BASES.filter(k => !BONUS_THEMES[k] || unlocked(BONUS_THEMES[k]))) { const o = h("option", { value: k }, PRESETS[k].label); if (k === state.custom.base) o.selected = true; base.append(o); }
   base.addEventListener("change", () => { commit({ custom: { ...state.custom, base: base.value } }); applyLook(); });
   box.append(
     h("div", { class: "row custom-picks" }, picker("bg", "Background"), picker("surface", "Cards"), picker("ink", "Text"), picker("accent", "Accent")),

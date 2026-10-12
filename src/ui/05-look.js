@@ -51,13 +51,19 @@ function isAltMode(key) {
 }
 deviceDark.addEventListener("change", () => { if (state.mode === "auto" || (state.mode === "theme" && state.preset === "ink")) { applyLook(); if (ui.view === "settings") render(false); } });
 
+/** The theme to show: your choice, or Ink while that theme is still locked (Silver River before level 40, say). */
+function usablePreset() {
+  const b = BONUS_THEMES[state.preset];
+  return b && !unlocked(b) ? "ink" : state.preset;
+}
 function applyLook() {
   const r = document.documentElement;
   const mle = state.mle && state.mle.on;
+  const preset = usablePreset();
   if (mle) r.setAttribute("data-preset", "ends");
-  else if (state.preset === "ink") r.removeAttribute("data-preset"); else r.setAttribute("data-preset", state.preset);
+  else if (preset === "ink") r.removeAttribute("data-preset"); else r.setAttribute("data-preset", preset);
   r.classList.toggle("mle-mode", !!mle);
-  r.setAttribute("data-mode", modeFor(mle ? "ends" : state.preset));
+  r.setAttribute("data-mode", modeFor(mle ? "ends" : preset));
   CUSTOM_VARS.forEach(p => r.style.removeProperty(p));
   r.style.colorScheme = "";
   if (state.accent) {
@@ -78,7 +84,7 @@ function applyLook() {
     if (tones) r.style.setProperty("--t" + (i + 1), tones[i]); else r.style.removeProperty("--t" + (i + 1));
   }
   if (state.preset === "custom" && state.custom && !mle) applyCustom(r);
-  const base = mle ? "ends" : state.preset === "custom" && state.custom ? state.custom.base : state.preset;
+  const base = mle ? "ends" : preset === "custom" && state.custom ? state.custom.base : preset;
   const shape = state.shapes ? base : "plain";
   r.setAttribute("data-shape", shape);
   if (state.uiFont === "standard") loadFontCss(THEME_FONTS[shape]);

@@ -108,7 +108,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; tex
   transform: rotate(-4deg);
 }
 .brand-name { font-family: var(--font-display); font-weight: 750; font-size: 1.3rem; letter-spacing: -0.02em; }
-.sync { font-size: .75rem; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+/* the sync button in Settings → Profile: an ordinary button with a status dot */
 .sync::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--t5); }
 .sync[data-s="synced"]::before { background: var(--t3); }
 .sync[data-s="saving"]::before { background: var(--t2); }
@@ -349,11 +349,8 @@ input[type="range"] { width: min(220px, 52vw); }
   font-size: .78rem; font-weight: 700; white-space: nowrap;
 }
 .lvl .hz { font-size: .95rem; }
-button.sync { background: none; height: 30px; color: var(--ink-soft); }
 .gear[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 @media (max-width: 480px) {
-  .sync .sync-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .sync { padding: 0 10px; }
   .me-name { font-size: 1.1rem; }
 }
 

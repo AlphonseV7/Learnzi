@@ -71,7 +71,7 @@ function drawWelcome() {
     }
     const L = LEVELS[wz.level];
     body.append(h("h2", null, "How much Chinese do you know?"), list,
-      h("p", { class: "muted small" }, "You'll start with " + L.decks.filter(d => d !== "starred").map(deckName).join(" and ") + ", " + L.perDay + " new words a day" + (L.pinyin ? "" : ", pinyin hidden") + ". Change any of it in Settings."));
+      h("p", { class: "muted small" }, "You'll start with " + L.decks.filter(d => d !== "starred").map(deckName).join(" and ") + ", " + L.perDay + " new words a day. Change any of it in Settings."));
   }
   const card = h("div", { class: "card welcome-card" + (s === 0 ? " intro" : "") }, s > 0 ? dots : null, body,
     h("div", { class: "row wz-buttons" }, back, next));
@@ -93,7 +93,7 @@ function closeWelcome() {
 function finishWelcome() {
   const L = LEVELS[wz.level];
   const av = { ...sanitizeAvatar(state.avatar), animal: wz.animal, starter: wz.animal };
-  commit({ avatar: av, nickname: cleanLine(wz.name, 24), accent: wz.accent, level: wz.level, activeDecks: [...L.decks], newPerDay: L.perDay, pinyin: L.pinyin, onboarded: true });
+  commit({ avatar: av, nickname: cleanLine(wz.name, 24), accent: wz.accent, level: wz.level, activeDecks: [...L.decks], newPerDay: L.perDay, onboarded: true });
   applyLook();
   updateTopbar();
   closeWelcome();
@@ -104,7 +104,7 @@ function finishWelcome() {
 // ---------- tour ----------
 const TAB_WORDS = [
   ["home", "家", "jiā", "home", "Home: your day at a glance."],
-  ["study", "学", "xué", "study", "Study: flashcards, decks, My cards and Look up."],
+  ["study", "学", "xué", "study", "Study: Review today's flashcards, your Decks and Cards, and Look up."],
   ["tools", "具", "jù", "tool", "Tools: the Reader, Watch and Listen, Photo to words and the Tone trainer."],
   ["myzi", "字", "zì", "character", "My Zì: my cards, decks, badges and progress."],
 ];
@@ -116,10 +116,23 @@ const TOUR = [
   ...TAB_WORDS.map(([key, c, p, en, text]) => ({ at: () => navBtn(key), nav: true, word: { c, p, en }, say: () => [text] })),
   { at: () => document.querySelector(".wotd .glyph"), wait: "panel", say: () => [h("b", null, "Try it: "), "tap the word of the day."] },
   { at: () => $("#panel"), say: () => ["Every word opens like this: the meaning, a voice to hear it, stroke order and examples. Tap ☆ to save it to My cards."], leave: () => closePanel() },
+  { at: () => document.querySelector(".wotd"), say: tourPinyin },
   { at: () => document.querySelector(".study-prompt"), say: () => ["Flashcards come back just before you'd forget them. After each one, tell me how it went: Again, Hard, Good or Easy."] },
   { at: () => document.querySelector(".view > .fold .fold-head"), say: () => ["Tap a box's title to fold it. Hold ⠿ to move it, and × removes it. Make Home yours."] },
   { finish: true, word: { c: "加油", p: "jiāyóu", en: "you've got this" }, say: () => ["Here's your first badge. See you at your first flashcard!"] },
 ];
+/** The pinyin and tone colours step: two switches that change the real settings, so you see them
+ *  on the word of the day straight away. */
+function tourPinyin() {
+  const sw = (key, label) => {
+    const b = h("button", { class: "chip filter-chip", type: "button", "aria-pressed": String(!!state[key]) }, label);
+    b.addEventListener("click", () => { commit({ [key]: !state[key] }); applyLook(); b.setAttribute("aria-pressed", String(!!state[key])); });
+    return b;
+  };
+  return [h("b", null, "Pinyin and tone colours. "), "Pinyin shows how to say each character; tone colours paint each of the four tones its own colour. Both start off. Try them:",
+    h("span", { class: "row tour-toggles" }, sw("pinyin", "Pinyin"), sw("tones", "Tone colours")),
+    h("span", { class: "muted small" }, "Change them any time in Settings → Reading.")];
+}
 let tour = null;
 function startTour() {
   if ($("#tour") || mleOn()) return;

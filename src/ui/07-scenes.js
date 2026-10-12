@@ -143,7 +143,8 @@ let sceneKey = "";
 function renderScene() {
   const host = $("#zen");
   if (!host) return;
-  const base = state.mle && state.mle.on ? "ends" : state.preset === "custom" && state.custom ? state.custom.base : state.preset;
+  const p = usablePreset();
+  const base = state.mle && state.mle.on ? "ends" : p === "custom" && state.custom ? state.custom.base : p;
   const kind = state.zen ? (SCENES[base] ? base : "ink") : "";
   if (kind === sceneKey) return;
   sceneKey = kind;

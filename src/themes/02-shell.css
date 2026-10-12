@@ -6,7 +6,7 @@
 :root[data-shape="cyber"] .app .main > .topbar.card { padding-inline: 16px 22px; }
 .topbar.card .me { min-width: 0; flex: 1; }
 .topbar.card .top-right { gap: 6px; }
-@media (max-width: 400px) { .topbar.card .sync { padding-inline: 8px; } .topbar.card .lvl { padding-inline: 8px; } }
+@media (max-width: 400px) { .topbar.card .lvl { padding-inline: 8px; } }
 
 .navmenu {
   position: fixed; z-index: 60; display: grid; gap: 4px; padding: 8px; min-width: 230px; max-width: calc(100vw - 20px);

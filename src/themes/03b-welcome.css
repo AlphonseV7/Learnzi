@@ -78,3 +78,4 @@
 .stamp-text { display: grid; gap: 2px; padding: 10px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); animation: wzCard .3s .35s both; }
 .stamp.out { opacity: 0; transition: opacity .4s; }
 .stamp.calm .seal-badge.big, .stamp.calm .stamp-text { animation: none; }
+.tour-toggles { display: flex; gap: 8px; margin: 8px 0 4px; }

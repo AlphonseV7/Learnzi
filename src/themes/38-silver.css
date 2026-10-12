@@ -1,0 +1,72 @@
+/* ---------- Silver River 银河: the Milky Way at night. Frosted-glass panels over a starry sky, an aurora
+   accent (violet melting into cyan), starlight glinting on the corners, airy space lettering. ---------- */
+:root[data-preset="silver"] {
+  --bg: #090a1c; --surface: #131536; --surface-2: #1c1e47; --ink: #eceaff; --ink-soft: #aeaddb;
+  --line: #2d2f63; --accent: #a18cff; --accent-ink: #0d0626; --accent-soft: #2b2563; --aurora: #5fe6ff;
+  --t1: #ff7a95; --t2: #ffb35c; --t3: #5fe0a0; --t4: #74bcff; --t5: #a4a3c8;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 30px rgb(2 0 30 / .55);
+  color-scheme: dark;
+}
+:root[data-shape="silver"] {
+  --font-display: "Syne", "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zen-k: 1.6;
+  --glass: color-mix(in srgb, var(--surface) 80%, transparent);
+  --rim: linear-gradient(135deg, color-mix(in srgb, var(--accent) 70%, transparent), color-mix(in srgb, var(--line) 80%, transparent) 38%, color-mix(in srgb, var(--line) 80%, transparent) 62%, color-mix(in srgb, var(--aurora, #5fe6ff) 55%, transparent));
+}
+:root[data-shape="silver"] body { background: radial-gradient(ellipse at 70% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%), var(--bg); }
+:root[data-shape="silver"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: .01em; }
+:root[data-shape="silver"] h1 { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
+:root[data-shape="silver"] :is(h1, h2, h3) :is(.py, rt, .hz) { -webkit-text-fill-color: initial; }
+:root[data-shape="silver"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✦ "; color: var(--aurora, #5fe6ff); }
+/* frosted glass with a starlit rim */
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .lu-card, .pv-box) {
+  position: relative; border: 1px solid transparent; border-radius: 18px;
+  background: linear-gradient(var(--glass), var(--glass)) padding-box, var(--rim) border-box;
+  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / .05);
+}
+/* a four-point star glinting on the corner of each main panel */
+:root[data-shape="silver"] :is(.view > .card, .action)::after {
+  content: ""; position: absolute; right: 12px; top: -6px; width: 12px; height: 12px; pointer-events: none;
+  background: var(--ink); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 4px var(--aurora, #5fe6ff)); animation: silverGlint 4.5s ease-in-out infinite;
+}
+:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n)::after { animation-delay: -1.5s; right: 30px; }
+:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n+1)::after { animation-delay: -3s; right: 20%; }
+@keyframes silverGlint { 0%, 100% { opacity: .25; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
+:root[data-shape="silver"] :is(.btn, .chip, .seg, .lvl, .stat, .swatch, .av-tile, .tone-opt, .grade) { border-radius: 999px; }
+:root[data-shape="silver"] :is(.stat, .swatch, .av-tile, .tone-opt, .grade) { border-radius: 16px; }
+:root[data-shape="silver"] .btn { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--surface-2) 80%, transparent); }
+:root[data-shape="silver"] .btn.primary {
+  border-color: transparent; color: #0d0626; font-weight: 700;
+  background: linear-gradient(120deg, var(--accent), var(--aurora, #5fe6ff));
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .12) inset, 0 6px 22px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+:root[data-shape="silver"] .lvl { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+:root[data-shape="silver"] :is(.bar > i, .xpbar > i) { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); }
+:root[data-shape="silver"] .nav { background: color-mix(in srgb, var(--surface) 70%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+:root[data-shape="silver"] .seal { background: linear-gradient(135deg, var(--accent), var(--aurora, #5fe6ff)); color: #0d0626; }
+
+/* the scene's moving parts */
+.zen-magpies { animation: silverBob 6s ease-in-out infinite alternate; }
+@keyframes silverBob { to { transform: translateY(-6px); } }
+.zen-star { animation: silverGlint 5s ease-in-out infinite; }
+@keyframes silverGlint { 50% { opacity: .65; } }
+.zen-shoot { opacity: 0; animation: silverShoot 11s linear infinite 2s; }
+@keyframes silverShoot { 0% { opacity: 0; transform: translate(1150px, 60px); } 2% { opacity: 1; } 9% { opacity: 0; transform: translate(760px, 210px); } 100% { opacity: 0; transform: translate(760px, 210px); } }
+
+/* level-up: warp streaks, then a constellation drawing itself */
+.levelup[data-fx="warp"] .warp-line {
+  position: absolute; left: 50%; top: 42%; width: var(--len); height: 2px; border-radius: 2px; transform-origin: 0 50%; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--ink), var(--aurora, #5fe6ff));
+  animation: warp .9s cubic-bezier(.3, 0, .6, 1) var(--delay) forwards;
+}
+@keyframes warp { 0% { opacity: 0; transform: rotate(var(--a)) translateX(10px) scaleX(.2); } 30% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(46vmax) scaleX(1.6); } }
+.levelup[data-fx="warp"] .constellation { position: absolute; left: 6%; right: 6%; top: 8%; height: 22%; overflow: visible; }
+.levelup[data-fx="warp"] .constellation polyline { stroke: color-mix(in srgb, var(--aurora, #5fe6ff) 70%, transparent); stroke-width: .35; stroke-dasharray: 120; stroke-dashoffset: 120; animation: drawLine 1.4s ease-out .9s forwards; vector-effect: non-scaling-stroke; }
+.levelup[data-fx="warp"] .constellation circle { fill: var(--ink); opacity: 0; animation: starOn .4s ease-out forwards; filter: drop-shadow(0 0 2px var(--aurora, #5fe6ff)); }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+@keyframes starOn { to { opacity: 1; } }
+.levelup[data-fx="warp"] .lu-seal { background: linear-gradient(135deg, var(--accent), var(--aurora, #5fe6ff)); color: #0d0626; box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 60%, transparent); }
+@media (prefers-reduced-motion: reduce) { .zen-shoot { display: none; } }

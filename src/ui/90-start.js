@@ -60,7 +60,6 @@ function start() {
   });
   $("#clock-badge").addEventListener("click", () => go("debug"));
   $("#me").addEventListener("click", () => go("myzi"));
-  $("#sync").addEventListener("click", () => toast(PILL[Sync.status][1]));
   $("#lvl").addEventListener("click", () => go("myzi"));
   $("#scrim").addEventListener("click", closePanel);
   window.addEventListener("hashchange", () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== ui.view) go(v); });

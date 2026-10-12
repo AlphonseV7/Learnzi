@@ -148,3 +148,47 @@ SCENES.ends = function () {
   out.push(bus);
   return out;
 };
+
+/* Silver River (银河, the Milky Way): a night sky full of stars, the Milky Way sweeping across, and the
+ * two stars of the Qixi legend on either bank: Vega, the Weaver Girl (织女), and Altair, the Cowherd
+ * (牛郎), who may cross only once a year on a bridge of magpies. Now and then a shooting star. */
+SCENES.silver = function () {
+  const r = seeded(77);
+  const out = [];
+  // the Milky Way: soft overlapping glows along a diagonal band, then dense star dust inside it
+  const band = (t, w) => [80 + t * 1040, 760 - t * 700 + Math.sin(t * 5) * 30, w];
+  for (let i = 0; i <= 22; i++) {
+    const t = i / 22, [x, y, w] = band(t, 120 + 60 * Math.sin(t * 3.1));
+    out.push(sv("ellipse", { cx: x.toFixed(0), cy: y.toFixed(0), rx: (w * 1.6).toFixed(0), ry: (w * 0.55).toFixed(0), transform: "rotate(-34 " + x.toFixed(0) + " " + y.toFixed(0) + ")",
+      style: fill(i % 3 ? "--accent" : "--t4", 0.05) + "; filter: blur(18px)" }));
+  }
+  for (let i = 0; i < 260; i++) {
+    const t = r(), [x, y, w] = band(t, 110);
+    const dx = (r() - 0.5) * w * 2.2, dy = (r() - 0.5) * w * 0.9;
+    out.push(sv("circle", { cx: (x + dx * 0.83 + dy * 0.56).toFixed(1), cy: (y - dx * 0.56 + dy * 0.83).toFixed(1), r: (0.4 + r() * 0.9).toFixed(2), style: fill("--ink", 0.18 + r() * 0.25) }));
+  }
+  // the rest of the sky
+  for (let i = 0; i < 150; i++) {
+    const big = r() > 0.88;
+    out.push(sv("circle", { cx: (r() * 1200).toFixed(0), cy: (r() * 800).toFixed(0), r: (big ? 1.4 + r() : 0.5 + r() * 0.8).toFixed(2),
+      class: r() > 0.55 ? "zen-twinkle" : null, style: fill(big && r() > 0.5 ? "--t4" : "--ink", big ? 0.55 : 0.3) + "; animation-delay: " + (-r() * 4).toFixed(2) + "s" }));
+  }
+  // Vega and Altair, each with a four-point glint and its name
+  const star = (x, y, label) => sv("g", { class: "zen-star", transform: "translate(" + x + " " + y + ")" },
+    sv("circle", { r: 14, style: fill("--accent", 0.12) + "; filter: blur(6px)" }),
+    sv("path", { d: "M0 -16 L2 -2 L16 0 L2 2 L0 16 L-2 2 L-16 0 L-2 -2 Z", style: fill("--ink", 0.75) }),
+    sv("circle", { r: 2.6, style: fill("--ink", 0.95) }),
+    sv("text", { x: 20, y: 5, "font-size": 15, style: fill("--ink-soft", 0.5) + "; font-family: var(--font-hanzi)" }, label));
+  out.push(star(455, 230, "织女"), star(700, 590, "牛郎"));
+  // the magpie bridge: little birds in an arc across the river between them
+  const birds = [];
+  for (let i = 0; i < 7; i++) {
+    const t = 0.2 + 0.6 * i / 6, x = 455 + (700 - 455) * t, y = 230 + (590 - 230) * t - Math.sin(t * Math.PI) * 120;
+    birds.push(sv("path", { d: "M" + (x - 7).toFixed(0) + " " + y.toFixed(0) + " q7 -6 7 0 q0 -6 7 0", style: "fill: none; stroke: var(--ink-soft); stroke-width: 1.4; opacity: calc(.32 * var(--zen-k, 1))" }));
+  }
+  out.push(sv("g", { class: "zen-magpies" }, birds));
+  // a shooting star
+  out.push(sv("g", { class: "zen-shoot" }, sv("path", { d: "M0 0 L-120 -46", style: "stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; opacity: calc(.6 * var(--zen-k, 1))" }),
+    sv("circle", { r: 2, style: fill("--ink", 0.9) })));
+  return out;
+};

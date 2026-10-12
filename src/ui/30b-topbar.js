@@ -25,6 +25,11 @@ function xpBarShow(info) {
     if (frac > xpShown.frac) { bar.classList.remove("filling"); void bar.offsetWidth; bar.classList.add("filling"); clearTimeout(bar.fillTimer); bar.fillTimer = setTimeout(() => bar.classList.remove("filling"), 1600); }
   }
   xpShown = { level: info.level, frac, mle };
+  // The numbers: beside the bar on a computer, printed on the bar on phones (less room there).
+  const txt = info.into + "/" + info.need;
+  const num = $("#xpnum"), inBar = bar.querySelector(".xpbar-num");
+  if (num) num.textContent = txt;
+  if (inBar) inBar.textContent = txt;
 }
 /** Tiny characters drift from the level pill into the end of the bar. */
 function xpFlow(chars, gained) {

@@ -111,7 +111,15 @@ function chime(delay) {
 function levelEffects(kind) {
   const fx = [];
   const add = (cls, vars) => { const el = h("span", { class: cls }); for (const [k, v] of Object.entries(vars)) el.style.setProperty(k, v); fx.push(el); };
-  if (kind === "lanterns") {
+  if (kind === "warp") {
+    // Silver River: stars streak past at warp speed, then a constellation draws itself.
+    for (let i = 0; i < 28; i++) add("warp-line", { "--a": (i * (360 / 28) + (i % 3) * 4) + "deg", "--len": (60 + (i % 5) * 26) + "px", "--delay": ((i % 7) * 0.05) + "s" });
+    const pts = [[16, 28], [30, 18], [44, 30], [58, 20], [74, 30], [86, 18]];
+    const svgc = sv("svg", { class: "constellation", viewBox: "0 0 100 50", preserveAspectRatio: "none" },
+      sv("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none" }),
+      pts.map(([x, y], i) => sv("circle", { cx: x, cy: y, r: 1.1, style: "animation-delay: " + (0.9 + i * 0.16) + "s" })));
+    fx.push(svgc);
+  } else if (kind === "lanterns") {
     for (let i = 0; i < 9; i++) add("lantern", { "--x": (6 + i * 11 + (i % 3) * 2) + "%", "--delay": (i * 0.12 + (i % 2) * 0.2) + "s", "--dur": (3.4 + (i % 4) * 0.5) + "s", "--r": ((i % 2 ? 1 : -1) * (4 + i)) + "deg", "--sz": (0.75 + (i % 3) * 0.2) });
   } else {
     // Ink blots spread out behind the seal (also used under neon, tinted by the theme).
@@ -132,7 +140,7 @@ function showLevelUp(level, from) {
   const rank = rankFor(level).rank, newRank = rank !== rankFor(from || level - 1).rank ? rank : null;
   const shape = document.documentElement.getAttribute("data-shape");
   const base = shape && shape !== "plain" ? shape : state.preset;
-  const kind = { arcade: "pixel", lantern: "lanterns", nightmarket: "neon", cyber: "neon", jade: "ripple", porcelain: "blue", peach: "petals", imperial: "gold" }[base] || "ink";
+  const kind = { arcade: "pixel", lantern: "lanterns", nightmarket: "neon", cyber: "neon", jade: "ripple", porcelain: "blue", peach: "petals", imperial: "gold", silver: "warp" }[base] || "ink";
   const ov = h("div", { class: "levelup", id: "levelup", "data-fx": kind, role: "dialog", "aria-modal": "true", "aria-labelledby": "lu-title" },
     h("div", { class: "lu-fx", "aria-hidden": "true" }, levelEffects(kind)),
     h("div", { class: "lu-card" },

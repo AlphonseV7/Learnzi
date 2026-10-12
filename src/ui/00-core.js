@@ -11,12 +11,12 @@ const READER_MAX = 75000; // characters; keeps the synced reader document under 
 const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug"];
 const DECK_ID = /^(starred|welcome|hsk[1-6]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
-// Your Chinese level from the welcome: which decks start, new words a day, pinyin, word of the day, Reader sample.
+// Your Chinese level from the welcome: which decks start, new words a day, word of the day, Reader sample.
 const LEVELS = {
-  new: { label: "Brand new", zh: "零基础", note: "I've never studied Chinese", decks: ["starred", "welcome"], perDay: 5, pinyin: true, hsk: 1 },
-  little: { label: "A little", zh: "入门", note: "I know some basics, around HSK 1–2", decks: ["starred", "welcome", "hsk1"], perDay: 10, pinyin: true, hsk: 2 },
-  middle: { label: "Getting comfortable", zh: "中级", note: "I can manage everyday Chinese, around HSK 3–4", decks: ["starred", "hsk3"], perDay: 15, pinyin: true, hsk: 3 },
-  high: { label: "Confident", zh: "高级", note: "I read and talk with ease, around HSK 5–6", decks: ["starred", "hsk5"], perDay: 20, pinyin: false, hsk: 5 },
+  new: { label: "Brand new", zh: "零基础", note: "I've never studied Chinese", decks: ["starred", "welcome"], perDay: 5, hsk: 1 },
+  little: { label: "A little", zh: "入门", note: "I know some basics, around HSK 1–2", decks: ["starred", "welcome", "hsk1"], perDay: 10, hsk: 2 },
+  middle: { label: "Getting comfortable", zh: "中级", note: "I can manage everyday Chinese, around HSK 3–4", decks: ["starred", "hsk3"], perDay: 15, hsk: 3 },
+  high: { label: "Confident", zh: "高级", note: "I read and talk with ease, around HSK 5–6", decks: ["starred", "hsk5"], perDay: 20, hsk: 5 },
 };
 // Original short texts for the Reader, one per level.
 const SAMPLES = {
@@ -99,18 +99,20 @@ const PRESETS = {
   porcelain: { label: "Porcelain", note: "Blue and white", mode: "light", dots: ["#f4f6fb", "#1f45a8", "#c9302c", "#23874a"], alt: ["#0c111f", "#86a3ff", "#ff6f66", "#52c983"] },
   lantern: { label: "Lantern", note: "Warm glow", mode: "dark", dots: ["#1d1312", "#e9a945", "#ff7a66", "#82a8ff"], alt: ["#fbf3e7", "#a85a12", "#c8352b", "#2f5fc4"] },
   nightmarket: { label: "Night Market", note: "Neon signs", mode: "dark", dots: ["#0f1220", "#ff5c8a", "#5fe0a0", "#6fb2ff"], alt: ["#f6f4fb", "#d3205f", "#1d8a4f", "#2a5fc8"] },
-  peach: { label: "Peach Blossom", note: "Unlocks at level 4", mode: "light", dots: ["#fbf1f1", "#c2456b", "#7a9a3a", "#3f6fb5"], alt: ["#1b1115", "#ff8db0", "#9ccc5a", "#7ea8ff"] },
-  imperial: { label: "Imperial", note: "Unlocks at level 8", mode: "dark", dots: ["#1a0f0d", "#d9a93f", "#e05a4a", "#7fb0ff"], alt: ["#f8f0e0", "#946512", "#c0392b", "#2f5bb8"] },
+  peach: { label: "Peach Blossom", note: "Blossom and petals", mode: "light", dots: ["#fbf1f1", "#c2456b", "#7a9a3a", "#3f6fb5"], alt: ["#1b1115", "#ff8db0", "#9ccc5a", "#7ea8ff"] },
+  imperial: { label: "Imperial", note: "Gold and lacquer", mode: "dark", dots: ["#1a0f0d", "#d9a93f", "#e05a4a", "#7fb0ff"], alt: ["#f8f0e0", "#946512", "#c0392b", "#2f5bb8"] },
   arcade: { label: "Retro Arcade", note: "Pixels", mode: "dark", dots: ["#07071a", "#ffd23f", "#ff4f64", "#3ef07a"], alt: ["#eceeff", "#c8155f", "#4040b8", "#12894a"] },
   cyber: { label: "Cyberedge", note: "Neon polygons", mode: "dark", dots: ["#05070d", "#00f0ff", "#ff2bd6", "#ffb000"], alt: ["#edf2f6", "#007f9e", "#c0168f", "#b07000"] },
+  silver: { label: "Silver River", note: "银河, the Milky Way", mode: "dark", dots: ["#090a1c", "#a18cff", "#5fe6ff", "#ff8fc7"], alt: ["#f3f0fb", "#5b46c9", "#0f8aa8", "#c2387f"] },
   custom: { label: "Custom", note: "Your own colours", mode: "own", dots: [] },
 };
 const MODES = [["theme", "Theme's own"], ["light", "Light"], ["dark", "Dark"], ["auto", "Match device"]];
-const BONUS_THEMES = { peach: { lv: 4 }, imperial: { lv: 8 } };
-const SHAPE_BASES = ["ink", "jade", "porcelain", "lantern", "nightmarket", "arcade", "cyber"];
+// Themes you earn: Peach Blossom at level 4 up to Silver River at 40. The others are free from the start.
+const BONUS_THEMES = { peach: { lv: 4 }, imperial: { lv: 8 }, nightmarket: { lv: 12 }, arcade: { lv: 18 }, cyber: { lv: 25 }, silver: { lv: 40 } };
+const SHAPE_BASES = ["ink", "jade", "porcelain", "lantern", "nightmarket", "arcade", "cyber", "silver"];
 // Themes with their own English fonts (used unless you pick another English font in Settings).
 const THEME_FONTS = {
-  ink: "LXGW+WenKai+TC:wght@400;700",
+  ink: "Lexend:wght@400;500;600;700",
   ends: "Permanent+Marker&family=Barlow:wght@400;500;600;700",
   jade: "Quicksand:wght@600;700",
   porcelain: "Cormorant+Garamond:ital,wght@1,600;1,700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700",
@@ -120,6 +122,7 @@ const THEME_FONTS = {
   imperial: "Cinzel:wght@600;700&family=EB+Garamond:wght@400;500;600;700",
   arcade: "Press+Start+2P&family=Tiny5",
   cyber: "Orbitron:wght@600;800&family=Chakra+Petch:wght@400;600;700",
+  silver: "Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700",
 };
 const HEX = /^#[0-9a-f]{6}$/i;
 // Chinese fonts (characters only).
@@ -148,6 +151,11 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["13 Oct", "New theme at level 40: Silver River (银河), the Milky Way with the Weaver Girl and Cowherd stars"],
+  ["13 Oct", "Night Market, Retro Arcade and Cyberedge now unlock at levels 12, 18 and 25"],
+  ["13 Oct", "Pinyin and tone colours start off; the tour shows what they do. Ink uses the Lexend font"],
+  ["13 Oct", "Sync moved to Settings → Profile; XP numbers sit inside the bar on phones"],
+  ["13 Oct", "Study menu: Review and Cards"],
   ["12 Oct", "Sync: flashcard progress is now saved in 17 smaller parts, so it keeps syncing for years"],
   ["12 Oct", "Welcome for new learners: pick your companion, name, colour and level, then a tour with your avatar"],
   ["12 Oct", "Badges: 18 seal stamps to collect in My Zì"],
@@ -181,7 +189,7 @@ const UPDATES = [
 
 // ---------- saved state (validated whenever it comes from storage or sync) ----------
 const DEFAULTS = {
-  v: 2, nickname: "", script: "s", pinyin: true, tones: true, preset: "ink", accent: "", font: "sans", uiFont: "standard",
+  v: 2, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "sans", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
   zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
   saved: [], recent: [], decks: [], activeDecks: ["starred", "welcome"], updatedAt: 0,
@@ -195,8 +203,9 @@ function sanitize(raw) {
   const s = { ...DEFAULTS };
   s.nickname = cleanLine(o.nickname, 24);
   s.script = o.script === "t" ? "t" : "s";
-  s.pinyin = o.pinyin !== false;
-  s.tones = o.tones !== false;
+  // Pinyin and tone colours start off (the tour shows what they do and where to turn them on).
+  s.pinyin = typeof o.pinyin === "boolean" ? o.pinyin : false;
+  s.tones = typeof o.tones === "boolean" ? o.tones : false;
   s.preset = Object.hasOwn(PRESETS, o.preset) ? o.preset : "ink";
   s.accent = typeof o.accent === "string" && /^#[0-9a-f]{6}$/i.test(o.accent) ? o.accent.toLowerCase() : "";
   s.font = Object.hasOwn(FONTS, o.font) ? o.font : "sans";
