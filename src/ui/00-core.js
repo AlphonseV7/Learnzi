@@ -133,6 +133,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Listen: audiobooks that follow along, as an Audio tab next to Watch; tap along to time plain text"],
   ["12 Oct", "Watch: videos with tappable subtitles, side by side on a computer; flashcards that play the moment from the video"],
   ["12 Oct", "Photo to words: read Chinese in photos and screenshots on your device, then make a deck"],
   ["12 Oct", "Built-in samples to try Watch and Photo to words"],
@@ -251,7 +252,7 @@ function sanitize(raw) {
       // A deck made in Watch remembers its videos (name and size, to find the file again) and, per word,
       // the moment it's said: v = [start, end, which video], x = the line (shown as plain text).
       const videos = Array.isArray(d.videos) ? d.videos.filter(x => x && typeof x.name === "string").slice(0, 20)
-        .map(x => ({ name: cleanLine(x.name, 120), size: Math.floor(num(x.size, 0, 1e13, 0)) })) : [];
+        .map(x => ({ name: cleanLine(x.name, 120), size: Math.floor(num(x.size, 0, 1e13, 0)), ...(x.a === true ? { a: true } : {}) })) : [];
       const words = Array.isArray(d.words) ? d.words.filter(w => w && typeof w.s === "string" && typeof w.p === "string").slice(0, Math.max(0, room))
         .map(w => {
           const out = { s: w.s.slice(0, 32), p: w.p.slice(0, 120) };

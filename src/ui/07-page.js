@@ -8,7 +8,9 @@ const PAGES = {
   deck: () => { const b = BUILTIN[ui.deckId]; return { title: deckExists(ui.deckId) ? deckName(ui.deckId) : "Deck", zhPlain: b ? b.zh : null, desc: b ? b.note : "Your own deck.", back: ["Decks", "decks"] }; },
   study: () => ({ title: "Study", zh: "学习", py: "xue2 xi2", desc: "Today's flashcards, with new words mixed in." }),
   reader: () => ({ title: "Reader", zh: "阅读", py: "yue4 du2", desc: "Paste Chinese text or import a text file. Tap a word to see its meaning; tap it again to hear it." }),
-  watch: () => ({ title: "Watch", zh: "看视频", py: "kan4 shi4 pin2", desc: "Play a video from your device with its Chinese subtitles. Tap any word to pause and look it up. Each line you watch earns 1 XP (up to " + MEDIA_CAP + " a day)." }),
+  watch: () => (isAudio()
+    ? { title: "Listen", zh: "听书", py: "ting1 shu1", desc: "Play an audiobook or recording from your device with its Chinese text. Tap any word to pause and look it up. Each sentence you hear earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Watch)." }
+    : { title: "Watch", zh: "看视频", py: "kan4 shi4 pin2", desc: "Play a video from your device with its Chinese subtitles. Tap any word to pause and look it up. Each line you watch earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Listen)." }),
   photo: () => ({ title: "Photo to words", zh: "拍照识字", py: "pai1 zhao4 shi2 zi4", desc: "Read the Chinese in a photo or screenshot, then make flashcards from its words." }),
   tones: () => ({ title: "Tone trainer", zh: "声调", py: "sheng1 diao4", desc: "Listen, then pick the tone. Every correct answer earns 2 XP (up to " + TONE_CAP + " a day) and grows your water garden." }),
   myzi: () => ({ title: "My Zì", zh: "我的字", py: "wo3 de5 zi4", desc: "You, your level and your progress." }),

@@ -88,3 +88,17 @@
   .watch-left .watch-video { max-height: 70vh; }
 }
 .line-in { display: block; }
+
+/* ---------- Video | Audio tabs, the audio player, tap along ---------- */
+.media-tabs { order: 0; justify-self: center; }
+.media-tabs button { padding-inline: 18px; }
+.listen-stage { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface-2); }
+.listen-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 1.6rem; }
+.watch-audio { width: 100%; max-height: none; background: transparent; }
+.tap-card .tap-next { margin: 0; font-size: 1.5rem; line-height: 1.6; min-height: 2.4em; }
+.tap-btns { gap: 8px; align-items: center; }
+.tap-btns .tap-now { min-width: 9rem; }
+.watch-view .watch-now { order: 2; }
+.watch-view .tap-card { order: 2; }
+.wl:disabled { opacity: .55; cursor: default; }
+.clip-audio { width: 100%; }

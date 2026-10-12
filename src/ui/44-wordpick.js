@@ -58,7 +58,7 @@ function wordDeckCard(opts) {
   return h("div", { class: "card photo-deck" },
     h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Make flashcards"), count),
     h("p", { class: "muted small" }, words.length + (words.length === 1 ? " word" : " words") + " in " + opts.what + ". Words already in your decks start unticked. Tick the ones you want to learn."
-      + (opts.video ? " Each word keeps the moment it's said, so its flashcard can play that bit of the video." : "")),
+      + (opts.video ? " Each word keeps the moment it's said, so its flashcard can play that bit of the " + (opts.video.a ? "recording." : "video.") : "")),
     h("div", { class: "row" },
       h("button", { class: "btn small", type: "button", onclick: () => setAll(true) }, "Tick all"),
       h("button", { class: "btn small", type: "button", onclick: () => setAll(false) }, "Untick all")),
@@ -78,7 +78,7 @@ function addWordsToDeck(id, entries, clip, video) {
     if (video) {
       d.videos = [...(d.videos || [])];
       vi = d.videos.findIndex(x => x.name === video.name && x.size === video.size);
-      if (vi < 0 && d.videos.length < 20) { d.videos.push({ name: video.name, size: video.size }); vi = d.videos.length - 1; }
+      if (vi < 0 && d.videos.length < 20) { d.videos.push({ name: video.name, size: video.size, ...(video.a ? { a: true } : {}) }); vi = d.videos.length - 1; }
     }
     for (const e of entries) {
       const c = clip && vi >= 0 ? clip(e) : null;

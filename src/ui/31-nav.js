@@ -10,7 +10,8 @@ const NAV_MENUS = {
   ],
   tools: [
     { zh: "读", label: "Reader", sub: () => "Paste or import Chinese, tap any word", run: () => go("reader") },
-    { zh: "看", label: "Watch", sub: () => "Videos with Chinese subtitles", run: () => go("watch") },
+    { zh: "看", label: "Watch", sub: () => "Videos with Chinese subtitles", run: () => { setWatchTab("video"); go("watch"); } },
+    { zh: "听", label: "Listen", sub: () => "Audiobooks that follow along", run: () => { setWatchTab("audio"); go("watch"); } },
     { zh: "拍", label: "Photo to words", sub: () => "Read Chinese in a photo, make a deck", run: () => go("photo") },
     { zh: "声", label: "Tone trainer", sub: () => "Hear a word, pick its tones", run: () => { drill.active = false; go("tones"); } },
   ],
