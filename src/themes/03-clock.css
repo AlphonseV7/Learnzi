@@ -53,8 +53,9 @@
 .cl-sparks i:nth-child(3) { right: 0; bottom: 10%; animation-delay: 1.2s; } .cl-sparks i:nth-child(4) { left: 6%; bottom: 0; animation-delay: 1.7s; }
 @keyframes clSpark { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }
 /* tiles in the editor show small live previews */
-.clock-mini { width: 100%; height: 64px; display: grid; place-items: center; overflow: hidden; }
-.clock-mini .clock-face { transform: scale(.42); min-height: 0; padding: 0; }
+.clock-mini { width: 100%; height: 64px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+/* full-size face, shrunk: flex centres it even though it's wider than the tile; fitClockMinis() shrinks wide ones more */
+.clock-mini .clock-face { flex: none; transform: scale(var(--mini, .42)); min-height: 0; padding: 0; }
 .clock-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
 .clock-preview { padding-block: 18px; }
 /* theme touches */

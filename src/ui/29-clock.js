@@ -190,6 +190,15 @@ function switchCtl(id, on, change) {
   return h("span", { class: "toggle" }, inp, h("span"));
 }
 /** Profile → Clock: faces, effects and options. */
+/** Shrink each clock preview so the whole face fits its tile (wide faces like 汉字 words need more). */
+function fitClockMinis() {
+  for (const box of document.querySelectorAll(".clock-mini")) {
+    const face = box.querySelector(".clock-face");
+    if (!face || !box.clientWidth) continue;
+    const s = Math.min(0.42, (box.clientWidth - 10) / face.offsetWidth, (box.clientHeight - 4) / face.offsetHeight);
+    box.style.setProperty("--mini", String(Math.max(0.15, s)));
+  }
+}
 function clockEditor(v) {
   const c = sanitizeClock(state.clock), worn = wornClock();
   v.append(h("div", { class: "card clock-card clock-preview" }, clockBody(worn)));
@@ -218,4 +227,5 @@ function clockEditor(v) {
     opt("clk-h24", "24-hour time", c.h24), opt("clk-secs", "Show seconds", c.secs),
     opt("clk-zhDate", "Date in Chinese", c.zhDate, "十月十二日 星期一, with pinyin")));
   v.append(h("p", { class: "muted small" }, "More faces and effects unlock as my Zì level grows."));
+  requestAnimationFrame(fitClockMinis);
 }

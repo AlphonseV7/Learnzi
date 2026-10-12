@@ -63,6 +63,7 @@ function setupNav() {
     if ($("#navmenu") && !ev.target.closest("#navmenu, .nav button[data-menu]")) closeNavMenu();
   }, true);
   window.addEventListener("resize", closeNavMenu);
+  window.addEventListener("resize", fitClockMinis);
 }
 function markNav() {
   const tab = NAV_TAB[ui.view];
