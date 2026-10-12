@@ -127,8 +127,8 @@ async function playSource(src, clean, p, slow) {
     return true;
   }
   if (src === "word") {
-    if ([...clean].length < 2) return false;
-    const simp = ui.dict === "ready" && !p ? (Engine.lookup(clean)[0] || {}).s || clean : clean;
+    const simp = wordRecKey(clean, p);
+    if (!simp) return false;
     const whole = await recording("w", simp);
     if (!whole) return false;
     playBuffers([{ buf: whole }], slow);
@@ -177,14 +177,24 @@ function speak(text, p, opts = {}) {
     return null;
   })();
 }
+/** The key of a whole-word recording that's safe to play for this text, or null. Single characters
+ *  only when the dictionary knows one reading for them: a character like 行 (háng or xíng) could be
+ *  recorded in the other reading, so it uses the syllable recording of the exact pinyin instead. */
+function wordRecKey(clean, p) {
+  const chars = [...clean];
+  if (chars.length > 1) return ui.dict === "ready" && !p ? (Engine.lookup(clean)[0] || {}).s || clean : clean;
+  if (chars.length !== 1 || ui.dict !== "ready") return null;
+  const list = Engine.lookup(clean);
+  const readings = new Set(list.map(e => e.p.toLowerCase()));
+  if (readings.size !== 1 || (p && !readings.has(p.toLowerCase()))) return null;
+  return list[0].s || clean;
+}
 /** Every source that can say this text: whole-word recording, syllables, browser voice. */
 async function sourcesFor(text, p) {
   const clean = text.replace(/[^\u3400-\u9fff\uf900-\ufaff]/g, "") || text;
   const idx = await audioIndex(), out = [];
-  if ([...clean].length > 1) {
-    const simp = ui.dict === "ready" && !p ? (Engine.lookup(clean)[0] || {}).s || clean : clean;
-    if (idx.has("w|" + simp)) out.push("word");
-  }
+  const simp = wordRecKey(clean, p);
+  if (simp && idx.has("w|" + simp)) out.push("word");
   const keys = pinyinFor(clean, p).flatMap(x => syllableKeys(x.p, x.form));
   if (keys.length && keys.every(k => idx.has("s|" + k.key))) out.push("syllables");
   if (hasTTS()) out.push("browser");
