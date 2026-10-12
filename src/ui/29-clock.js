@@ -198,9 +198,9 @@ function clockEditor(v) {
     for (const [id, item] of Object.entries(CLOCK[key])) {
       const open = unlocked(item);
       const preview = { ...worn, [key]: id, secs: false };
-      grid.append(h("button", { class: "av-tile clock-tile", type: "button", disabled: !open, "aria-pressed": String(c[key] === id),
-        "aria-label": item.label + (open ? "" : ", locked until " + lockText(item)), onclick: () => setClock({ [key]: id }) },
-        h("div", { class: "clock-mini" }, clockFace(preview)), h("b", { class: "small" }, item.label),
+      grid.append(h("button", { class: "av-tile clock-tile" + (keepSecret(item) ? " is-secret" : ""), type: "button", disabled: !open, "aria-pressed": String(c[key] === id),
+        "aria-label": open ? item.label : secretLabel(item), onclick: () => setClock({ [key]: id }) },
+        h("div", { class: "clock-mini" }, clockFace(preview)), h("b", { class: "small" }, secretName(item)),
         open ? null : h("span", { class: "lock small" }, icon("lock"), lockText(item))));
     }
     v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, title), grid));
@@ -217,5 +217,5 @@ function clockEditor(v) {
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Options"),
     opt("clk-h24", "24-hour time", c.h24), opt("clk-secs", "Show seconds", c.secs),
     opt("clk-zhDate", "Date in Chinese", c.zhDate, "十月十二日 星期一, with pinyin")));
-  v.append(h("p", { class: "muted small" }, "More faces and effects unlock as your Zì level grows: 汉字 words at level 3, Pixel LED at 4, Flip at 6 and Neon at 8."));
+  v.append(h("p", { class: "muted small" }, "More faces and effects unlock as my Zì level grows."));
 }

@@ -35,21 +35,22 @@ function deckItem(id) {
     h("button", { class: "btn", type: "button", onclick: () => { setActive(id, true); toast(deckName(id) + " added to your daily study"); render(false); } }, "Start"));
 }
 
-/** My Zì: you. Your avatar and level, today's numbers, your decks and your progress. */
+/** My Zì: me. My avatar and level, today's numbers, my cards, my decks and my progress. */
 function viewMyZi() {
   const v = h("section", { class: "view" });
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
   const a = wornAvatar(), lv = levelNow();
   v.append(h("div", { class: "card me-card" },
-    h("button", { class: "me-card-avatar plain-btn", type: "button", "aria-label": "Edit your avatar", onclick: () => { ui.meTab = "avatar"; go("me"); } }, liveAvatar(96, "Your avatar")),
+    h("button", { class: "me-card-avatar plain-btn", type: "button", "aria-label": "Edit my avatar", onclick: () => { ui.meTab = "avatar"; go("me"); } }, liveAvatar(96, "My avatar")),
     h("div", { class: "stack-tight me-card-info" },
       h("div", { class: "row spread" },
-        h("b", { class: "me-card-name" }, state.nickname || "You"),
+        h("b", { class: "me-card-name" }, state.nickname || "Me"),
         h("button", { class: "btn small", type: "button", onclick: () => { ui.meTab = "avatar"; go("me"); } }, "Edit")),
       h("span", { class: "muted small" }, AV.animal[a.animal].label + " · tap to dress up"),
       levelBar(lv))));
   v.append(studyCard(null, false));
-  v.append(decksBox());
+  v.append(myCardsBox());
+  v.append(decksBox("My decks"));
   v.append(progressPreview());
   return v;
 }
@@ -157,10 +158,11 @@ function afterDeck() {
 }
 
 /** Home: the decks you're studying, each with its progress bar. */
-function decksBox() {
+/** label: "Your decks" on Home, "My decks" on My Zì. */
+function decksBox(label = "Your decks") {
   const ids = ["starred", "welcome", ...state.decks.map(d => d.id), "hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6"].filter(isActive);
   const box = h("div", { class: "card stack" },
-    h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, "Your decks"),
+    h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, label),
       h("button", { class: "plain-btn build-link small", type: "button", onclick: () => go("decks") }, "All decks")));
   if (!ids.length) { box.append(h("p", { class: "muted" }, "No decks yet. Open Study → Decks to start one.")); return box; }
   for (const id of ids.slice(0, 4)) {

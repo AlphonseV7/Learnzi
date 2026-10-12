@@ -1,6 +1,6 @@
 /* LearnZì UI, part 3: how words are drawn, My Zì saving, and the word panel. */
 
-const ui = { view: "home", query: "", stack: [], focus: null, dict: "loading", progress: 0, highlight: null, myziSort: "new", deckId: null, deckShow: 100, picker: false, meTab: "avatar" };
+const ui = { view: "home", query: "", stack: [], focus: null, dict: "loading", progress: 0, highlight: null, myziSort: "new", deckId: null, deckShow: 100, picker: false, meTab: "avatar", cardsDeck: "all", cardsStatus: "all", cardsQ: "", cardsShow: 100 };
 const disp = e => (state.script === "t" ? e.t : e.s);
 const other = e => (state.script === "t" ? e.s : e.t);
 const keyOf = e => e.s + "|" + e.p;

@@ -8,7 +8,7 @@ const LS_KEY = "learnzi.state.v1";
 const READER_KEY = "learnzi.reader.v1";
 const PROGRESS_KEY = "learnzi.progress.v1";
 const READER_MAX = 75000; // characters; keeps the synced reader document under the store's size limit
-const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug"];
+const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug"];
 const DECK_ID = /^(starred|welcome|hsk[1-6]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
 const BUILD = "Day 4 build · avatars";
@@ -133,6 +133,10 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Locked items are shadows with ??? until unlocked (Debug → Show locked items reveals them)"],
+  ["12 Oct", "Recordings: no more clipped endings, the same volume throughout, and Listen slowly keeps the pitch"],
+  ["12 Oct", "My cards: every saved word's flashcards, by deck and status; My Zì says my"],
+  ["12 Oct", "Themes moved to Customise → Theme; Settings keeps fonts, text size and box layout"],
   ["12 Oct", "Voice button: a speaker beside every Listen button shows which voice you hear; tap it to flick to the next one"],
   ["12 Oct", "Top bar: an XP bar that fills as tiny characters fly in; on phones it follows you down the page and tucks away when you stop scrolling"],
   ["12 Oct", "Avatars: seven new animals up to level 50, a halo, faces that react to you, and imperial exam ranks from 学童 to 状元"],
@@ -216,6 +220,7 @@ function sanitize(raw) {
   for (const k of ["tips", "write", "story", "words", "freq", "examples", "notes"]) if (obj(o.details)[k] === false) s.details[k] = false;
   s.voice = o.voice === "browser" ? "browser" : "real";
   s.unlockAll = o.unlockAll === true;
+  s.showLocked = o.showLocked === true;
   // MLE mode (the secret): on/off, unlocked, rude words, its own flashcards, quiz XP and daily counts.
   const m = obj(o.mle), mc = {}, ma = {};
   for (const [k, a] of Object.entries(obj(m.cards)).slice(0, 600)) {

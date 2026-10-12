@@ -13,9 +13,10 @@ const PAGES = {
     : { title: "Watch", zh: "看视频", py: "kan4 shi4 pin2", desc: "Play a video from your device with its Chinese subtitles. Tap any word to pause and look it up. Each line you watch earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Listen)." }),
   photo: () => ({ title: "Photo to words", zh: "拍照识字", py: "pai1 zhao4 shi2 zi4", desc: "Read the Chinese in a photo or screenshot, then make flashcards from its words." }),
   tones: () => ({ title: "Tone trainer", zh: "声调", py: "sheng1 diao4", desc: "Listen, then pick the tone. Every correct answer earns 2 XP (up to " + TONE_CAP + " a day) and grows your water garden." }),
-  myzi: () => ({ title: "My Zì", zh: "我的字", py: "wo3 de5 zi4", desc: "You, your level and your progress." }),
-  stats: () => ({ title: "Progress", zh: "进步", py: "jin4 bu4", desc: "How your studying is going.", back: ["My Zì", "myzi"] }),
-  me: () => ({ title: "Customise", zh: "装扮", py: "zhuang1 ban4", desc: "Dress up your avatar and choose your clock.", back: ["My Zì", "myzi"] }),
+  myzi: () => ({ title: "My Zì", zh: "我的字", py: "wo3 de5 zi4", desc: "My level, my cards, my decks and my progress." }),
+  mycards: () => ({ title: "My cards", zh: "我的卡片", py: "wo3 de5 ka3 pian4", desc: "Every word I've saved and how its flashcards are going.", back: ["My Zì", "myzi"] }),
+  stats: () => ({ title: "My progress", zh: "我的进步", py: "wo3 de5 jin4 bu4", desc: "How my studying is going.", back: ["My Zì", "myzi"] }),
+  me: () => ({ title: "Customise", zh: "装扮", py: "zhuang1 ban4", desc: "Dress up my avatar, choose my clock and pick my theme.", back: ["My Zì", "myzi"] }),
   settings: () => ({ title: "Settings", zh: "设置", py: "she4 zhi4", desc: "How LearnZì looks, sounds and studies." }),
   debug: () => ({ title: "Debug settings", zh: "调试", py: "tiao2 shi4", desc: "Testing tools. Changes made here are real and sync to your other devices, except the clock, which stays on this device.", back: ["Settings", "settings"] }),
 };

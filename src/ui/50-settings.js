@@ -1,31 +1,34 @@
+/* Settings rows, shared with Customise → Theme. */
+const setRow = (id, label, control, hint) => h("div", { class: "set-row" },
+  h("div", { class: "set-label" }, h("label", { for: id }, label), hint ? h("span", { class: "muted small" }, hint) : null), control);
+function setToggle(id, on, change) {
+  const inp = h("input", { type: "checkbox", id, role: "switch" });
+  inp.checked = on;
+  inp.addEventListener("change", () => change(inp.checked));
+  return h("span", { class: "toggle" }, inp, h("span"));
+}
+function setSeg(id, opts, val, pick) {
+  const g = h("div", { class: "seg", role: "group", id });
+  for (const [k, label] of opts) {
+    g.append(h("button", { type: "button", "aria-pressed": String(k === val), onclick: ev => {
+      g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === ev.currentTarget)));
+      pick(k);
+    } }, label));
+  }
+  return g;
+}
+function setSelect(id, table, val, change) {
+  const s = h("select", { id });
+  for (const [k, f] of Object.entries(table)) { const o = h("option", { value: k }, f.label); if (k === val) o.selected = true; s.append(o); }
+  s.addEventListener("change", () => change(s.value));
+  return s;
+}
+
 /* LearnZì UI, part 6: Settings. */
 
 function viewSettings() {
   const v = h("section", { class: "view" });
-  const row = (id, label, control, hint) => h("div", { class: "set-row" },
-    h("div", { class: "set-label" }, h("label", { for: id }, label), hint ? h("span", { class: "muted small" }, hint) : null), control);
-  const toggleCtl = (id, on, change) => {
-    const inp = h("input", { type: "checkbox", id, role: "switch" });
-    inp.checked = on;
-    inp.addEventListener("change", () => change(inp.checked));
-    return h("span", { class: "toggle" }, inp, h("span"));
-  };
-  const seg = (id, opts, val, pick) => {
-    const g = h("div", { class: "seg", role: "group", id });
-    for (const [k, label] of opts) {
-      g.append(h("button", { type: "button", "aria-pressed": String(k === val), onclick: ev => {
-        g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === ev.currentTarget)));
-        pick(k);
-      } }, label));
-    }
-    return g;
-  };
-  const select = (id, table, val, change) => {
-    const s = h("select", { id });
-    for (const [k, f] of Object.entries(table)) { const o = h("option", { value: k }, f.label); if (k === val) o.selected = true; s.append(o); }
-    s.addEventListener("change", () => change(s.value));
-    return s;
-  };
+  const row = setRow, toggleCtl = setToggle, seg = setSeg, select = setSelect;
 
   // Profile
   const nick = h("input", { type: "text", id: "nickname", maxlength: "24", placeholder: "Your name", autocomplete: "nickname", spellcheck: "false" });
@@ -45,51 +48,21 @@ function viewSettings() {
       h("span", { class: "tone-demo" }, pyEl("ma1 ma2 ma3 ma4 ma5"))),
     toneEditor()));
 
-  // Look
-  const sw = h("div", { class: "swatches", role: "group", "aria-label": "Theme" });
-  for (const [key, p] of Object.entries(PRESETS)) {
-    const dots = h("span", { class: "dots" });
-    const colors = key === "custom" ? (state.custom ? [state.custom.bg, state.custom.accent, state.custom.surface, state.custom.ink] : []) : isAltMode(key) ? p.alt : p.dots;
-    if (key === "custom" && !colors.length) dots.append(h("i", { class: "rainbow" }));
-    colors.forEach(c => { const i = h("i"); i.style.background = c; dots.append(i); });
-    const bonus = BONUS_THEMES[key];
-    const locked = bonus && !state.unlockAll && levelNow().level < bonus.lv;
-    sw.append(h("button", { class: "swatch" + (locked ? " locked" : ""), type: "button", disabled: locked, "aria-pressed": String(state.preset === key), onclick: () => {
-      if (key === "custom" && !state.custom) commit({ custom: currentColors() });
-      commit({ preset: key }); applyLook(); render(false);
-    } }, dots, h("b", null, p.label), h("span", { class: "muted small" }, key === "custom" ? p.note : p.note + " · " + modeFor(key))));
-  }
-  const color = h("input", { type: "color", id: "accent", "aria-label": "Accent colour" });
-  color.value = state.accent || (getComputedStyle(document.documentElement).getPropertyValue("--accent").trim().match(/^#[0-9a-f]{6}$/i) || ["#c2362b"])[0];
-  color.addEventListener("input", () => { state.accent = color.value.toLowerCase(); applyLook(); });
-  color.addEventListener("change", () => commit({ accent: color.value.toLowerCase() }));
+  // Text and layout (themes, colours, scenes and shapes are in Customise → Theme)
   const scaleOut = h("span", { class: "muted small num" }, Math.round(state.scale * 100) + "%");
   const scale = h("input", { type: "range", id: "scale", min: "85", max: "130", step: "5" });
   scale.value = String(Math.round(state.scale * 100));
   scale.addEventListener("input", () => { scaleOut.textContent = scale.value + "%"; document.documentElement.style.setProperty("--scale", String(scale.value / 100)); });
   scale.addEventListener("change", () => commit({ scale: scale.value / 100 }));
-  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Look"),
-    h("span", { class: "eyebrow" }, "Theme"), sw,
-    row("mode", "Light or dark", seg("mode", MODES, state.mode, k => { commit({ mode: k }); applyLook(); render(false); }),
-      state.preset === "custom" ? "Custom uses the colours you pick, so this doesn't change it" : "Every theme has a light and a dark look. Theme's own uses the one it was made with."),
-    state.preset === "custom" && state.custom ? customEditor() : null,
-    state.preset === "custom" ? null : row("accent", "Accent colour", h("div", { class: "row" }, color,
-      h("button", { class: "btn", type: "button", onclick: () => { commit({ accent: "" }); applyLook(); render(false); } }, "Reset"))),
-    row("zen", "Background scene", toggleCtl("zen", state.zen, on => { commit({ zen: on }); applyLook(); }), "A faint scene behind the app that matches the theme"),
-    h("div", { class: "stack-tight box-layout" }, h("b", null, "Box layout"),
-      h("span", { class: "muted small" }, "Applies to every page and the word pop-up."),
-      h("div", { class: "row" },
-        h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {} }); render(false); renderPanel(); toast("Every box is back in its original place"); } }, "Original order"),
-        h("button", { class: "btn small", type: "button", onclick: () => { commit({ hidden: {} }); render(false); renderPanel(); toast("Removed boxes are back"); } }, "Show removed boxes"),
-        h("button", { class: "btn small", type: "button", onclick: () => { commit({ folds: {} }); render(false); renderPanel(); toast("Every box is open"); } }, "Open all boxes"),
-        h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {}, hidden: {}, folds: {} }); render(false); renderPanel(); toast("Boxes are back to how they started"); } }, "Reset everything"))),
-    row("shapes", "Theme shapes", toggleCtl("shapes", state.shapes, on => { commit({ shapes: on }); applyLook(); }), "Hand-drawn, soft, cut-corner, neon, pixel or polygon edges, plus theme fonts, depending on the theme"),
-    row("avmatch", "Avatar matches theme", toggleCtl("avmatch", state.avMatch, on => { commit({ avMatch: on }); refreshAvatars(); }), "Draws your avatar in the theme's own look: ink sketch for Ink, pixels for Arcade, neon for Cyber. Off: always the standard look"),
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Text and layout"),
+    h("p", { class: "muted small" }, "Themes, colours, light or dark, background scenes and shapes are in ",
+      h("button", { class: "plain-btn build-link", type: "button", onclick: () => { ui.meTab = "theme"; go("me"); } }, "Customise → Theme"), "."),
     row("font", "Chinese font", select("font", FONTS, state.font, k => { commit({ font: k }); applyLook(); }),
       h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
     row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),
       "Menus, buttons, headings and meanings"),
-    row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut))));
+    row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut)),
+    boxLayoutRow()));
 
   // Study
   const perDay = h("select", { id: "newperday" });
@@ -193,6 +166,16 @@ function toneEditor() {
 }
 
 /** The current theme's main colours as hex, used to start a custom theme. */
+/** Settings → Text and layout: put boxes back how they were. */
+function boxLayoutRow() {
+  return h("div", { class: "stack-tight box-layout" }, h("b", null, "Box layout"),
+    h("span", { class: "muted small" }, "Applies to every page and the word pop-up."),
+    h("div", { class: "row" },
+      h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {} }); render(false); renderPanel(); toast("Every box is back in its original place"); } }, "Original order"),
+      h("button", { class: "btn small", type: "button", onclick: () => { commit({ hidden: {} }); render(false); renderPanel(); toast("Removed boxes are back"); } }, "Show removed boxes"),
+      h("button", { class: "btn small", type: "button", onclick: () => { commit({ folds: {} }); render(false); renderPanel(); toast("Every box is open"); } }, "Open all boxes"),
+      h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {}, hidden: {}, folds: {} }); render(false); renderPanel(); toast("Boxes are back to how they started"); } }, "Reset everything")));
+}
 function currentColors() {
   const hex = c => {
     const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c);

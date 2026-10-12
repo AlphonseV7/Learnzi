@@ -27,7 +27,7 @@ function updateTopbar() {
   if (me) me.setAttribute("aria-label", (state.nickname ? state.nickname + ": " : "") + "your profile and avatar");
 }
 function render(animate) {
-  const fn = { home: viewHome, lookup: viewLookup, reader: viewReader, photo: viewPhoto, watch: viewWatch, myzi: viewMyZi, decks: viewDecks, study: viewStudy, tones: viewTones, me: viewMe, settings: viewSettings, debug: viewDebug, deck: viewDeck, stats: viewStats }[ui.view];
+  const fn = { home: viewHome, lookup: viewLookup, reader: viewReader, photo: viewPhoto, watch: viewWatch, myzi: viewMyZi, mycards: viewMyCards, decks: viewDecks, study: viewStudy, tones: viewTones, me: viewMe, settings: viewSettings, debug: viewDebug, deck: viewDeck, stats: viewStats }[ui.view];
   const v = mleOn() ? (MLE_VIEWS[ui.view] || fn)() : fn();
   if (FOLD_VIEWS.includes(ui.view)) foldify(v, ui.view, ":scope > .card");
   const head = pageHead(ui.view, v);

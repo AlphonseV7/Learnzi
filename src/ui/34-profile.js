@@ -17,16 +17,17 @@ function viewMe() {
   for (const [k] of AV_GROUPS) for (const it of Object.values(AV[k])) { all++; if (unlocked(it)) have++; }
   for (const [, it] of AV_EXTRAS) { all++; if (unlocked(it)) have++; }
   v.append(h("div", { class: "me-hero card" },
-    h("div", { class: "me-avatar" }, liveAvatar(168, "Your avatar: " + AV.animal[a.animal].label)),
+    h("div", { class: "me-avatar" }, liveAvatar(168, "My avatar: " + AV.animal[a.animal].label)),
     h("div", { class: "stack-tight me-info" },
-      h("h1", null, state.nickname || "Your profile"),
+      h("h1", null, state.nickname || "My profile"),
       h("p", { class: "muted" }, AV.animal[a.animal].label + " ", h("span", { class: "hz" }, AV.animal[a.animal].zh), " · " + have + " of " + all + " unlocked"),
       levelBar(lv),
-      h("button", { class: "plain-btn build-link small", type: "button", onclick: () => { go("settings"); const n = $("#nickname"); if (n) n.focus(); } }, state.nickname ? "Change nickname" : "Set your nickname"))));
+      h("button", { class: "plain-btn build-link small", type: "button", onclick: () => { go("settings"); const n = $("#nickname"); if (n) n.focus(); } }, state.nickname ? "Change nickname" : "Set my nickname"))));
   const tab = (id, label) => h("button", { type: "button", "aria-pressed": String(ui.meTab === id), onclick: () => { ui.meTab = id; render(false); } }, label);
   v.append(h("div", { class: "row me-tabs" },
-    h("div", { class: "seg", role: "group", "aria-label": "Customise" }, tab("avatar", "Avatar"), tab("clock", "Clock"))));
+    h("div", { class: "seg", role: "group", "aria-label": "Customise" }, tab("avatar", "Avatar"), tab("clock", "Clock"), tab("theme", "Theme"))));
   if (ui.meTab === "clock") { clockEditor(v); return v; }
+  if (ui.meTab === "theme") { themeEditor(v); return v; }
   const base = { ...a, expr: "calm" };   // the tiles show a calm face; only the big one reacts
   for (const [key, title] of AV_GROUPS) {
     const grid = h("div", { class: "av-grid" });
@@ -40,10 +41,11 @@ function viewMe() {
         else if (id === "none") setAvatar({ accs: [] });
         else setAvatar({ accs: on ? a.accs.filter(x => x !== id) : [...a.accs, id] });
       };
-      grid.append(h("button", { class: "av-tile", type: "button", disabled: !open, "aria-pressed": String(on),
-        "aria-label": item.label + (open ? "" : ", locked until " + lockText(item)), onclick: choose },
-        avatarSvg(preview, 64, item.label), h("b", { class: "small" }, item.label),
-        key === "animal" ? h("span", { class: "hz small muted" }, item.zh) : null,
+      const secret = keepSecret(item);
+      grid.append(h("button", { class: "av-tile" + (secret ? " is-secret" : ""), type: "button", disabled: !open, "aria-pressed": String(on),
+        "aria-label": open ? item.label : secretLabel(item), onclick: choose },
+        avatarSvg(secret ? { ...preview, plain: true } : preview, 64, secretName(item)), h("b", { class: "small" }, secretName(item)),
+        key === "animal" ? h("span", { class: "hz small muted" }, secret ? "？" : item.zh) : null,
         open ? null : h("span", { class: "lock small" }, icon("lock"), lockText(item))));
     }
     v.append(h("div", { class: "card stack" }, h("div", { class: "row spread" }, h("h2", { class: "h-card" }, title),
@@ -52,9 +54,9 @@ function viewMe() {
   const extras = h("div", { class: "av-grid" });
   for (const [k, item] of AV_EXTRAS) {
     const open = unlocked(item);
-    extras.append(h("button", { class: "av-tile", type: "button", disabled: !open, "aria-pressed": String(a[k]),
-      "aria-label": item.label + (open ? "" : ", locked until " + lockText(item)), onclick: () => setAvatar({ [k]: !a[k] }) },
-      avatarSvg({ ...base, [k]: true }, 64, item.label), h("b", { class: "small" }, item.label + (a[k] ? " on" : "")),
+    extras.append(h("button", { class: "av-tile" + (keepSecret(item) ? " is-secret" : ""), type: "button", disabled: !open, "aria-pressed": String(a[k]),
+      "aria-label": open ? item.label : secretLabel(item), onclick: () => setAvatar({ [k]: !a[k] }) },
+      avatarSvg({ ...base, [k]: true, plain: keepSecret(item) }, 64, secretName(item)), h("b", { class: "small" }, secretName(item) + (a[k] ? " on" : "")),
       open ? null : h("span", { class: "lock small" }, icon("lock"), lockText(item))));
   }
   v.append(h("div", { class: "card stack" }, h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Extras"),
@@ -69,10 +71,10 @@ function rankLadder(level) {
   for (const r of RANKS) {
     const got = level >= r.lv;
     list.append(h("li", { class: (got ? "got" : "ahead") + (r === cur ? " now" : "") },
-      h("button", { class: "plain-btn rank-row", type: "button", onclick: () => openWord(r.s), "aria-label": r.en + ", " + r.s + ", level " + r.lv + (r === cur ? ", your rank" : got ? ", reached" : "") },
+      h("button", { class: "plain-btn rank-row", type: "button", onclick: () => openWord(r.s), "aria-label": r.en + ", " + r.s + ", level " + r.lv + (r === cur ? ", my rank" : got ? ", reached" : "") },
         h("span", { class: "hz rank-zh" }, r.s),
         h("span", { class: "stack-tight rank-text" }, h("b", null, r.en), h("span", { class: "muted small" }, Engine.toMarks(r.p) + " · " + r.note)),
-        h("span", { class: "badge num" }, r === cur ? "You" : "Lv " + r.lv))));
+        h("span", { class: "badge num" }, r === cur ? "Me" : "Lv " + r.lv))));
   }
   return h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "Ranks ", h("span", { class: "hz" }, "科举")),
     h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, 状元 takes about a year."), list);

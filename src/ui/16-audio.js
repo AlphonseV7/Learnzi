@@ -34,7 +34,7 @@ function audioCtxNow() {
   if (audioCtx.state === "suspended") audioCtx.resume();
   return audioCtx;
 }
-/** One recording, decoded and with the silence trimmed off both ends. */
+/** One recording, decoded, trimmed and levelled (tidySamples in 16b-dsp). */
 async function recording(kind, key) {
   const id = kind + "|" + key;
   if (AUDIO.decoded.has(id)) return AUDIO.decoded.get(id);
@@ -49,44 +49,55 @@ async function recording(kind, key) {
     const ctx = audioCtxNow();
     if (!ctx) return null;
     const audio = await ctx.decodeAudioData(buf.slice(at[1], at[1] + at[2]));
-    return trimSilence(ctx, audio);
+    const d = tidySamples(audio.getChannelData(0), audio.sampleRate);
+    const out = ctx.createBuffer(1, d.length, audio.sampleRate);
+    out.getChannelData(0).set(d);
+    return out;
   })().catch(() => null);
   AUDIO.decoded.set(id, job);
   const res = await job;
   if (!res) AUDIO.decoded.delete(id);
   return res;
 }
-function trimSilence(ctx, b) {
-  const d = b.getChannelData(0), limit = 0.02, pad = Math.round(b.sampleRate * 0.012);
-  let s = 0, e = d.length - 1;
-  while (s < e && Math.abs(d[s]) < limit) s++;
-  while (e > s && Math.abs(d[e]) < limit) e--;
-  s = Math.max(0, s - pad); e = Math.min(d.length - 1, e + pad);
-  if (e - s < b.sampleRate * 0.05) return b;
-  const out = ctx.createBuffer(1, e - s + 1, b.sampleRate);
-  out.getChannelData(0).set(d.subarray(s, e + 1));
-  return out;
-}
+/** Stop what's playing with a quick fade (a hard stop clicks). */
 function stopRecordings() {
-  for (const src of AUDIO.playing) { try { src.stop(); } catch { /* already finished */ } }
+  const ctx = audioCtx;
+  for (const { src, g } of AUDIO.playing) {
+    try {
+      if (ctx) { const t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + 0.03); src.stop(t + 0.035); }
+      else src.stop();
+    } catch { /* already finished */ }
+  }
   AUDIO.playing = [];
 }
-/** Plays buffers one after another, overlapping each join a little so syllables run together. */
+const slowCache = new WeakMap();
+/** The same recording 25% slower at the same pitch (made once, then kept). */
+function slowed(ctx, buf) {
+  if (!slowCache.has(buf)) {
+    const d = stretchSamples(buf.getChannelData(0), buf.sampleRate, 1.25);
+    const out = ctx.createBuffer(1, d.length, buf.sampleRate);
+    out.getChannelData(0).set(d);
+    slowCache.set(buf, out);
+  }
+  return slowCache.get(buf);
+}
+/** Plays buffers one after another, overlapping each join a little so syllables run together.
+ *  Slow plays them 25% slower without changing the pitch, so the tones stay true. */
 function playBuffers(list, slow) {
   const ctx = audioCtxNow();
   stopRecordings();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
-  const rate = slow ? 0.8 : 1;
-  let t = ctx.currentTime + 0.03;
+  let t = ctx.currentTime + 0.04;
   list.forEach(({ buf, gain }, i) => {
+    const b = slow ? slowed(ctx, buf) : buf;
     const src = ctx.createBufferSource(), g = ctx.createGain();
-    src.buffer = buf; src.playbackRate.value = rate;
+    src.buffer = b;
     g.gain.value = gain || 1;
     src.connect(g); g.connect(ctx.destination);
     src.start(t);
-    AUDIO.playing.push(src);
-    const len = buf.duration / rate;
-    t += i < list.length - 1 ? Math.max(0.12, len - (slow ? 0.02 : 0.06)) : len;
+    AUDIO.playing.push({ src, g });
+    // Each recording now keeps ~40 ms of natural fade at the end, so joins overlap by that much more.
+    t += i < list.length - 1 ? Math.max(0.12, b.duration - (slow ? 0.06 : 0.1)) : b.duration;
   });
 }
 

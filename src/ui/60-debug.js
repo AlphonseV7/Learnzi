@@ -93,9 +93,15 @@ function viewDebug() {
   const unlockSw = h("input", { type: "checkbox", id: "unlock-all", role: "switch" });
   unlockSw.checked = state.unlockAll;
   unlockSw.addEventListener("change", () => { commit({ unlockAll: unlockSw.checked }); toast(unlockSw.checked ? "Everything unlocked" : "Back to normal unlocks"); updateTopbar(); render(false); });
+  const showSw = h("input", { type: "checkbox", id: "show-locked", role: "switch" });
+  showSw.checked = state.showLocked;
+  showSw.addEventListener("change", () => { commit({ showLocked: showSw.checked }); toast(showSw.checked ? "Locked items show their names" : "Locked items are secret again"); });
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Unlocks"),
+    h("div", { class: "set-row" }, h("div", { class: "set-label" }, h("label", { for: "show-locked" }, "Show locked items"),
+      h("span", { class: "muted small" }, "Off: anything you haven't unlocked is a shadow with ??? for a name, plus what unlocks it. On: you can see what's coming.")),
+      h("span", { class: "toggle" }, showSw, h("span"))),
     h("div", { class: "set-row" }, h("div", { class: "set-label" }, h("label", { for: "unlock-all" }, "Unlock everything"),
-      h("span", { class: "muted small" }, "Every animal, expression, eye, accessory, aura, extra, bonus theme, clock face and clock effect, whatever your level or streak. Turn it off to go back; your XP isn't changed.")),
+      h("span", { class: "muted small" }, "Every animal, eye, accessory, aura, extra, bonus theme, clock face and clock effect, whatever your level or streak. Turn it off to go back; your XP isn't changed.")),
       h("span", { class: "toggle" }, unlockSw, h("span")))));
 
   // Glitch

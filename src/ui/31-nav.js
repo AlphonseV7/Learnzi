@@ -17,7 +17,7 @@ const NAV_MENUS = {
   ],
 };
 // Which tab lights up for each page.
-const NAV_TAB = { home: "home", lookup: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", stats: "myzi", me: "myzi" };
+const NAV_TAB = { home: "home", lookup: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", mycards: "myzi", stats: "myzi", me: "myzi" };
 
 function closeNavMenu() {
   const m = $("#navmenu");

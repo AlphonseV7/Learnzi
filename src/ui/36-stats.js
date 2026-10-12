@@ -125,7 +125,7 @@ function forecastChart() {
 function progressPreview() {
   const t = totals();
   return h("div", { class: "card stack" },
-    h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Progress"),
+    h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "My progress"),
       h("button", { class: "btn", type: "button", onclick: () => go("stats") }, "See all stats")),
     h("div", { class: "stats" }, stat(t.familiar + t.known, "words learned"), stat(t.reviews, "reviews"), stat(t.days, "days studied")),
     heatmap(12));
@@ -153,7 +153,7 @@ function viewStats() {
   const all = activeWords();
   const counts = [0, 0, 0, 0];
   all.forEach(e => counts[strength(e)]++);
-  v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "How well you know your words"),
+  v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "How well I know my words"),
     h("p", { class: "muted small" }, "Learning: still in short steps. Familiar: remembered for under 3 weeks. Known: 3 weeks or more."),
     strengthBar(counts, all.length), strengthLegend(counts),
     ids.map(id => { const s = deckSummary(id); return h("div", { class: "deck-strength" }, h("div", { class: "row spread small" }, h("b", null, deckName(id)), h("span", { class: "muted" }, (s.counts[2] + s.counts[3]) + " / " + s.total + " learned")), strengthBar(s.counts, s.total)); })));

@@ -39,6 +39,11 @@ function unlocked(item) {
   return true;
 }
 const lockText = item => (item.lv ? "Level " + item.lv : item.streak + "-day streak");
+/** Locked items are a shadow with ??? for a name (and the level or streak that unlocks them),
+ *  unless Debug settings → Show locked items is on. */
+const keepSecret = item => !state.showLocked && !unlocked(item);
+const secretName = (item, name) => (keepSecret(item) ? "???" : name || item.label);
+const secretLabel = item => (keepSecret(item) ? "Locked item, unlocks at " : item.label + ", locked until ") + lockText(item);
 /** The avatar to show: anything no longer unlocked (e.g. after a level reset) falls back. */
 function wornAvatar() {
   const a = sanitizeAvatar(state.avatar);
@@ -316,7 +321,7 @@ let avatarSeq = 0;
 // ---------- avatar art styles ----------
 const THEME_AVSTYLE = { arcade: "pixel", cyber: "neon", ink: "ink" };
 /** The art style an avatar is drawn in: the theme's own look when "Avatar matches theme" is on
- *  (Settings → Look), otherwise the standard one. */
+ *  (Customise → Theme), otherwise the standard one. */
 function avStyle() {
   if (!state.avMatch) return "cute";
   return THEME_AVSTYLE[document.documentElement.getAttribute("data-shape")] || "cute";
@@ -368,11 +373,11 @@ function avatarSvg(a, size, label) {
   const sparks = a.sparkles ? sv("g", {}, [[16, 22, 0], [84, 18, 0.7], [88, 70, 1.4], [12, 74, 2.1]].map(([x, y, d]) =>
     sv("path", { class: "av-sparkle", d: "M" + x + " " + (y - 5) + " L" + (x + 1.4) + " " + (y - 1.4) + " L" + (x + 5) + " " + y + " L" + (x + 1.4) + " " + (y + 1.4) + " L" + x + " " + (y + 5) + " L" + (x - 1.4) + " " + (y + 1.4) + " L" + (x - 5) + " " + y + " L" + (x - 1.4) + " " + (y - 1.4) + " Z", fill: "#f5c542", style: "animation-delay: " + d + "s" }))) : null;
   const z = a.expr === "sleepy" ? sv("g", { class: "av-zs" }, ["z", "z", "Z"].map((t, i) => sv("text", { x: 70 + i * 6, y: 30 - i * 7, class: "av-z", style: "animation-delay: " + i * 0.8 + "s; fill: var(--ink-soft)", "font-size": 8 + i * 2, "font-weight": 700 }, document.createTextNode(t)))) : null;
-  const style = avStyle();
+  const style = a.plain ? "cute" : avStyle();   // plain: locked tiles are a simple shadow in every theme
   return sv("svg", { viewBox: "0 0 100 100", width: size, height: size, class: "avatar avs-" + style, role: "img", "aria-label": label || (AV.animal[a.animal].label + " avatar") },
     sv("defs", {}, sv("clipPath", { id }, sv("circle", { cx: 50, cy: 50, r: 49 })), avFilter(style, id + "f", size)),
     sv("g", { class: "av-art", filter: style === "cute" ? null : "url(#" + id + "f)" }, sv("g", { "clip-path": "url(#" + id + ")" },
-      sv("circle", { cx: 50, cy: 50, r: 49, style: "fill: var(--surface-2)" }),
+      sv("circle", { class: "av-bg", cx: 50, cy: 50, r: 49, style: "fill: var(--surface-2)" }),
       aura(a.aura), face, z, sparks)));
 }
 /** What a new level unlocks, for the level-up screen. */
