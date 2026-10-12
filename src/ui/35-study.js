@@ -50,6 +50,7 @@ function grade(g) {
   // Still learning: show it again a few cards later in this session.
   if (SRS.isLearning(next)) study.queue.splice(Math.min(3, study.queue.length), 0, cur);
   afterXp(before, gained);
+  if (g === 1) setMood("oops", 2200);
   nextCard();
   render(false);
 }
@@ -152,7 +153,15 @@ function levelBar(lv) {
   bar.firstChild.style.width = Math.round((lv.into / lv.need) * 100) + "%";
   return h("div", { class: "level-box" },
     h("div", { class: "row spread" }, h("b", null, "Zì level " + lv.level), h("span", { class: "muted small num" }, lv.into + " / " + lv.need + " XP")),
-    bar);
+    bar, rankLine(lv.level));
+}
+/** Your rank under the level bar, and how far the next one is. */
+function rankLine(level) {
+  const { next } = rankFor(level);
+  const left = next ? next.lv - level : 0;
+  return h("div", { class: "rank-line" }, rankChip(level),
+    next ? h("span", { class: "muted small" }, left + (left === 1 ? " level" : " levels") + " to ", h("span", { class: "hz" }, next.s))
+      : h("span", { class: "muted small" }, "The highest rank"));
 }
 function whenText(dueMin) {
   const mins = dueMin - Math.floor(clock() / 60000);

@@ -20,6 +20,33 @@ function rawXp() {
 }
 const totalXp = () => Math.max(0, rawXp() + progress.adj[1]);
 const levelNow = () => SRS.levelInfo(totalXp());
+/* Ranks: the steps of the old imperial exams (科举 kējǔ), spread over about a year of daily study.
+ * At the default 10 new words a day a steady learner earns about 270,000 XP a year, and level 100
+ * needs 252,450, so 状元 arrives in roughly a year. */
+const RANKS = [
+  { lv: 1, s: "学童", p: "xue2 tong2", en: "Pupil", note: "A child just starting school, learning first characters" },
+  { lv: 5, s: "童生", p: "tong2 sheng1", en: "Candidate", note: "Passed the first local tests and may sit the real exams" },
+  { lv: 10, s: "秀才", p: "xiu4 cai5", en: "County graduate", note: "Passed the county exam: a recognised scholar" },
+  { lv: 20, s: "举人", p: "ju3 ren2", en: "Provincial graduate", note: "Passed the provincial exam, held once every three years" },
+  { lv: 30, s: "贡士", p: "gong4 shi4", en: "Capital graduate", note: "Passed the great exam in the capital" },
+  { lv: 45, s: "进士", p: "jin4 shi4", en: "Palace graduate", note: "Passed the final exam, set in the palace by the emperor" },
+  { lv: 60, s: "探花", p: "tan4 hua1", en: "Third in the empire", note: "Third place in the palace exam" },
+  { lv: 80, s: "榜眼", p: "bang3 yan3", en: "Second in the empire", note: "Second place in the palace exam" },
+  { lv: 100, s: "状元", p: "zhuang4 yuan2", en: "First in the empire", note: "The top scholar of the whole empire" },
+];
+/** The rank for a level, and the next one (null at the top). */
+function rankFor(level) {
+  let i = 0;
+  while (i + 1 < RANKS.length && RANKS[i + 1].lv <= level) i++;
+  return { rank: RANKS[i], next: RANKS[i + 1] || null };
+}
+/** A tappable line: 秀才 xiùcai · County graduate. Tapping opens the word. */
+function rankChip(level, cls) {
+  const { rank } = rankFor(level);
+  return h("button", { class: "rank-chip plain-btn" + (cls ? " " + cls : ""), type: "button", title: rank.note + ". Tap to open the word.",
+    "aria-label": "Rank: " + rank.en + ", " + rank.s + ". Open the word", onclick: ev => { ev.stopPropagation(); openWord(rank.s); } },
+    h("span", { class: "hz rank-zh" }, rank.s), h("span", { class: "rank-py" }, Engine.toMarks(rank.p)), h("span", { class: "rank-en" }, rank.en));
+}
 function streak() {
   const d = new Date(clock() - 4 * 3600e3);
   const key = () => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
@@ -37,14 +64,16 @@ function xpPop(n) {
   host.append(pop);
   setTimeout(() => pop.remove(), 1300);
 }
-function afterXp(before, gained) {
-  xpPop(gained);
+/** After earning XP: the +XP pop and a happy face, or the level-up screen. `quiet` (Watch and Listen,
+ *  1 XP a line) skips the pop and the face so the avatar doesn't bounce all through a film. */
+function afterXp(before, gained, quiet) {
+  if (!quiet) xpPop(gained);
   const now = levelNow().level;
   if (now > before) {
     showLevelUp(now, before);
     const pill = $("#lvl");
     if (pill) { pill.classList.remove("lvl-pulse"); void pill.offsetWidth; pill.classList.add("lvl-pulse"); }
-  }
+  } else if (gained > 0 && !quiet) setMood("happy", 2200);
 }
 const lookedToday = new Set();
 function gainBonus(n) {

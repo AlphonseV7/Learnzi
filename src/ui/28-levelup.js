@@ -128,6 +128,8 @@ function showLevelUp(level, from) {
   const lv = levelNow();
   const newStuff = [];
   for (let l = (from || level - 1) + 1; l <= level; l++) newStuff.push(...unlocksAt(l));
+  setMood("surprised", 6000);
+  const rank = rankFor(level).rank, newRank = rank !== rankFor(from || level - 1).rank ? rank : null;
   const shape = document.documentElement.getAttribute("data-shape");
   const base = shape && shape !== "plain" ? shape : state.preset;
   const kind = { arcade: "pixel", lantern: "lanterns", nightmarket: "neon", cyber: "neon", jade: "ripple", porcelain: "blue", peach: "petals", imperial: "gold" }[base] || "ink";
@@ -138,8 +140,14 @@ function showLevelUp(level, from) {
         h("span", { class: "lu-num" }, zh), h("span", { class: "lu-ji" }, "级")),
       h("p", { class: "lu-py" }, zhNumPinyin(zh) + " jí"),
       h("h2", { id: "lu-title" }, h("span", { class: "hz" }, "升级"), " Level up!"),
-      h("p", { class: "lu-sub" }, "You're now Zì level " + level + "."),
-      h("p", { class: "muted small" }, (lv.need - lv.into) + " XP to level " + (level + 1)),
+      h("div", { class: "lu-me" }, liveAvatar(64, "Your avatar"),
+        h("div", { class: "stack-tight" },
+          h("p", { class: "lu-sub" }, "You're now Zì level " + level + "."),
+          h("p", { class: "muted small" }, (lv.need - lv.into) + " XP to level " + (level + 1)))),
+      newRank ? h("div", { class: "lu-rank" }, h("span", { class: "eyebrow" }, "New rank"),
+        h("button", { class: "plain-btn lu-rank-word", type: "button", onclick: () => { closeLevelUp(); openWord(newRank.s); } },
+          h("span", { class: "hz" }, newRank.s), h("span", { class: "rank-py" }, Engine.toMarks(newRank.p))),
+        h("b", null, newRank.en), h("p", { class: "muted small" }, newRank.note + ".")) : null,
       newStuff.length ? h("div", { class: "lu-unlocks" }, h("span", { class: "eyebrow" }, "Unlocked"),
         h("div", { class: "row" }, newStuff.map(t => h("span", { class: "chip" }, t)))) : null,
       h("div", { class: "row lu-buttons" },

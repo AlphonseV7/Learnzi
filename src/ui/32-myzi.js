@@ -41,7 +41,7 @@ function viewMyZi() {
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
   const a = wornAvatar(), lv = levelNow();
   v.append(h("div", { class: "card me-card" },
-    h("button", { class: "me-card-avatar plain-btn", type: "button", "aria-label": "Edit your avatar", onclick: () => { ui.meTab = "avatar"; go("me"); } }, avatarSvg(a, 96, "Your avatar")),
+    h("button", { class: "me-card-avatar plain-btn", type: "button", "aria-label": "Edit your avatar", onclick: () => { ui.meTab = "avatar"; go("me"); } }, liveAvatar(96, "Your avatar")),
     h("div", { class: "stack-tight me-card-info" },
       h("div", { class: "row spread" },
         h("b", { class: "me-card-name" }, state.nickname || "You"),

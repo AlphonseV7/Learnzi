@@ -1,27 +1,34 @@
 /* LearnZì UI, part 4b: animated avatars, drawn in code (SVG) and animated with CSS.
- * Five animals unlock at Zì levels 1–5; expressions, eyes, accessories and auras unlock with
- * higher levels and study streaks. Everything here is original artwork. */
+ * Twelve animals unlock from Zì level 1 to 50; eyes, accessories, auras and extras unlock with
+ * levels and study streaks. The face isn't chosen: it reacts to what you do (see "moods" below).
+ * Everything here is original artwork. */
 
 const AV = {
   animal: {
     panda: { label: "Panda", zh: "熊猫", lv: 1 }, cat: { label: "Lucky cat", zh: "招财猫", lv: 2 }, tiger: { label: "Tiger", zh: "老虎", lv: 3 },
     rabbit: { label: "Jade rabbit", zh: "玉兔", lv: 4 }, dragon: { label: "Dragon", zh: "龙", lv: 5 },
+    redpanda: { label: "Red panda", zh: "小熊猫", lv: 8 }, koi: { label: "Koi", zh: "锦鲤", lv: 12 }, crane: { label: "Crane", zh: "仙鹤", lv: 16 },
+    monkey: { label: "Golden monkey", zh: "金丝猴", lv: 20 }, fox: { label: "Nine-tailed fox", zh: "九尾狐", lv: 30 },
+    qilin: { label: "Qilin", zh: "麒麟", lv: 40 }, phoenix: { label: "Phoenix", zh: "凤凰", lv: 50 },
   },
-  expr: { calm: { label: "Calm", lv: 1 }, happy: { label: "Happy", lv: 2 }, wink: { label: "Wink", lv: 3 }, sleepy: { label: "Sleepy", lv: 4 }, surprised: { label: "Surprised", lv: 6 } },
+  // Moods, used for drawing only: the avatar shows them by itself (calm, happy on XP, surprised on a
+  // level up, sleepy when left alone, wink when tapped, oops on a forgotten card).
+  expr: { calm: { label: "Calm" }, happy: { label: "Happy" }, wink: { label: "Wink" }, sleepy: { label: "Sleepy" }, surprised: { label: "Surprised" }, oops: { label: "Oops" } },
   eyes: { normal: { label: "Normal", lv: 1 }, glow: { label: "Glowing", lv: 5 }, star: { label: "Starry", streak: 7 } },
   acc: { none: { label: "None", lv: 1 }, scarf: { label: "Red scarf", lv: 2 }, bamboo: { label: "Bamboo sprig", lv: 4 }, lantern: { label: "Lantern", lv: 6 }, phones: { label: "Headphones", lv: 8 }, crown: { label: "Crown", lv: 10 } },
   aura: { none: { label: "None", lv: 1 }, ring: { label: "Gold ring", lv: 7 }, petals: { label: "Falling petals", lv: 9 } },
   sparkles: { on: { label: "Sparkles", streak: 3 } },
+  halo: { on: { label: "Halo", lv: 15 } },
 };
-const AV_DEFAULT = { animal: "panda", expr: "calm", eyes: "normal", accs: [], aura: "none", blush: true, sparkles: false, style: "auto" };
+const BIRDS = new Set(["crane", "phoenix"]);
+const AV_DEFAULT = { animal: "panda", expr: "calm", eyes: "normal", accs: [], aura: "none", sparkles: false, halo: false };
 function sanitizeAvatar(raw) {
   const o = obj(raw);
   const a = { ...AV_DEFAULT };
-  for (const k of ["animal", "expr", "eyes", "aura"]) if (typeof o[k] === "string" && Object.hasOwn(AV[k], o[k])) a[k] = o[k];
+  for (const k of ["animal", "eyes", "aura"]) if (typeof o[k] === "string" && Object.hasOwn(AV[k], o[k])) a[k] = o[k];
   a.accs = Array.isArray(o.accs) ? o.accs.filter(x => Object.hasOwn(AV.acc, x) && x !== "none") : [];
-  a.blush = o.blush !== false;
   a.sparkles = o.sparkles === true;
-  a.style = Object.hasOwn(AV_STYLES, o.style) ? o.style : "auto";
+  a.halo = o.halo === true;
   return a;
 }
 const bestStreak = () => Math.max(streak(), totals().best);
@@ -35,11 +42,53 @@ const lockText = item => (item.lv ? "Level " + item.lv : item.streak + "-day str
 /** The avatar to show: anything no longer unlocked (e.g. after a level reset) falls back. */
 function wornAvatar() {
   const a = sanitizeAvatar(state.avatar);
-  for (const k of ["animal", "expr", "eyes", "aura"]) if (!unlocked(AV[k][a[k]])) a[k] = AV_DEFAULT[k];
+  for (const k of ["animal", "eyes", "aura"]) if (!unlocked(AV[k][a[k]])) a[k] = AV_DEFAULT[k];
   a.accs = a.accs.filter(x => unlocked(AV.acc[x]));
   if (a.sparkles && !unlocked(AV.sparkles.on)) a.sparkles = false;
+  if (a.halo && !unlocked(AV.halo.on)) a.halo = false;
+  a.expr = avMood;
   return a;
 }
+
+// ---------- moods: the face reacts to what you do ----------
+let avMood = "calm", avMoodTimer = 0, avIdleTimer = 0;
+const AV_IDLE_MS = 120000;   // two minutes with no taps or keys and your avatar dozes off
+/** Show a mood for `ms` (then back to calm), or until something else happens when `ms` is 0. */
+function setMood(m, ms) {
+  // A level up beats a little XP; a forgotten card doesn't interrupt a level up either.
+  if (avMood === "surprised" && m !== "surprised" && m !== "calm" && avMoodTimer) return;
+  clearTimeout(avMoodTimer); avMoodTimer = 0;
+  if (m !== avMood) { avMood = m; refreshAvatars(); }
+  if (ms) avMoodTimer = setTimeout(() => { avMoodTimer = 0; avMood = "calm"; refreshAvatars(); }, ms);
+}
+/** An avatar that shows your current mood and redraws when it changes. */
+function liveAvatar(size, label) {
+  const svg = avatarSvg(wornAvatar(), size, label);
+  svg.dataset.live = String(size);
+  return svg;
+}
+function refreshAvatars() {
+  for (const old of document.querySelectorAll("svg.avatar[data-live]")) {
+    const svg = liveAvatar(+old.dataset.live, old.getAttribute("aria-label"));
+    old.replaceWith(svg);
+  }
+  if (typeof updateTopbar === "function") updateTopbar();
+}
+const mediaPlaying = () => [...document.querySelectorAll("video, audio")].some(m => !m.paused && !m.ended);
+function armIdle() {
+  clearTimeout(avIdleTimer);
+  avIdleTimer = setTimeout(() => {
+    if (document.hidden || mediaPlaying()) { armIdle(); return; }   // not while a video or recording plays
+    setMood("sleepy", 0);
+  }, AV_IDLE_MS);
+}
+/** Any tap, key or scroll: wake up (with a stretch) and start counting again. */
+function nudgeAvatar() {
+  if (avMood === "sleepy") setMood("calm", 0);
+  armIdle();
+}
+/** Tapping your own avatar gets a wink. */
+const winkAvatar = () => setMood("wink", 1600);
 
 // ---------- drawing ----------
 const OUT = "#2b2523";
@@ -83,6 +132,91 @@ function animalParts(kind) {
     P.push(c(73, 40, 3.2, "#7cc7a4"), c(27, 40, 3.2, "#7cc7a4"));
     return { parts: P, eye: "#2b2523", mouthY: 71 };
   }
+  if (kind === "redpanda") {
+    const rust = "#cf5f2c", cream = "#fff4e4";
+    P.push(p("M17 45 Q13 14 42 25 Z", rust, line), p("M83 45 Q87 14 58 25 Z", rust, line));
+    P.push(p("M22 38 Q21 23 36 27 Z", cream), p("M78 38 Q79 23 64 27 Z", cream));
+    P.push(c(50, 57, 33, rust, line));
+    P.push(e(20, 62, 5, 10, cream), e(80, 62, 5, 10, cream));
+    P.push(e(37, 43, 5.5, 3.6, cream), e(63, 43, 5.5, 3.6, cream));
+    P.push(p("M50 54 q-17 1 -17 13 q0 11 17 11 q17 0 17 -11 q0 -12 -17 -13 Z", cream));
+    P.push(e(50, 63, 3.6, 2.5, "#2b2523"));
+    return { parts: P, eye: "#2b2523", mouthY: 69 };
+  }
+  if (kind === "koi") {
+    const red = "#e5532c", white = "#fffaf3", fin = { stroke: "#b8401f", "stroke-width": 1.2 };
+    P.push(sv("g", { class: "av-fin-l" }, p("M22 58 q-16 -6 -18 8 q8 6 18 2 Z", red, fin)));
+    P.push(sv("g", { class: "av-fin-r" }, p("M78 58 q16 -6 18 8 q-8 6 -18 2 Z", red, fin)));
+    P.push(p("M38 28 q10 -18 26 -6 q-10 -1 -12 6 Z", red, fin));
+    P.push(c(50, 57, 32, white, line));
+    P.push(p("M21 52 q-2 -20 16 -25 q16 -4 20 6 q2 9 -10 11 q-10 1 -14 6 q-5 5 -12 2 Z", red));
+    P.push(p("M63 30 q12 -2 15 10 q1 8 -8 8 q-9 -1 -9 -9 q0 -6 2 -9 Z", red));
+    P.push(p("M40 82 q4 -4 8 0 q4 -4 8 0 q4 -4 8 0", "none", { stroke: "#efcdb6", "stroke-width": 1.2, "stroke-linecap": "round" }));
+    P.push(p("M44 72 q-4 6 -10 7 M56 72 q4 6 10 7", "none", { stroke: "#d6a77a", "stroke-width": 1.6, "stroke-linecap": "round" }));
+    P.push(sv("g", { class: "av-bubbles" }, [[84, 30, 2.6, 0], [80, 22, 1.8, 0.9], [87, 14, 1.4, 1.8]].map(([x, y, r, d]) =>
+      c(x, y, r, "none", { stroke: "#8cc7e8", "stroke-width": 1.1, class: "av-bubble", style: "animation-delay: " + d + "s" }))));
+    return { parts: P, eye: "#2b2523", mouthY: 69 };
+  }
+  if (kind === "crane") {
+    P.push(c(50, 58, 31, "#fbfaf6", line));
+    P.push(p("M25 76 q25 18 50 0 q2 10 -4 18 L29 94 q-6 -8 -4 -18 Z", "#2b2523"));
+    P.push(e(50, 31, 9, 6.5, "#d8342b"));
+    return { parts: P, eye: "#2b2523", mouthY: 64, beak: "#d9c27a" };
+  }
+  if (kind === "monkey") {
+    const gold = "#eaa83c", fur = { stroke: "#b8741d", "stroke-width": 1.2 };
+    P.push(sv("g", { class: "av-tuft" }, p("M42 26 q2 -12 8 -16 q6 4 8 16 q-8 -4 -16 0 Z", gold, fur)));
+    P.push(p("M24 38 q-16 18 -8 46 q4 -8 9 -8 q-3 8 3 14 q2 -10 8 -12 Z", gold, fur), p("M76 38 q16 18 8 46 q-4 -8 -9 -8 q3 8 -3 14 q-2 -10 -8 -12 Z", gold, fur));
+    P.push(c(50, 55, 32, gold, line));
+    P.push(p("M28 40 q22 -22 44 0 q-22 -10 -44 0 Z", "#9a6424"));
+    P.push(p("M50 41 q-20 0 -20 20 q0 20 20 20 q20 0 20 -20 q0 -20 -20 -20 Z", "#a9cfe8"));
+    P.push(e(50, 70, 10, 7, "#d9ebf6"));
+    P.push(p("M46 63 q4 -5 8 0", "none", { stroke: "#6f9fbf", "stroke-width": 1.6, "stroke-linecap": "round" }));
+    P.push(c(47.5, 65, 1.4, "#3b4a58"), c(52.5, 65, 1.4, "#3b4a58"));
+    return { parts: P, eye: "#2b2523", mouthY: 72 };
+  }
+  if (kind === "fox") {
+    const orange = "#f08a3c", tip = "#fff6ec";
+    const tails = [];
+    for (let i = 0; i < 9; i++) {
+      const ang = -100 + i * 25;
+      tails.push(sv("g", { transform: "rotate(" + ang + " 50 64)" },
+        p("M50 64 q-20 -16 -11 -42 q9 -10 18 -1 q7 20 -7 43 Z", orange, { stroke: "#b85d1f", "stroke-width": 1 }),
+        p("M39 22 q9 -10 18 -1 q-9 4 -18 1 Z", tip)));
+    }
+    P.push(sv("g", { class: "av-tails" }, tails));
+    P.push(p("M26 44 L29 16 L46 34 Z", orange, line), p("M74 44 L71 16 L54 34 Z", orange, line));
+    P.push(p("M29 19 L30 26 L35 23 Z M71 19 L70 26 L65 23 Z", "#4a2a1a"));
+    P.push(c(50, 58, 30, orange, line));
+    P.push(p("M21 60 Q50 98 79 60 Q65 70 50 66 Q35 70 21 60 Z", tip));
+    P.push(p("M50 34 q-4 5 0 10 q4 -5 0 -10 Z", "#d8342b"));
+    P.push(e(50, 66, 3, 2.2, "#2b2523"));
+    return { parts: P, eye: "#2b2523", mouthY: 72 };
+  }
+  if (kind === "qilin") {
+    const gold = "#f1c04f", mane = "#2fa59a", antler = { stroke: "#9b6a1e", "stroke-width": 3, "stroke-linecap": "round", fill: "none" };
+    P.push(sv("g", { class: "av-mane" }, [[15, 44, -30], [12, 62, -10], [17, 79, 20], [85, 44, 30], [88, 62, 10], [83, 79, -20]].map(([x, y, r]) =>
+      p("M" + x + " " + (y + 8) + " q-6 -10 0 -18 q2 8 7 6 q-2 6 -7 12 Z", mane, { transform: "rotate(" + r + " " + x + " " + y + ")" }))));
+    P.push(p("M38 30 q-6 -10 -4 -22 M36 20 l-8 -6 M64 30 q6 -10 4 -22 M66 20 l8 -6", "none", antler));
+    P.push(c(50, 57, 32, gold, { stroke: "#9b6a1e", "stroke-width": 1.6 }));
+    P.push(p("M38 34 q4 -4 8 0 M54 34 q4 -4 8 0 M46 40 q4 -4 8 0", "none", { stroke: "#d49a2c", "stroke-width": 1.4, "stroke-linecap": "round" }));
+    P.push(e(50, 70, 16, 11, "#fbe3a4", { stroke: "#9b6a1e", "stroke-width": 1 }));
+    P.push(c(45, 67, 1.5, "#7a4e12"), c(55, 67, 1.5, "#7a4e12"));
+    P.push(c(50, 44, 3, mane));
+    return { parts: P, eye: "#2b2523", mouthY: 74 };
+  }
+  if (kind === "phoenix") {
+    const red = "#e2452e", gold = "#f5b93a";
+    P.push(sv("g", { class: "av-plume" },
+      p("M50 30 q-2 -16 -12 -24", "none", { stroke: gold, "stroke-width": 2, "stroke-linecap": "round" }), c(38, 6, 3.4, gold), c(38, 6, 1.5, "#2f8fbf"),
+      p("M50 30 q0 -18 0 -26", "none", { stroke: gold, "stroke-width": 2, "stroke-linecap": "round" }), c(50, 4, 3.4, gold), c(50, 4, 1.5, "#2f8fbf"),
+      p("M50 30 q2 -16 12 -24", "none", { stroke: gold, "stroke-width": 2, "stroke-linecap": "round" }), c(62, 6, 3.4, gold), c(62, 6, 1.5, "#2f8fbf")));
+    P.push(p("M22 52 q-14 10 -12 28 q8 -12 16 -14 Z M78 52 q14 10 12 28 q-8 -12 -16 -14 Z", gold, { stroke: "#b8741d", "stroke-width": 1 }));
+    P.push(c(50, 58, 31, red, { stroke: "#8f1d17", "stroke-width": 1.6 }));
+    P.push(p("M28 40 q22 -14 44 0 q-22 -6 -44 0 Z", gold));
+    P.push(p("M30 72 q20 16 40 0 q-20 8 -40 0 Z", gold, { opacity: 0.8 }));
+    return { parts: P, eye: "#2b2523", mouthY: 64, beak: "#f5c542" };
+  }
   // dragon
   P.push(p("M36 30 q-6 -14 -14 -16 q8 6 8 18 Z", "#e9b949", line), p("M64 30 q6 -14 14 -16 q-8 6 -8 18 Z", "#e9b949", line));
   P.push(p("M40 25 l4 -8 l4 7 l4 -8 l4 8 l4 -7 l2 9", "#e9b949", line));
@@ -113,10 +247,25 @@ function eyesFor(a, eyeColor) {
   if (a.expr === "sleepy") return [arc(L, false), arc(R, false)];
   if (a.expr === "wink") return [openEye(L, false, " av-blink"), openEye(R, false, " av-winker")];
   if (a.expr === "surprised") return [openEye(L, true, " av-blink"), openEye(R, true, " av-blink")];
+  if (a.expr === "oops") return [openEye(L, false, " av-blink"), openEye(R, false, " av-blink"),
+    sv("path", { d: "M32 45 L42 42 M58 42 L68 45", fill: "none", stroke: a.animal === "panda" ? "#222" : OUT, "stroke-width": 2, "stroke-linecap": "round" })];
   return [openEye(L, false, " av-blink"), openEye(R, false, " av-blink")];
+}
+/** Birds have a beak instead of a mouth: closed, or open when happy, surprised or caught out. */
+function beakFor(a, y, col) {
+  const edge = { stroke: "#8a6a1e", "stroke-width": 1, "stroke-linejoin": "round" };
+  if (a.expr === "happy" || a.expr === "surprised" || a.expr === "oops") {
+    const gap = a.expr === "surprised" ? 6 : a.expr === "happy" ? 4.5 : 3;
+    return [sv("path", { d: "M45 " + (y + 1) + " L55 " + (y + 1) + " L50 " + (y + 4 + gap) + " Z", fill: "#7a2e2e" }),
+      sv("path", Object.assign({ d: "M43.5 " + y + " L56.5 " + y + " L50 " + (y + 5) + " Z", fill: col }, edge)),
+      sv("path", Object.assign({ d: "M46 " + (y + 2 + gap) + " L54 " + (y + 2 + gap) + " L50 " + (y + 7 + gap) + " Z", fill: col }, edge))];
+  }
+  return [sv("path", Object.assign({ d: "M43.5 " + y + " L56.5 " + y + " L50 " + (y + 10) + " Z", fill: col }, edge)),
+    sv("path", { d: "M45.5 " + (y + 3.5) + " L54.5 " + (y + 3.5), stroke: "#8a6a1e", "stroke-width": 0.8 })];
 }
 function mouthFor(a, y) {
   const m = { stroke: OUT, "stroke-width": 1.8, fill: "none", "stroke-linecap": "round" };
+  if (a.expr === "oops") return [sv("path", Object.assign({ d: "M44 " + (y + 1) + " q2 -3 4 0 q2 3 4 0 q2 -3 4 0" }, m))];
   if (a.expr === "happy") return [sv("path", { d: "M43 " + (y - 2) + " q7 9 14 0 Z", fill: "#7a2e2e" }), sv("path", { d: "M46.5 " + (y + 2.2) + " q3.5 2.6 7 0 q-3.5 -2 -7 0", fill: "#f08a8a" })];
   if (a.expr === "wink") return [sv("path", Object.assign({ d: "M44 " + (y - 1) + " q6 5 12 0" }, m)), sv("path", { d: "M51 " + (y + 1) + " q2.5 5 5 0 Z", fill: "#f08a8a" })];
   if (a.expr === "sleepy") return [sv("ellipse", { cx: 50, cy: y, rx: 2, ry: 2.4, fill: "#7a2e2e" })];
@@ -139,13 +288,13 @@ function accessory(kind, animal) {
       sv("path", { d: "M82 56 v6", stroke: "#e9b949", "stroke-width": 1.5 }));
   }
   if (kind === "phones") {
-    const y = animal === "rabbit" ? 58 : 55;
+    const y = animal === "rabbit" ? 58 : animal === "crane" || animal === "phoenix" || animal === "fox" ? 58 : 55;
     return sv("g", {}, sv("path", { d: "M17 " + y + " q0 -40 33 -40 q33 0 33 40", fill: "none", stroke: "#2d2f36", "stroke-width": 4, "stroke-linecap": "round" }),
       sv("rect", { x: 11, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }), sv("rect", { x: 79, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }),
       sv("rect", { x: 13.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }), sv("rect", { x: 81.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }));
   }
   if (kind === "crown") {
-    const y = animal === "dragon" ? 16 : animal === "rabbit" ? 26 : 20;
+    const y = { dragon: 16, rabbit: 26, crane: 26, phoenix: 30, fox: 30, qilin: 22, monkey: 18, koi: 22 }[animal] || 20;
     return sv("g", { class: "av-crown" }, sv("path", { d: "M38 " + y + " l3 -11 l5 6 l4 -9 l4 9 l5 -6 l3 11 Z", fill: "#f5c542", stroke: "#a87b12", "stroke-width": 1 }),
       sv("circle", { cx: 50, cy: y - 5, r: 1.6, fill: "#e0412f" }));
   }
@@ -165,12 +314,18 @@ function aura(kind) {
 let avatarSeq = 0;
 /** An animated avatar as an <svg>. `a` is a sanitized avatar; `size` in CSS pixels. */
 // ---------- avatar art styles ----------
-const AV_STYLES = { auto: "Match theme", cute: "Cute", pixel: "Pixel", neon: "Neon", ink: "Ink sketch" };
-const THEME_AVSTYLE = { arcade: "pixel", cyber: "neon" };
-/** The art style an avatar is drawn in: your choice, or the theme's own when set to "Match theme". */
-function avStyle(a) {
-  if (a.style && a.style !== "auto") return a.style;
+const THEME_AVSTYLE = { arcade: "pixel", cyber: "neon", ink: "ink" };
+/** The art style an avatar is drawn in: the theme's own look when "Avatar matches theme" is on
+ *  (Settings → Look), otherwise the standard one. */
+function avStyle() {
+  if (!state.avMatch) return "cute";
   return THEME_AVSTYLE[document.documentElement.getAttribute("data-shape")] || "cute";
+}
+function halo(animal) {
+  const y = { rabbit: 7, fox: 9, phoenix: 9, crane: 9, qilin: 9, cat: 10 }[animal] || 12;
+  return sv("g", { class: "av-halo" },
+    sv("ellipse", { cx: 50, cy: y, rx: 15, ry: 4.2, fill: "none", stroke: "#fff3b0", "stroke-width": 4.4, opacity: 0.55 }),
+    sv("ellipse", { cx: 50, cy: y, rx: 15, ry: 4.2, fill: "none", stroke: "#f5c542", "stroke-width": 2.4 }));
 }
 /** The SVG filter for a style, kept inside each avatar so it always travels with it. Units are the
  *  avatar's own 0–100 grid, so Pixel is always a 25 × 25 sprite whatever size the avatar is shown at. */
@@ -198,20 +353,22 @@ function avFilter(style, id, size) {
   if (style === "ink") return sv("filter", box,
     sv("feTurbulence", { type: "fractalNoise", baseFrequency: 0.07, numOctaves: 2, seed: 4, result: "noise" }),
     sv("feDisplacementMap", { in: "SourceGraphic", in2: "noise", scale: 3.2, xChannelSelector: "R", yChannelSelector: "G", result: "wobble" }),
-    sv("feColorMatrix", { in: "wobble", type: "saturate", values: 0.12 }));
+    sv("feColorMatrix", { in: "wobble", type: "saturate", values: 0.55 }));
   return null;
 }
 function avatarSvg(a, size, label) {
   const id = "avc" + (++avatarSeq);
-  const { parts, eye, mouthY } = animalParts(a.animal);
+  const { parts, eye, mouthY, beak } = animalParts(a.animal);
   const face = sv("g", { class: "av-body av-" + a.expr },
-    parts, eyesFor(a, eye), mouthFor(a, mouthY),
-    a.blush ? [sv("ellipse", { cx: 29, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 }), sv("ellipse", { cx: 71, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 })] : null,
-    ["scarf", "bamboo", "lantern", "phones", "crown"].filter(x => a.accs.includes(x)).map(x => accessory(x, a.animal)));
+    parts, eyesFor(a, eye), beak ? beakFor(a, mouthY, beak) : mouthFor(a, mouthY),
+    [sv("ellipse", { cx: 29, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 }), sv("ellipse", { cx: 71, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 })],
+    a.expr === "oops" ? sv("path", { class: "av-sweat", d: "M79 30 q-4 6 0 8 q4 -2 0 -8 Z", fill: "#8cc7e8", stroke: "#4f95bd", "stroke-width": 0.8 }) : null,
+    ["scarf", "bamboo", "lantern", "phones", "crown"].filter(x => a.accs.includes(x)).map(x => accessory(x, a.animal)),
+    a.halo ? halo(a.animal) : null);
   const sparks = a.sparkles ? sv("g", {}, [[16, 22, 0], [84, 18, 0.7], [88, 70, 1.4], [12, 74, 2.1]].map(([x, y, d]) =>
     sv("path", { class: "av-sparkle", d: "M" + x + " " + (y - 5) + " L" + (x + 1.4) + " " + (y - 1.4) + " L" + (x + 5) + " " + y + " L" + (x + 1.4) + " " + (y + 1.4) + " L" + x + " " + (y + 5) + " L" + (x - 1.4) + " " + (y + 1.4) + " L" + (x - 5) + " " + y + " L" + (x - 1.4) + " " + (y - 1.4) + " Z", fill: "#f5c542", style: "animation-delay: " + d + "s" }))) : null;
   const z = a.expr === "sleepy" ? sv("g", { class: "av-zs" }, ["z", "z", "Z"].map((t, i) => sv("text", { x: 70 + i * 6, y: 30 - i * 7, class: "av-z", style: "animation-delay: " + i * 0.8 + "s; fill: var(--ink-soft)", "font-size": 8 + i * 2, "font-weight": 700 }, document.createTextNode(t)))) : null;
-  const style = avStyle(a);
+  const style = avStyle();
   return sv("svg", { viewBox: "0 0 100 100", width: size, height: size, class: "avatar avs-" + style, role: "img", "aria-label": label || (AV.animal[a.animal].label + " avatar") },
     sv("defs", {}, sv("clipPath", { id }, sv("circle", { cx: 50, cy: 50, r: 49 })), avFilter(style, id + "f", size)),
     sv("g", { class: "av-art", filter: style === "cute" ? null : "url(#" + id + "f)" }, sv("g", { "clip-path": "url(#" + id + ")" },
@@ -221,7 +378,7 @@ function avatarSvg(a, size, label) {
 /** What a new level unlocks, for the level-up screen. */
 function unlocksAt(level) {
   const out = [];
-  for (const k of ["animal", "expr", "eyes", "acc", "aura"]) for (const item of Object.values(AV[k])) if (item.lv === level && item.label !== "None") out.push(item.label);
+  for (const k of ["animal", "eyes", "acc", "aura", "halo"]) for (const item of Object.values(AV[k])) if (item.lv === level && item.label !== "None") out.push(item.label);
   for (const [id, t] of Object.entries(BONUS_THEMES)) if (t.lv === level) out.push(PRESETS[id].label + " theme");
   for (const item of Object.values(CLOCK.face)) if (item.lv === level) out.push(item.label + " clock");
   for (const item of Object.values(CLOCK.fx)) if (item.lv === level) out.push(item.label + " clock effect");

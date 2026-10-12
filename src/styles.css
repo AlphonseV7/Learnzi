@@ -855,3 +855,49 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 .lu-buttons { justify-content: center; }
 .av-sparkle { transform-box: fill-box; transform-origin: center; animation: avSparkle 2.4s ease-in-out infinite; }
 @keyframes avSparkle { 0%, 100% { transform: scale(.3); opacity: 0; } 50% { transform: scale(1) rotate(45deg); opacity: 1; } }
+
+/* ---------- avatar moods, the new animals, the halo ---------- */
+.av-sleepy { animation: avBreathe 5.5s ease-in-out infinite; }
+.av-oops { animation: avOops .5s ease-in-out 2; }
+@keyframes avOops { 25% { transform: translateX(-1.6px) rotate(-1.5deg); } 75% { transform: translateX(1.6px) rotate(1.5deg); } }
+.av-wink { animation: avBounce 1.4s ease-in-out 1; }
+.av-sweat { transform-box: fill-box; animation: avSweat 1.6s ease-in infinite; }
+@keyframes avSweat { 0% { transform: translateY(-2px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
+.av-fin-l, .av-fin-r { transform-box: fill-box; animation: avFin 1.3s ease-in-out infinite alternate; }
+.av-fin-l { transform-origin: 100% 50%; } .av-fin-r { transform-origin: 0 50%; animation-delay: .65s; }
+@keyframes avFin { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+.av-bubble { transform-box: fill-box; animation: avBubble 2.7s ease-in infinite; }
+@keyframes avBubble { 0% { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
+.av-plume { transform-box: fill-box; transform-origin: 50% 100%; animation: avPlume 3s ease-in-out infinite alternate; }
+@keyframes avPlume { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+.av-tuft { transform-box: fill-box; transform-origin: 50% 100%; animation: avEars 4.2s ease-in-out infinite; }
+.av-tails { transform-box: view-box; transform-origin: 50% 58%; animation: avTails 3.4s ease-in-out infinite alternate; }
+@keyframes avTails { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.av-mane { animation: avMane 1.8s ease-in-out infinite alternate; }
+@keyframes avMane { to { filter: brightness(1.25); } }
+.av-halo { transform-box: fill-box; animation: avHalo 2.6s ease-in-out infinite; filter: drop-shadow(0 0 2px #f5c542); }
+@keyframes avHalo { 50% { transform: translateY(-1.6px); filter: drop-shadow(0 0 4px #f5c542); } }
+
+/* ---------- ranks ---------- */
+.rank-line { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; margin-top: 6px; }
+.rank-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 0; color: var(--ink); text-align: left; }
+.rank-chip .rank-zh { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
+.rank-chip .rank-py { color: var(--ink-soft); font-size: .85rem; }
+.rank-chip .rank-en { font-size: .85rem; font-weight: 600; }
+.rank-chip:hover .rank-zh { text-decoration: underline; text-underline-offset: 3px; }
+.rank-ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rank-row { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; padding: 8px 10px; border-radius: 10px; text-align: left; color: var(--ink); }
+.rank-row:hover { background: var(--surface-2); }
+.rank-ladder .rank-zh { font-size: 1.35rem; font-weight: 700; }
+.rank-ladder .got .rank-zh { color: var(--accent); }
+.rank-ladder .ahead { opacity: .55; }
+.rank-ladder .now .rank-row { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.rank-text { min-width: 0; }
+.lu-me { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; }
+.lu-me p { margin: 0; }
+.lu-rank { display: grid; gap: 2px; justify-items: center; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); }
+.lu-rank p { margin: 0; }
+.lu-rank-word { display: inline-flex; align-items: baseline; gap: 8px; color: var(--ink); }
+.lu-rank-word .hz { font-size: 2rem; font-weight: 700; color: var(--accent); }
+.lu-rank-word .rank-py { color: var(--ink-soft); }
+.me-tabs { margin-top: -4px; }

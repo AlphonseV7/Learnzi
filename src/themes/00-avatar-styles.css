@@ -1,2 +1,2 @@
-/* ---------- avatar art styles (Profile → Art style); the filters live inside each avatar ---------- */
+/* ---------- avatar art styles (matched to the theme: Settings → Look → Avatar matches theme); the filters live inside each avatar ---------- */
 .avatar.avs-neon { background: radial-gradient(circle, #070b16 0 69%, transparent 71%); border-radius: 50%; }

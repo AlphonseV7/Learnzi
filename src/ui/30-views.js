@@ -17,7 +17,7 @@ function updateTopbar() {
   const seal = $("#me .seal");
   if (seal) {
     const a = wornAvatar();
-    const key = JSON.stringify(a) + avStyle(a);
+    const key = JSON.stringify(a) + avStyle();
     if (seal.dataset.key !== key) { seal.dataset.key = key; seal.classList.add("avatar-mini"); seal.replaceChildren(avatarSvg(a, 40, "Your avatar")); }
   }
   const name = $("#me-name");

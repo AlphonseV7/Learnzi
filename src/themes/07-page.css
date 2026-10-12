@@ -8,7 +8,7 @@
 .btn.small.page-restore { padding-inline: 10px; gap: 2px; }
 .btn.small.page-restore svg { width: 14px; height: 14px; transform: rotate(-30deg); }
 @media (max-width: 480px) { .page-head h1 { font-size: 1.5rem; } }
-.me-tabs { justify-content: flex-end; }
+.me-tabs { justify-content: center; }
 /* the remove button on each box's title bar */
 .fold-remove {
   flex: none; display: grid; place-items: center; width: 28px; height: 32px; margin-right: -6px; padding: 0;

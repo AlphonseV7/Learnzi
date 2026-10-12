@@ -133,6 +133,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Avatars: seven new animals up to level 50, a halo, faces that react to you, and imperial exam ranks from 学童 to 状元"],
   ["12 Oct", "Listen: audiobooks that follow along, as an Audio tab next to Watch; tap along to time plain text"],
   ["12 Oct", "Watch: videos with tappable subtitles, side by side on a computer; flashcards that play the moment from the video"],
   ["12 Oct", "Photo to words: read Chinese in photos and screenshots on your device, then make a deck"],
@@ -153,7 +154,7 @@ const UPDATES = [
 const DEFAULTS = {
   v: 2, nickname: "", script: "s", pinyin: true, tones: true, preset: "ink", accent: "", font: "sans", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
+  zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
   saved: [], recent: [], decks: [], activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 const num = (v, lo, hi, d) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
@@ -194,14 +195,14 @@ function sanitize(raw) {
   // Avatar choices (checked against the unlock list when shown).
   const av = obj(o.avatar);
   s.avatar = {};
-  for (const k of ["animal", "expr", "eyes", "aura"]) if (typeof av[k] === "string" && /^[a-z]{1,16}$/.test(av[k])) s.avatar[k] = av[k];
+  for (const k of ["animal", "eyes", "aura"]) if (typeof av[k] === "string" && /^[a-z]{1,16}$/.test(av[k])) s.avatar[k] = av[k];
   const accs = Array.isArray(av.accs) ? av.accs : typeof av.acc === "string" ? [av.acc] : [];
   s.avatar.accs = [...new Set(accs.filter(x => typeof x === "string" && /^[a-z]{1,16}$/.test(x) && x !== "none"))].slice(0, 8);
-  // Blush is on unless you turned it off after it became the default (avatar version 2).
-  s.avatar.blush = av.v === 2 ? av.blush !== false : true;
   s.avatar.sparkles = av.sparkles === true;
-  s.avatar.style = ["auto", "cute", "pixel", "neon", "ink"].includes(av.style) ? av.style : "auto";
-  s.avatar.v = 2;
+  s.avatar.halo = av.halo === true;
+  s.avatar.v = 3;
+  // Avatar drawn in the theme's own look (pixel, neon, ink sketch) or always the standard one.
+  s.avMatch = o.avMatch !== false;
   s.zen = o.zen !== false;
   s.mode = MODES.some(m => m[0] === o.mode) ? o.mode : "theme";
   s.subSize = ["s", "m", "l", "xl"].includes(o.subSize) ? o.subSize : "m";

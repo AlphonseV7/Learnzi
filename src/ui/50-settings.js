@@ -84,6 +84,7 @@ function viewSettings() {
         h("button", { class: "btn small", type: "button", onclick: () => { commit({ folds: {} }); render(false); renderPanel(); toast("Every box is open"); } }, "Open all boxes"),
         h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {}, hidden: {}, folds: {} }); render(false); renderPanel(); toast("Boxes are back to how they started"); } }, "Reset everything"))),
     row("shapes", "Theme shapes", toggleCtl("shapes", state.shapes, on => { commit({ shapes: on }); applyLook(); }), "Hand-drawn, soft, cut-corner, neon, pixel or polygon edges, plus theme fonts, depending on the theme"),
+    row("avmatch", "Avatar matches theme", toggleCtl("avmatch", state.avMatch, on => { commit({ avMatch: on }); refreshAvatars(); }), "Draws your avatar in the theme's own look: ink sketch for Ink, pixels for Arcade, neon for Cyber. Off: always the standard look"),
     row("font", "Chinese font", select("font", FONTS, state.font, k => { commit({ font: k }); applyLook(); }),
       h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
     row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),

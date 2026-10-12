@@ -65,6 +65,14 @@ function start() {
   $("#scrim").addEventListener("click", closePanel);
   window.addEventListener("hashchange", () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== ui.view) go(v); });
   document.addEventListener("paste", photoPaste);
+  // Your avatar dozes off when you leave the app alone, wakes when you come back, and winks when tapped.
+  for (const t of ["keydown", "wheel", "touchstart", "scroll"]) document.addEventListener(t, nudgeAvatar, { passive: true, capture: true });
+  document.addEventListener("pointerdown", ev => {
+    nudgeAvatar();
+    const av = ev.target.closest && ev.target.closest("svg.avatar");
+    if (av && !av.closest(".av-tile")) winkAvatar();
+  }, { passive: true, capture: true });
+  armIdle();
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);

@@ -266,8 +266,10 @@ function watchEarn(i) {
   watch.earned.add(i);
   const a = dayAct();
   if (a[5] >= MEDIA_CAP) return;
+  const before = levelNow().level;
   a[5] += 1;
   commitProgress();
+  afterXp(before, 1, true);   // a level reached while watching gets its level-up screen too
   const xp = $("#watch-xp");
   if (xp) xp.textContent = "Today: " + a[5] + " / " + MEDIA_CAP + " XP from watching and listening";
   updateTopbar();
