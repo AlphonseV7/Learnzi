@@ -4,7 +4,7 @@
 .tones-main { display: grid; gap: 14px; min-width: 0; align-content: start; }
 @media (min-width: 900px) {
   .tones-layout { grid-template-columns: minmax(0, 1fr) 280px; align-items: start; }
-  .tones-layout > .garden-card { order: 0; position: sticky; top: 12px; }
+  .tones-layout > .garden-card { order: 0; position: sticky; top: calc(12px + var(--bar-off, 0px)); transition: top .3s var(--ease); }
 }
 .tone-card .fc-play { width: 4rem; height: 4rem; }
 .tone-card .fc-play svg { width: 24px; height: 24px; }

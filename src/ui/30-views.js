@@ -9,6 +9,7 @@ function updateTopbar() {
     pill.setAttribute("aria-label", "Zì level " + lv.level + ": " + lv.into + " of " + lv.need + " XP to the next level. Open My Zì");
     pill.title = lv.into + " / " + lv.need + " XP to level " + (lv.level + 1);
   }
+  xpBarShow(mleOn() ? mleLevel() : lv);
   const badge = $("#clock-badge");
   if (badge) {
     badge.hidden = !clockShift;

@@ -197,7 +197,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; tex
 .plan li.done .tick::after { content: "✓"; display: block; color: var(--surface); font-size: .7rem; font-weight: 800; text-align: center; line-height: 14px; }
 
 /* ---------- lookup ---------- */
-.search { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding-block: 6px; background: var(--bg); }
+.search { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-off, 0px)); transition: top .3s var(--ease); z-index: 5; padding-block: 6px; background: var(--bg); }
 .search input {
   width: 100%; font-size: 1.1rem; padding: 14px 16px 14px 46px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface);
 }
@@ -469,7 +469,7 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
   0% { transform: rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
   100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(.3); opacity: 0; }
 }
-.search-row { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--bg); padding-block: 6px; }
+.search-row { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-off, 0px)); transition: top .3s var(--ease); z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--bg); padding-block: 6px; }
 .search-row .search { position: relative; flex: 1; min-width: 0; padding: 0; top: auto; }
 .random { flex: none; height: 52px; }
 @media (max-width: 480px) { .random { width: 52px; padding: 0; justify-content: center; font-size: 0; font-size-adjust: none; } .random svg { width: 22px; height: 22px; } }

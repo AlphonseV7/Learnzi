@@ -102,7 +102,7 @@ function answerDrill(k) {
       const before = levelNow().level;
       a[4] += add; drill.xp += add;
       commitProgress();
-      afterXp(before, add);
+      afterXp(before, add, false, q.e && q.e.s);
     }
   } else drill.run = 0;
   render(false);

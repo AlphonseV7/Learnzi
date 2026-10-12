@@ -133,6 +133,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Top bar: an XP bar that fills as tiny characters fly in; on phones it follows you down the page and tucks away when you stop scrolling"],
   ["12 Oct", "Avatars: seven new animals up to level 50, a halo, faces that react to you, and imperial exam ranks from 学童 to 状元"],
   ["12 Oct", "Listen: audiobooks that follow along, as an Audio tab next to Watch; tap along to time plain text"],
   ["12 Oct", "Watch: videos with tappable subtitles, side by side on a computer; flashcards that play the moment from the video"],

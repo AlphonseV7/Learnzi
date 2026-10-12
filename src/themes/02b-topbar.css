@@ -1,0 +1,44 @@
+/* ---------- top bar: XP bar, flying characters, and following you down the page on phones ---------- */
+.app .main > .topbar.card { position: relative; }
+/* room for the XP bar (the doubled class outranks the themes' own padding) */
+.app .main > .topbar.card.card { padding-bottom: 14px; }
+:root.desk .app .main > .topbar.card.card { padding-bottom: 15px; }
+.xpbar {
+  position: absolute; left: 14px; right: 14px; bottom: 5px; height: 4px; border-radius: 999px; pointer-events: none;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+}
+:root.desk .xpbar { left: 40px; right: 40px; }
+.xpbar > i {
+  position: relative; display: block; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--surface)), var(--accent));
+  transition: width .9s var(--ease) .35s;
+}
+.xpbar > i.snap { transition: none; }
+/* the shimmer while it fills: little dots running along the bar */
+.xpbar.filling > i, .xpbar.full > i {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--surface) 85%, transparent) 0 1px, transparent 1.5px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--surface)), var(--accent));
+  background-size: 7px 4px, 100% 100%; animation: xpDots .5s linear infinite;
+}
+@keyframes xpDots { to { background-position: 7px 0, 0 0; } }
+/* a glint at the end of the bar each time a character lands */
+.xpbar.ping > i::after {
+  content: ""; position: absolute; right: -3px; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(0, -50%);
+  background: radial-gradient(circle, var(--surface) 0 20%, var(--accent) 45%, transparent 70%); animation: xpPing .45s ease-out forwards;
+}
+@keyframes xpPing { from { opacity: 1; transform: translate(0, -50%) scale(.6); } to { opacity: 0; transform: translate(0, -50%) scale(1.8); } }
+.xpbar.full { box-shadow: 0 0 0 2px var(--accent-soft), 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent); }
+.xp-glyph {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; opacity: 0;
+  font-size: .82rem; font-weight: 700; line-height: 1; color: var(--accent); text-shadow: 0 0 6px var(--surface);
+}
+:root[data-shape="arcade"] .xpbar, :root[data-shape="arcade"] .xpbar > i { border-radius: 0; }
+:root[data-shape="ends"] .xpbar { border: 1px solid #000; height: 5px; }
+
+/* phones and tablets: the bar sticks to the top, tucks away when you stop scrolling, returns when you scroll */
+:root:not(.desk) .app .main > .topbar.card {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 8px); z-index: 25;
+  transition: transform .35s var(--ease), opacity .35s var(--ease);
+}
+:root:not(.desk) .app .main > .topbar.card.tucked { transform: translateY(calc(-100% - 24px)); opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { :root:not(.desk) .app .main > .topbar.card { transition: opacity .2s; } }

@@ -81,7 +81,7 @@
   .view.watch-view { max-width: 1200px; }
   .watch-cols { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr); gap: 20px; align-items: start; }
   .watch-col { display: grid; gap: 20px; align-content: start; min-width: 0; }
-  .watch-right { position: sticky; top: 12px; }
+  .watch-right { position: sticky; top: calc(12px + var(--bar-off, 0px)); transition: top .3s var(--ease); }
   :root.desk .watch-right { top: 76px; }
   .watch-right .watch-subs .watch-line { min-height: 9rem; display: grid; place-items: center; }
   .watch-right .watch-list { max-height: 38vh; }

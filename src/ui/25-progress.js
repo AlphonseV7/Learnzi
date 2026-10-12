@@ -66,8 +66,8 @@ function xpPop(n) {
 }
 /** After earning XP: the +XP pop and a happy face, or the level-up screen. `quiet` (Watch and Listen,
  *  1 XP a line) skips the pop and the face so the avatar doesn't bounce all through a film. */
-function afterXp(before, gained, quiet) {
-  if (!quiet) xpPop(gained);
+function afterXp(before, gained, quiet, chars) {
+  if (!quiet) { xpPop(gained); xpFlow(chars, gained); revealBar(); }
   const now = levelNow().level;
   if (now > before) {
     showLevelUp(now, before);
@@ -76,19 +76,19 @@ function afterXp(before, gained, quiet) {
   } else if (gained > 0 && !quiet) setMood("happy", 2200);
 }
 const lookedToday = new Set();
-function gainBonus(n) {
+function gainBonus(n, chars) {
   const a = dayAct();
   const add = Math.min(n, BONUS_CAP - a[0]);
   if (add <= 0) return;
   const before = levelNow().level;
   a[0] += add;
   commitProgress();
-  afterXp(before, add);
+  afterXp(before, add, false, chars);
 }
 function rewardLookup(s) {
   if (lookedToday.has(s)) return;
   lookedToday.add(s);
-  gainBonus(2);
+  gainBonus(2, s);
 }
 
 // ---------- cards ----------

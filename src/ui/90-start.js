@@ -73,6 +73,7 @@ function start() {
     if (av && !av.closest(".av-tile")) winkAvatar();
   }, { passive: true, capture: true });
   armIdle();
+  setupTopbar();
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);

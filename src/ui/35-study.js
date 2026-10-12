@@ -49,7 +49,7 @@ function grade(g) {
   if (g === 1) study.again++;
   // Still learning: show it again a few cards later in this session.
   if (SRS.isLearning(next)) study.queue.splice(Math.min(3, study.queue.length), 0, cur);
-  afterXp(before, gained);
+  afterXp(before, gained, false, cur.e.s);
   if (g === 1) setMood("oops", 2200);
   nextCard();
   render(false);
