@@ -162,7 +162,7 @@ function afterDeck() {
 function decksBox(label = "Your decks") {
   const ids = ["starred", "welcome", ...state.decks.map(d => d.id), "hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6"].filter(isActive);
   const box = h("div", { class: "card stack" },
-    h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, label),
+    h("div", { class: "row spread" }, label === "My decks" ? h("h2", { class: "h-card" }, label) : h("span", { class: "eyebrow" }, label),
       h("button", { class: "plain-btn build-link small", type: "button", onclick: () => go("decks") }, "All decks")));
   if (!ids.length) { box.append(h("p", { class: "muted" }, "No decks yet. Open Study → Decks to start one.")); return box; }
   for (const id of ids.slice(0, 4)) {

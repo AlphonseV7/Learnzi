@@ -98,13 +98,16 @@ function toneIcon(t) {
 
 function viewTones() {
   const v = h("section", { class: "view tones" });
+  // Both look the same; the one you tap lights up as you press it, then the round starts.
+  const pick = mode => ev => { ev.currentTarget.classList.add("picked"); setTimeout(() => startDrill(mode), 140); };
   const modes = h("div", { class: "row" },
-    h("button", { class: "btn" + (drill.mode === "single" ? " primary" : ""), type: "button", onclick: () => startDrill("single") }, "Single tones"),
-    h("button", { class: "btn" + (drill.mode === "pairs" ? " primary" : ""), type: "button", onclick: () => startDrill("pairs") }, "Tone pairs"));
+    h("button", { class: "btn tone-mode", type: "button", onclick: pick("single") }, "Single tones"),
+    h("button", { class: "btn tone-mode", type: "button", onclick: pick("pairs") }, "Tone pairs"));
   v.append(modes);
   const main = h("div", { class: "tones-main" });
-  const layout = h("div", { class: "tones-layout" + (drill.active ? " active" : "") }, main, gardenBox());
-  foldify(layout, "tones", ":scope > .garden-card");
+  // The water garden shows during a round (it grows as you answer), not on the start page.
+  const layout = h("div", { class: "tones-layout" + (drill.active ? " active" : "") }, main, drill.active ? gardenBox() : null);
+  if (drill.active) foldify(layout, "tones", ":scope > .garden-card");
   v.append(layout);
   if (!drill.active) {
     main.append(h("div", { class: "card stack" },

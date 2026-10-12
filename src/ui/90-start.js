@@ -48,8 +48,6 @@ function start() {
   setupDesk();
   setupPanelSwipe();
   $("#gear").append(icon("gear"));
-  $("#top-search").append(icon("search"));
-  $("#top-search").addEventListener("click", () => { go("lookup"); setTimeout(() => { const q = $("#q"); if (q) q.focus(); }, 60); });
   let lastGear = 0;
   $("#gear").addEventListener("click", () => {
     // Double-tap the cog while already on Settings to open the hidden Debug settings.
@@ -74,7 +72,7 @@ function start() {
   }, { passive: true, capture: true });
   armIdle();
   setupTopbar();
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);
   ui.view = VIEWS.includes(first) ? first : "home";

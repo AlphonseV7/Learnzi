@@ -79,6 +79,8 @@ const Sync = {
     this.set(all.includes("error") ? "error" : all.includes("saving") ? "saving" : all.includes("connecting") ? "connecting" : "synced");
   },
   queue(name) { const d = this.docs[name]; if (d) d.queue(); },
+  /** Save every document now (factory reset waits for this so the reset reaches the synced copy). */
+  flushAll() { return Promise.all(Object.values(this.docs).map(d => { clearTimeout(d.timer); return d.flush(); })); },
   async start() {
     const use = window.claude && typeof window.claude.use === "function" ? window.claude.use : null;
     if (!use) { this.set("local"); return; }

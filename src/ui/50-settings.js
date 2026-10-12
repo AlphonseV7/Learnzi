@@ -61,8 +61,7 @@ function viewSettings() {
       h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
     row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),
       "Menus, buttons, headings and meanings"),
-    row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut)),
-    boxLayoutRow()));
+    row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut))));
 
   // Study
   const perDay = h("select", { id: "newperday" });
@@ -103,6 +102,9 @@ function viewSettings() {
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Sync"),
     h("p", { class: "muted", id: "sync-note" }, PILL[Sync.status][1]),
     h("p", { class: "muted small" }, "Synced: your nickname, My Zì, flashcard progress and XP, recent lookups, reader text and these settings. Stored privately for your account; nobody else can read them.")));
+
+  // Reset: box layout and factory reset (51-reset)
+  v.append(resetBox());
 
   // About
   const a = (href, text) => h("a", { href, target: "_blank", rel: "noopener noreferrer" }, text);
@@ -174,7 +176,7 @@ function boxLayoutRow() {
       h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {} }); render(false); renderPanel(); toast("Every box is back in its original place"); } }, "Original order"),
       h("button", { class: "btn small", type: "button", onclick: () => { commit({ hidden: {} }); render(false); renderPanel(); toast("Removed boxes are back"); } }, "Show removed boxes"),
       h("button", { class: "btn small", type: "button", onclick: () => { commit({ folds: {} }); render(false); renderPanel(); toast("Every box is open"); } }, "Open all boxes"),
-      h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {}, hidden: {}, folds: {} }); render(false); renderPanel(); toast("Boxes are back to how they started"); } }, "Reset everything")));
+      h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {}, hidden: {}, folds: {} }); render(false); renderPanel(); toast("Boxes are back to how they started"); } }, "Reset all boxes")));
 }
 function currentColors() {
   const hex = c => {

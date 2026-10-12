@@ -36,7 +36,7 @@ function foldBox(el, prefix, closedByDefault) {
     title = span;
   }
   const rest = [...el.children].filter(c => c !== first);
-  const open = foldIsOpen(id, closedByDefault.includes(id));
+  const open = foldIsOpen(id, closedByDefault === true || (Array.isArray(closedByDefault) && closedByDefault.includes(id)));
   const bodyId = "fold-" + (++foldSeq);
   const btn = h("button", { class: "fold-btn", type: "button", "aria-expanded": String(open), "aria-controls": bodyId },
     h("span", { class: "fold-chev", "aria-hidden": "true" }, icon("next")),
@@ -64,7 +64,8 @@ function foldBox(el, prefix, closedByDefault) {
   });
   return el;
 }
-/** Folds every matching box inside a view or panel, then puts them in the order you arranged. */
+/** Folds every matching box inside a view or panel, then puts them in the order you arranged.
+ *  closedByDefault: a list of box ids that start folded, or true for all of them. */
 function foldify(root, prefix, selector, closedByDefault = []) {
   const hidden = hiddenOn(prefix);
   for (const el of root.querySelectorAll(selector)) {
@@ -161,9 +162,36 @@ function setupGrip(grip, el) {
     saveOrder(el);
     dropGhost();
   };
+  // On touch the grip must be held still for a moment before the box lifts (a quick swipe that starts on
+  // the grip just scrolls the page), so boxes don't move by accident. A mouse lifts it straight away.
+  const HOLD_MS = 400;
+  let hold = 0, holdAt = null;
+  const cancelHold = () => {
+    clearTimeout(hold); hold = 0; holdAt = null;
+    grip.classList.remove("arming");
+    document.removeEventListener("pointermove", watchHold);
+    document.removeEventListener("pointerup", cancelHold);
+    document.removeEventListener("pointercancel", cancelHold);
+  };
+  const watchHold = ev => {
+    if (!holdAt) return;
+    if (Math.hypot(ev.clientX - holdAt.clientX, ev.clientY - holdAt.clientY) > 10) cancelHold();
+    else holdAt = { clientX: ev.clientX, clientY: ev.clientY, button: 0 };
+  };
+  grip.addEventListener("contextmenu", ev => ev.preventDefault());
+  // Once lifted, the finger drags the box instead of scrolling the page.
+  grip.addEventListener("touchmove", ev => { if (active && ev.cancelable) ev.preventDefault(); }, { passive: false });
   grip.addEventListener("pointerdown", ev => {
     if (ev.button !== 0) return;
-    ev.preventDefault();
+    if (ev.pointerType === "mouse") { ev.preventDefault(); begin(ev); return; }
+    holdAt = { clientX: ev.clientX, clientY: ev.clientY, button: 0 };
+    grip.classList.add("arming");
+    document.addEventListener("pointermove", watchHold, { passive: true });
+    document.addEventListener("pointerup", cancelHold);
+    document.addEventListener("pointercancel", cancelHold);
+    hold = setTimeout(() => { const at = holdAt; cancelHold(); if (at) begin(at); }, HOLD_MS);
+  });
+  function begin(ev) {
     active = true; lastY = ev.clientY;
     makeGhost(ev);
     el.classList.add("moving");
@@ -180,10 +208,13 @@ function setupGrip(grip, el) {
       const step = lastY < top + 60 ? -12 : lastY > bottom - 60 ? 12 : 0;
       if (step) { if (box) box.scrollBy(0, step); else window.scrollBy(0, step); place(); }
     }, 30);
-  });
+  }
 }
 // Views whose boxes fold. The study screen, tone trainer and reader stay as they are.
-const FOLD_VIEWS = ["home", "lookup", "myzi", "decks", "deck", "stats", "me", "settings", "debug"];
+const FOLD_VIEWS = ["home", "lookup", "myzi", "mycards", "decks", "deck", "stats", "me", "settings", "debug"];
+// Pages whose boxes start open until you fold them: Home, and Look up (its results). Everywhere else
+// boxes start folded; once you open or fold one it stays that way (state.folds).
+const OPEN_VIEWS = ["home", "lookup"];
 
 /** The word pop-up's top bar: Fold all, and Bring back when some of its boxes were removed. */
 function updatePvTools() {

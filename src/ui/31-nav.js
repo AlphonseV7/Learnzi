@@ -6,6 +6,7 @@ const NAV_MENUS = {
     { zh: "学", label: "Study now", sub: () => { const p = ui.dict === "ready" ? studyPlan() : null; const n = p ? p.due.length + p.fresh.length : 0; return n ? n + (n === 1 ? " card ready" : " cards ready") : "All caught up"; },
       run: () => { const p = ui.dict === "ready" ? studyPlan() : null; if (p && p.due.length + p.fresh.length) startStudy(); else { toast("All caught up. Pick a deck to add new words."); go("decks"); } } },
     { zh: "卡", label: "Decks", sub: () => "Flashcard decks and word lists", run: () => go("decks") },
+    { zh: "片", label: "My cards", sub: () => { const n = state.saved.length; return n ? n + (n === 1 ? " saved word and its cards" : " saved words and their cards") : "Saved words and their flashcards"; }, run: () => go("mycards") },
     { zh: "查", label: "Look up", sub: () => "Characters, pinyin or English", run: () => go("lookup") },
   ],
   tools: [

@@ -133,6 +133,10 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Boxes start folded (except Home and search results); hold the grip a moment to move a box on a phone"],
+  ["12 Oct", "Top bar: compact XP bar next to the level; search button removed. My cards in the Study menu"],
+  ["12 Oct", "Settings → Reset: box layout and a factory reset with a wipe animation"],
+  ["12 Oct", "Ranks you haven't reached are hidden; tone trainer start page tidied"],
   ["12 Oct", "Locked items are shadows with ??? until unlocked (Debug → Show locked items reveals them)"],
   ["12 Oct", "Recordings: no more clipped endings, the same volume throughout, and Listen slowly keeps the pitch"],
   ["12 Oct", "My cards: every saved word's flashcards, by deck and status; My Zì says my"],

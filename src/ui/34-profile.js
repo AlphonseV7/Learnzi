@@ -48,8 +48,7 @@ function viewMe() {
         key === "animal" ? h("span", { class: "hz small muted" }, secret ? "？" : item.zh) : null,
         open ? null : h("span", { class: "lock small" }, icon("lock"), lockText(item))));
     }
-    v.append(h("div", { class: "card stack" }, h("div", { class: "row spread" }, h("h2", { class: "h-card" }, title),
-      key === "acc" ? h("span", { class: "muted small" }, "Wear as many as you like") : null), grid));
+    v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, title), grid));
   }
   const extras = h("div", { class: "av-grid" });
   for (const [k, item] of AV_EXTRAS) {
@@ -59,23 +58,24 @@ function viewMe() {
       avatarSvg({ ...base, [k]: true, plain: keepSecret(item) }, 64, secretName(item)), h("b", { class: "small" }, secretName(item) + (a[k] ? " on" : "")),
       open ? null : h("span", { class: "lock small" }, icon("lock"), lockText(item))));
   }
-  v.append(h("div", { class: "card stack" }, h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Extras"),
-    h("span", { class: "muted small" }, "Tap to turn on or off")), extras));
+  v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "Extras"), extras));
   v.append(rankLadder(lv.level));
   return v;
 }
-/** Every rank, the ones you've reached first. Tap one to open the word. */
+/** Every rank. The ones you haven't reached are a shadow with ??? and their level (Debug → Show locked
+ *  items reveals them). Tap a reached one to open the word. */
 function rankLadder(level) {
   const cur = rankFor(level).rank;
   const list = h("ol", { class: "rank-ladder" });
   for (const r of RANKS) {
-    const got = level >= r.lv;
-    list.append(h("li", { class: (got ? "got" : "ahead") + (r === cur ? " now" : "") },
-      h("button", { class: "plain-btn rank-row", type: "button", onclick: () => openWord(r.s), "aria-label": r.en + ", " + r.s + ", level " + r.lv + (r === cur ? ", my rank" : got ? ", reached" : "") },
-        h("span", { class: "hz rank-zh" }, r.s),
-        h("span", { class: "stack-tight rank-text" }, h("b", null, r.en), h("span", { class: "muted small" }, Engine.toMarks(r.p) + " · " + r.note)),
+    const got = level >= r.lv, secret = !got && !state.showLocked;
+    list.append(h("li", { class: (got ? "got" : "ahead") + (r === cur ? " now" : "") + (secret ? " is-secret" : "") },
+      h("button", { class: "plain-btn rank-row", type: "button", disabled: secret, onclick: () => openWord(r.s),
+        "aria-label": secret ? "Locked rank, unlocks at level " + r.lv : r.en + ", " + r.s + ", level " + r.lv + (r === cur ? ", my rank" : got ? ", reached" : "") },
+        h("span", { class: "hz rank-zh" }, secret ? "??" : r.s),
+        h("span", { class: "stack-tight rank-text" }, h("b", null, secret ? "???" : r.en), secret ? null : h("span", { class: "muted small" }, Engine.toMarks(r.p) + " · " + r.note)),
         h("span", { class: "badge num" }, r === cur ? "Me" : "Lv " + r.lv))));
   }
   return h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "Ranks ", h("span", { class: "hz" }, "科举")),
-    h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, 状元 takes about a year."), list);
+    h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, the top rank takes about a year."), list);
 }

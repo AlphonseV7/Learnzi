@@ -6,7 +6,6 @@
 :root[data-shape="cyber"] .app .main > .topbar.card { padding-inline: 16px 22px; }
 .topbar.card .me { min-width: 0; flex: 1; }
 .topbar.card .top-right { gap: 6px; }
-.btn.icon.top-search { width: 36px; height: 36px; }
 @media (max-width: 400px) { .topbar.card .sync { padding-inline: 8px; } .topbar.card .lvl { padding-inline: 8px; } }
 
 .navmenu {

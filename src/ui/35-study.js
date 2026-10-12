@@ -161,7 +161,7 @@ function rankLine(level) {
   const { next } = rankFor(level);
   const left = next ? next.lv - level : 0;
   return h("div", { class: "rank-line" }, rankChip(level),
-    next ? h("span", { class: "muted small" }, left + (left === 1 ? " level" : " levels") + " to ", h("span", { class: "hz" }, next.s))
+    next ? h("span", { class: "muted small" }, left + (left === 1 ? " level" : " levels") + " to ", state.showLocked ? h("span", { class: "hz" }, next.s) : "the next rank")
       : h("span", { class: "muted small" }, "The highest rank"));
 }
 function whenText(dueMin) {
