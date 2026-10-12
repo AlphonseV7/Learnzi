@@ -148,6 +148,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Sync: flashcard progress is now saved in 17 smaller parts, so it keeps syncing for years"],
   ["12 Oct", "Welcome for new learners: pick your companion, name, colour and level, then a tour with your avatar"],
   ["12 Oct", "Badges: 18 seal stamps to collect in My Zì"],
   ["12 Oct", "The Four Symbols and the Golden Dragon join the avatars, up to level 100"],
@@ -330,7 +331,8 @@ const CARD_KEY = /^[^|]{1,32}\|[^|]{1,120}\|[mlrw]$/;
 function sanitizeProgress(raw) {
   const o = obj(raw), src = obj(o.cards), srcAct = obj(o.act);
   const cards = {}, act = {};
-  for (const k of Object.keys(src).sort().slice(0, 6000)) {
+  // Up to 50,000 cards (about five years at 10 new words a day). Synced in 16 parts, see 10-sync.
+  for (const k of Object.keys(src).sort().slice(0, 50000)) {
     const a = src[k];
     if (!CARD_KEY.test(k) || !Array.isArray(a) || a.length !== 9 || !a.every(n => typeof n === "number" && Number.isFinite(n))) continue;
     cards[k] = [num(a[0], 0.01, 36500, 1), num(a[1], 1, 10, 5), Math.floor(num(a[2], 0, 1e9, 0)), Math.floor(num(a[3], 0, 1e9, 0)),
