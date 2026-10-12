@@ -270,6 +270,7 @@ function watchEarn(i) {
   a[5] += 1;
   commitProgress();
   afterXp(before, 1, true);   // a level reached while watching gets its level-up screen too
+  earnBadge(watch.kind === "audio" ? "listen" : "watch");
   const xp = $("#watch-xp");
   if (xp) xp.textContent = "Today: " + a[5] + " / " + MEDIA_CAP + " XP from watching and listening";
   updateTopbar();

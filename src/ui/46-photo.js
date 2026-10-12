@@ -65,6 +65,7 @@ async function readPhoto() {
     photo.stopped = photo.stop; photo.stop = false;
     setPhotoText(lines);
     photo.stage = "done";
+    if (photo.text.trim()) earnBadge("snap");
   } catch (err) {
     photo.stage = "crop";
     toast("Couldn't start the text reader here. Check your connection, or try Chrome.");

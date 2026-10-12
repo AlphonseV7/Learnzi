@@ -4,7 +4,7 @@ const PAGE_CHARS = 1500;
 const ACCEPT = ".txt,.text,.md,.markdown,.srt,.lrc,.csv,.tsv,text/plain";
 
 /** The page of the Reader you're on, for Listen and its voice button. */
-function readerPageText() { const ps = pagesOf(reader.text || SAMPLE); return ps[Math.min(reader.page, ps.length - 1)] || ""; }
+function readerPageText() { const ps = pagesOf(reader.text || readerSample()); return ps[Math.min(reader.page, ps.length - 1)] || ""; }
 function pagesOf(text) {
   const pages = [];
   let i = 0;
@@ -81,7 +81,7 @@ function viewReader() {
   const navTop = h("div", { class: "pager" });
   const navBottom = h("div", { class: "pager" });
   const draw = () => {
-    const text = reader.text || SAMPLE;
+    const text = reader.text || readerSample();
     const pages = pagesOf(text);
     const page = Math.min(reader.page, pages.length - 1);
     label.textContent = !reader.text ? "Sample text" : reader.title ? reader.title : "Your text";
@@ -101,13 +101,14 @@ function viewReader() {
     readerTimer = setTimeout(() => {
       if (ta.value.length > READER_MAX) toast("The Reader keeps the first 75,000 characters.");
       const text = ta.value.slice(0, READER_MAX);
-      commitReader({ text, page: Math.min(reader.page, pagesOf(text || SAMPLE).length - 1), title: text ? reader.title : "" });
+      commitReader({ text, page: Math.min(reader.page, pagesOf(text || readerSample()).length - 1), title: text ? reader.title : "" });
       draw();
     }, 450);
   });
   out.addEventListener("click", ev => {
     const b = ev.target.closest(".w");
     if (!b) return;
+    earnBadge("read");
     if (b.classList.contains("sel")) { speak(b.dataset.form); return; }
     out.querySelectorAll(".w.sel").forEach(x => x.classList.remove("sel"));
     b.classList.add("sel");
@@ -117,7 +118,7 @@ function viewReader() {
   v.append(ta);
   v.append(h("div", { class: "row" },
     h("button", { class: "btn", type: "button", onclick: () => fileIn.click() }, icon("file"), "Import file"), fileIn,
-    h("button", { class: "btn", type: "button", onclick: () => { ta.value = SAMPLE; commitReader({ text: SAMPLE, title: "", page: 0 }); draw(); } }, "Use sample"),
+    h("button", { class: "btn", type: "button", onclick: () => { ta.value = readerSample(); commitReader({ text: readerSample(), title: "", page: 0 }); draw(); } }, "Use sample"),
     h("button", { class: "btn", type: "button", onclick: () => { ta.value = ""; commitReader({ text: "", title: "", page: 0 }); draw(); ta.focus(); } }, "Clear")));
   v.append(h("div", { class: "stack-tight" },
     h("div", { class: "row spread" }, label, h("div", { class: "row" },

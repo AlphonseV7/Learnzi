@@ -901,3 +901,16 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 .lu-rank-word .hz { font-size: 2rem; font-weight: 700; color: var(--accent); }
 .lu-rank-word .rank-py { color: var(--ink-soft); }
 .me-tabs { margin-top: -4px; }
+/* the Four Symbols and the Golden Dragon */
+.av-frost { animation: avFrost 3.2s ease-in-out infinite; }
+@keyframes avFrost { 50% { opacity: .7; } }
+.av-tongue { transform-box: fill-box; transform-origin: 0 50%; animation: avTongue 2.6s ease-in-out infinite; }
+@keyframes avTongue { 0%, 80%, 100% { transform: scaleX(0); } 85%, 95% { transform: scaleX(1); } }
+.av-snake { transform-box: view-box; transform-origin: 50% 50%; animation: avSnake 4s ease-in-out infinite alternate; }
+@keyframes avSnake { to { transform: translateY(-1.2px); } }
+.av-flame, .av-flame-l, .av-flame-r { transform-box: fill-box; transform-origin: 50% 100%; animation: avFlame .9s ease-in-out infinite alternate; }
+.av-flame-r { animation-delay: .3s; } .av-flame-l { animation-delay: .6s; }
+@keyframes avFlame { from { transform: scaleY(.92) skewX(-2deg); } to { transform: scaleY(1.06) skewX(2deg); } }
+.av-pearl { transform-box: fill-box; animation: avPearl 3s ease-in-out infinite; }
+@keyframes avPearl { 50% { transform: translate(-1px, 2px); } }
+.av-glint { transform-box: fill-box; transform-origin: center; animation: avSparkle 2.2s ease-in-out infinite; }

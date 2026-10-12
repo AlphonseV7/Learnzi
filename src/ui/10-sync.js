@@ -15,11 +15,13 @@ class DocSync {
   constructor(ref, getLocal, applyRemote, clean, merge) {
     this.ref = ref; this.get = getLocal; this.apply = applyRemote; this.clean = clean; this.merge = merge;
     this.status = "connecting"; this.timer = 0; this.writing = false; this.again = false;
+    this.settled = new Promise(r => { this.settle = r; });   // first answer from the store (or an error)
   }
   mark(s) { this.status = s; Sync.refresh(); }
   listen() {
     this.ref.onSnapshot(snap => {
       if (snap.metadata.hasPendingWrites) return;
+      queueMicrotask(this.settle);
       const local = this.get();
       if (!snap.exists) { if (local.updatedAt) this.queue(0); else this.mark("synced"); return; }
       const raw = snap.data();
@@ -34,7 +36,7 @@ class DocSync {
       if (remote.updatedAt > local.updatedAt) { this.apply(remote, raw); this.mark("synced"); }
       else if (remote.updatedAt < local.updatedAt) this.queue(0);
       else this.mark("synced");
-    }, () => this.mark("error"));
+    }, () => { this.mark("error"); this.settle(); });
   }
   queue(delay = 1200) {
     clearTimeout(this.timer);
@@ -58,8 +60,12 @@ class DocSync {
   }
 }
 
+let syncSettle;
 const Sync = {
   status: "local", docs: {},
+  /** Resolves once your synced settings have loaded (or there's no sync here), so the first-time
+   *  welcome never appears on a new device for an account that already has its settings. */
+  settled: new Promise(r => { syncSettle = r; }),
   set(s) {
     this.status = s;
     const el = $("#sync");
@@ -83,12 +89,12 @@ const Sync = {
   flushAll() { return Promise.all(Object.values(this.docs).map(d => { clearTimeout(d.timer); return d.flush(); })); },
   async start() {
     const use = window.claude && typeof window.claude.use === "function" ? window.claude.use : null;
-    if (!use) { this.set("local"); return; }
+    if (!use) { this.set("local"); syncSettle(); return; }
     this.set("connecting");
     let db = null, user = null;
     try { [db, user] = await Promise.all([use("db"), use("user")]); } catch { /* treated as absent */ }
     const id = user ? await user.id() : null;
-    if (!db || !id) { this.set("local"); return; }
+    if (!db || !id) { this.set("local"); syncSettle(); return; }
     try {
       const base = db.collection("data/users/" + id);
       this.docs.state = new DocSync(base.doc("state"), () => state, (remote, raw) => {
@@ -102,7 +108,8 @@ const Sync = {
       this.docs.progress = new DocSync(base.doc("progress"), () => progress, merged => {
         progress = merged; writeJSON(PROGRESS_KEY, progress); onProgressChangedElsewhere();
       }, sanitizeProgress, mergeProgress);
-    } catch { this.docs = {}; this.set("local"); return; }
+    } catch { this.docs = {}; this.set("local"); syncSettle(); return; }
     Object.values(this.docs).forEach(d => d.listen());
+    this.docs.state.settled.then(syncSettle);
   },
 };

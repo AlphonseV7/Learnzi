@@ -52,6 +52,7 @@ function toggleSave(e) {
   commit({ saved: was ? state.saved.filter(x => !(x.s === e.s && x.p === e.p)) : [{ s: e.s, p: e.p, at: Date.now() }, ...state.saved] });
   toast(was ? "Removed " + disp(e) + " from My Zì" : "Added " + disp(e) + " to My Zì");
   if (!was && !progress.cards[cardBase(e) + "|m"]) gainBonus(5, e.s);
+  if (!was) checkBadges();
   renderPanel();
   refreshView();
 }

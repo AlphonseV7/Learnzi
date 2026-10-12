@@ -11,6 +11,21 @@ const READER_MAX = 75000; // characters; keeps the synced reader document under 
 const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug"];
 const DECK_ID = /^(starred|welcome|hsk[1-6]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
+// Your Chinese level from the welcome: which decks start, new words a day, pinyin, word of the day, Reader sample.
+const LEVELS = {
+  new: { label: "Brand new", zh: "零基础", note: "I've never studied Chinese", decks: ["starred", "welcome"], perDay: 5, pinyin: true, hsk: 1 },
+  little: { label: "A little", zh: "入门", note: "I know some basics, around HSK 1–2", decks: ["starred", "welcome", "hsk1"], perDay: 10, pinyin: true, hsk: 2 },
+  middle: { label: "Getting comfortable", zh: "中级", note: "I can manage everyday Chinese, around HSK 3–4", decks: ["starred", "hsk3"], perDay: 15, pinyin: true, hsk: 3 },
+  high: { label: "Confident", zh: "高级", note: "I read and talk with ease, around HSK 5–6", decks: ["starred", "hsk5"], perDay: 20, pinyin: false, hsk: 5 },
+};
+// Original short texts for the Reader, one per level.
+const SAMPLES = {
+  new: SAMPLE,
+  little: "我每天早上七点起床，先喝一杯咖啡，然后坐公共汽车去学校。我们的汉语老师很有意思，她常常给我们讲中国的故事。下课以后，我和同学一起去饭馆吃饭。",
+  middle: "周末我打算和朋友去爬山。天气预报说明天可能会下雨，所以我们决定早一点出发。虽然那座山不太高，但是风景非常漂亮。到了山顶，我们一边休息，一边聊天，觉得一路上的辛苦都值得了。",
+  high: "随着科技的发展，越来越多的人习惯在网上学习语言。这种方式虽然方便，却也需要很强的自律能力。专家认为，与其每天花几个小时死记硬背，不如坚持每天练习二十分钟，并把学到的内容运用到真实的生活中。",
+};
+const readerSample = () => SAMPLES[state.level] || SAMPLE;
 const BUILD = "Day 4 build · avatars";
 
 // ---------- debug clock (Debug settings → Time). Kept on this device only. ----------
@@ -133,6 +148,9 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Welcome for new learners: pick your companion, name, colour and level, then a tour with your avatar"],
+  ["12 Oct", "Badges: 18 seal stamps to collect in My Zì"],
+  ["12 Oct", "The Four Symbols and the Golden Dragon join the avatars, up to level 100"],
   ["12 Oct", "Boxes start folded (except Home and search results); hold the grip a moment to move a box on a phone"],
   ["12 Oct", "Top bar: compact XP bar next to the level; search button removed. My cards in the Study menu"],
   ["12 Oct", "Settings → Reset: box layout and a factory reset with a wipe animation"],
@@ -210,6 +228,7 @@ function sanitize(raw) {
   s.avatar.accs = [...new Set(accs.filter(x => typeof x === "string" && /^[a-z]{1,16}$/.test(x) && x !== "none"))].slice(0, 8);
   s.avatar.sparkles = av.sparkles === true;
   s.avatar.halo = av.halo === true;
+  if (["panda", "cat", "tiger", "rabbit", "dragon"].includes(av.starter)) s.avatar.starter = av.starter;
   s.avatar.v = 3;
   // Avatar drawn in the theme's own look (pixel, neon, ink sketch) or always the standard one.
   s.avMatch = o.avMatch !== false;
@@ -225,6 +244,13 @@ function sanitize(raw) {
   s.voice = o.voice === "browser" ? "browser" : "real";
   s.unlockAll = o.unlockAll === true;
   s.showLocked = o.showLocked === true;
+  // First-time welcome and tour: done for anyone who used LearnZì before they existed.
+  s.onboarded = o.onboarded === true || (o.onboarded === undefined && num(o.updatedAt, 0, 1e15, 0) > 0);
+  s.toured = o.toured === true || (o.toured === undefined && s.onboarded);
+  s.level = Object.hasOwn(LEVELS, o.level) ? o.level : "new";
+  // Badges earned: id → when (ms).
+  s.badges = {};
+  for (const [k, v] of Object.entries(obj(o.badges)).slice(0, 60)) if (/^[a-z]{2,16}$/.test(k) && Number.isFinite(v) && v > 0) s.badges[k] = v;
   // MLE mode (the secret): on/off, unlocked, rude words, its own flashcards, quiz XP and daily counts.
   const m = obj(o.mle), mc = {}, ma = {};
   for (const [k, a] of Object.entries(obj(m.cards)).slice(0, 600)) {

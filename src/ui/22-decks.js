@@ -104,6 +104,7 @@ function createDeck(name) {
   if (state.decks.length >= 50) { toast("You can have up to 50 decks."); return null; }
   const d = { id: newDeckId(), name: n, words: [], at: Date.now() };
   commit({ decks: [...state.decks, d], activeDecks: [...state.activeDecks, d.id] });
+  checkBadges();
   return d;
 }
 function updateDeck(id, fn) {

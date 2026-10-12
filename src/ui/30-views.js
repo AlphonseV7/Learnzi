@@ -62,9 +62,9 @@ function viewHome() {
       ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Study now") : null));
   }
   if (ui.dict === "ready") {
-    const w = Engine.wordOfDay();
+    const w = Engine.wordOfDay(undefined, (LEVELS[state.level] || LEVELS.new).hsk);
     if (w) {
-      v.append(h("div", { class: "card wotd" }, h("span", { class: "eyebrow" }, "Word of the day · HSK 1"),
+      v.append(h("div", { class: "card wotd" }, h("span", { class: "eyebrow" }, "Word of the day · HSK " + (LEVELS[state.level] || LEVELS.new).hsk),
         h("button", { class: "glyph" + ([...w.s].length > 1 ? " long" : ""), type: "button", "aria-label": "Open the word of the day", onclick: () => openWord(w.s, w) }, rubyHz(disp(w), w.p)),
         h("div", { class: "wotd-body" },
           h("span", { class: "wotd-def" }, shortDef(w, 3)),

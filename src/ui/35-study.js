@@ -51,6 +51,8 @@ function grade(g) {
   if (SRS.isLearning(next)) study.queue.splice(Math.min(3, study.queue.length), 0, cur);
   afterXp(before, gained, false, cur.e.s);
   if (g === 1) setMood("oops", 2200);
+  timeBadges();
+  if (cur.k.endsWith("|w") && g >= 3) earnBadge("write");
   nextCard();
   render(false);
 }

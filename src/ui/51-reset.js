@@ -77,5 +77,6 @@ async function factoryReset() {
   go("home");
   setMood("surprised", 2500);
   layer.classList.add("lift");
+  setTimeout(startWelcome, 1300);   // a fresh start begins with the welcome
   setTimeout(() => { layer.remove(); toast("LearnZì is fresh again. 你好！"); }, 1100);
 }

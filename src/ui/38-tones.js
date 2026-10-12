@@ -87,7 +87,12 @@ function answerDrill(k) {
   } else drill.run = 0;
   render(false);
 }
-function nextDrill() { drill.i++; drill.picked = null; render(false); if (drill.i < drill.qs.length) setTimeout(playDrill, 250); }
+function nextDrill() {
+  drill.i++; drill.picked = null;
+  if (drill.i >= drill.qs.length && drill.qs.length >= 10 && drill.right === drill.qs.length) earnBadge("perfect");
+  render(false);
+  if (drill.i < drill.qs.length) setTimeout(playDrill, 250);
+}
 
 /** Little drawings of each tone's pitch: level, rising, dipping, falling. */
 function toneIcon(t) {

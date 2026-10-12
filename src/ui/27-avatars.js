@@ -5,11 +5,19 @@
 
 const AV = {
   animal: {
-    panda: { label: "Panda", zh: "熊猫", lv: 1 }, cat: { label: "Lucky cat", zh: "招财猫", lv: 2 }, tiger: { label: "Tiger", zh: "老虎", lv: 3 },
-    rabbit: { label: "Jade rabbit", zh: "玉兔", lv: 4 }, dragon: { label: "Dragon", zh: "龙", lv: 5 },
+    // The five starters: the one you picked in the welcome is yours from level 1, the others arrive at 2–5.
+    panda: { label: "Panda", zh: "熊猫", get lv() { return starterLevel("panda"); } },
+    cat: { label: "Lucky cat", zh: "招财猫", get lv() { return starterLevel("cat"); } },
+    tiger: { label: "Tiger", zh: "老虎", get lv() { return starterLevel("tiger"); } },
+    rabbit: { label: "Jade rabbit", zh: "玉兔", get lv() { return starterLevel("rabbit"); } },
+    dragon: { label: "Dragon", zh: "龙", get lv() { return starterLevel("dragon"); } },
     redpanda: { label: "Red panda", zh: "小熊猫", lv: 8 }, koi: { label: "Koi", zh: "锦鲤", lv: 12 }, crane: { label: "Crane", zh: "仙鹤", lv: 16 },
     monkey: { label: "Golden monkey", zh: "金丝猴", lv: 20 }, fox: { label: "Nine-tailed fox", zh: "九尾狐", lv: 30 },
     qilin: { label: "Qilin", zh: "麒麟", lv: 40 }, phoenix: { label: "Phoenix", zh: "凤凰", lv: 50 },
+    // The Four Symbols (四象), guardians of the four directions, and the Golden Dragon at the top rank.
+    whitetiger: { label: "White Tiger", zh: "白虎", lv: 60 }, tortoise: { label: "Black Tortoise", zh: "玄武", lv: 70 },
+    vermilion: { label: "Vermilion Bird", zh: "朱雀", lv: 80 }, azure: { label: "Azure Dragon", zh: "青龙", lv: 90 },
+    golddragon: { label: "Golden Dragon", zh: "金龙", lv: 100 },
   },
   // Moods, used for drawing only: the avatar shows them by itself (calm, happy on XP, surprised on a
   // level up, sleepy when left alone, wink when tapped, oops on a forgotten card).
@@ -20,8 +28,14 @@ const AV = {
   sparkles: { on: { label: "Sparkles", streak: 3 } },
   halo: { on: { label: "Halo", lv: 15 } },
 };
-const BIRDS = new Set(["crane", "phoenix"]);
-const AV_DEFAULT = { animal: "panda", expr: "calm", eyes: "normal", accs: [], aura: "none", sparkles: false, halo: false };
+const BIRDS = new Set(["crane", "phoenix", "vermilion"]);
+const STARTERS = ["panda", "cat", "tiger", "rabbit", "dragon"];
+/** Your starter is level 1; the other four follow at 2, 3, 4 and 5 in this order. */
+function starterLevel(id) {
+  const pick = STARTERS.includes(state.avatar && state.avatar.starter) ? state.avatar.starter : "panda";
+  return id === pick ? 1 : 2 + STARTERS.filter(x => x !== pick).indexOf(id);
+}
+const AV_DEFAULT = { animal: "panda", expr: "calm", eyes: "normal", accs: [], aura: "none", sparkles: false, halo: false, starter: "panda" };
 function sanitizeAvatar(raw) {
   const o = obj(raw);
   const a = { ...AV_DEFAULT };
@@ -29,6 +43,7 @@ function sanitizeAvatar(raw) {
   a.accs = Array.isArray(o.accs) ? o.accs.filter(x => Object.hasOwn(AV.acc, x) && x !== "none") : [];
   a.sparkles = o.sparkles === true;
   a.halo = o.halo === true;
+  a.starter = STARTERS.includes(o.starter) ? o.starter : "panda";
   return a;
 }
 const bestStreak = () => Math.max(streak(), totals().best);
@@ -47,7 +62,7 @@ const secretLabel = item => (keepSecret(item) ? "Locked item, unlocks at " : ite
 /** The avatar to show: anything no longer unlocked (e.g. after a level reset) falls back. */
 function wornAvatar() {
   const a = sanitizeAvatar(state.avatar);
-  for (const k of ["animal", "eyes", "aura"]) if (!unlocked(AV[k][a[k]])) a[k] = AV_DEFAULT[k];
+  for (const k of ["animal", "eyes", "aura"]) if (!unlocked(AV[k][a[k]])) a[k] = k === "animal" ? a.starter : AV_DEFAULT[k];
   a.accs = a.accs.filter(x => unlocked(AV.acc[x]));
   if (a.sparkles && !unlocked(AV.sparkles.on)) a.sparkles = false;
   if (a.halo && !unlocked(AV.halo.on)) a.halo = false;
@@ -222,6 +237,65 @@ function animalParts(kind) {
     P.push(p("M30 72 q20 16 40 0 q-20 8 -40 0 Z", gold, { opacity: 0.8 }));
     return { parts: P, eye: "#2b2523", mouthY: 64, beak: "#f5c542" };
   }
+  if (kind === "whitetiger") {
+    const fur = "#f7f9fc", stripe = "#3b4660", rim = { stroke: "#4a5d7c", "stroke-width": 1.6 };
+    P.push(c(50, 55, 44, "#bfe3ff", { opacity: 0.45, class: "av-frost" }));
+    P.push(c(26, 28, 10, fur, rim), c(74, 28, 10, fur, rim), c(26, 28, 5, "#b8d4ef"), c(74, 28, 5, "#b8d4ef"));
+    P.push(c(50, 56, 34, fur, rim));
+    P.push(e(50, 68, 17, 12, "#ffffff", { stroke: "#dbe6f2", "stroke-width": 1 }));
+    P.push(p("M44 30 h12 M42 35 h16 M44 40 h12 M50 30 v10", "none", { stroke: stripe, "stroke-width": 2.4, "stroke-linecap": "round" }));
+    P.push(p("M17 50 q8 2 12 7 M16 60 q8 0 11 4 M83 50 q-8 2 -12 7 M84 60 q-8 0 -11 4 M30 33 q4 3 5 8 M70 33 q-4 3 -5 8", "none", { stroke: stripe, "stroke-width": 2.2, "stroke-linecap": "round" }));
+    P.push(p("M46.5 61 h7 l-3.5 3.5 Z", "#e98a96"));
+    return { parts: P, eye: "#2f6fb0", mouthY: 69 };
+  }
+  if (kind === "tortoise") {
+    const hexes = { fill: "none", stroke: "#5f7d69", "stroke-width": 1.4, "stroke-linejoin": "round" };
+    P.push(e(50, 44, 43, 31, "#2f3b35", { stroke: "#1b2420", "stroke-width": 1.6 }));
+    P.push(p("M42 24 l8 -5 l8 5 v8 l-8 5 l-8 -5 Z M26 34 l8 -4 l8 4 v7 l-8 4 l-8 -4 Z M58 34 l8 -4 l8 4 v7 l-8 4 l-8 -4 Z", "none", hexes));
+    P.push(sv("g", { class: "av-snake" },
+      p("M13 54 q2 -34 37 -34 q33 0 37 28", "none", { stroke: "#2f9e8a", "stroke-width": 5, "stroke-linecap": "round" }),
+      p("M13 54 q2 -34 37 -34 q33 0 37 28", "none", { stroke: "#7fd3bf", "stroke-width": 1.2, "stroke-dasharray": "2 4", "stroke-linecap": "round" }),
+      e(88, 50, 4.6, 3.6, "#2f9e8a"), c(89.5, 49, 0.9, "#10231d"),
+      p("M92 51 l4 1.5 M92 51 l4 -0.5", "none", { stroke: "#e0412f", "stroke-width": 1, "stroke-linecap": "round", class: "av-tongue" })));
+    P.push(c(50, 62, 26, "#6f8a6a", line));
+    P.push(e(50, 73, 15, 9, "#a9bf98"));
+    P.push(c(47, 69, 1.2, "#2f3b2c"), c(53, 69, 1.2, "#2f3b2c"));
+    return { parts: P, eye: "#1d2a1c", mouthY: 75 };
+  }
+  if (kind === "vermilion") {
+    P.push(sv("g", { class: "av-flame-l" }, p("M22 64 q-18 -6 -15 -28 q6 9 12 9 q-4 -11 3 -21 q5 13 13 22 Z", "#f39a2b"), p("M22 62 q-10 -5 -9 -17 q5 6 9 6 q-1 -6 2 -10 q3 9 6 14 Z", "#ffd25a")));
+    P.push(sv("g", { class: "av-flame-r" }, p("M78 64 q18 -6 15 -28 q-6 9 -12 9 q4 -11 -3 -21 q-5 13 -13 22 Z", "#f39a2b"), p("M78 62 q10 -5 9 -17 q-5 6 -9 6 q1 -6 -2 -10 q-3 9 -6 14 Z", "#ffd25a")));
+    P.push(sv("g", { class: "av-flame" }, p("M50 32 q-11 -12 -5 -27 q4 10 8 8 q-2 -8 6 -14 q-2 14 4 18 q4 -4 2 -10 q10 13 -3 26 Z", "#f6b13a"), p("M50 31 q-5 -7 -2 -15 q3 6 5 5 q0 -4 3 -7 q0 8 2 11 Z", "#ffe08a")));
+    P.push(c(50, 58, 30, "#e43d24", { stroke: "#9c1f12", "stroke-width": 1.6 }));
+    P.push(e(50, 67, 19, 10, "#ff7a3d", { opacity: 0.55 }));
+    P.push(p("M30 46 q8 -6 14 -2 M70 46 q-8 -6 -14 -2", "none", { stroke: "#ffd25a", "stroke-width": 2, "stroke-linecap": "round" }));
+    return { parts: P, eye: "#2b1408", mouthY: 63, beak: "#f5c542" };
+  }
+  if (kind === "azure" || kind === "golddragon") {
+    const gold = kind === "golddragon";
+    const skin = gold ? "#f2b81d" : "#3d8fdc", edge = gold ? "#9a6a0a" : "#1c4f8a", snout = gold ? "#fbe08a" : "#a9d6f5", whisk = gold ? "#ffe9a3" : "#cfe6f7";
+    if (gold) {
+      // a ring of flames for the mane
+      const flames = [];
+      for (let i = 0; i < 7; i++) flames.push(sv("g", { transform: "rotate(" + (-105 + i * 35) + " 50 56)" }, p("M43 24 q7 -14 7 -21 q5 9 7 21 Z", "#d8342b"), p("M46.5 24 q3.5 -8 3.5 -13 q2.5 6 3.5 13 Z", "#f08a2a")));
+      P.push(sv("g", { class: "av-mane" }, flames));
+    } else {
+      P.push(p("M12 86 q6 -8 14 -4 q4 -6 11 -2 q-2 6 -9 6 q-6 4 -16 0 Z M88 86 q-6 -8 -14 -4 q-4 -6 -11 -2 q2 6 9 6 q6 4 16 0 Z", "#d9ecfb", { opacity: 0.9 }));
+      P.push(p("M18 40 l-6 -6 l9 1 M16 52 l-8 -2 l7 -4 M82 40 l6 -6 l-9 1 M84 52 l8 -2 l-7 -4", "#1d5fa8"));
+    }
+    const horn = gold ? { fill: "none", stroke: "#f6d15a", "stroke-width": 3.2, "stroke-linecap": "round" } : { fill: "none", stroke: "#e8d9a0", "stroke-width": 2.6, "stroke-linecap": "round" };
+    P.push(p("M37 30 q-6 -10 -2 -24 M35 18 l-8 -6 M36 24 l-7 1 M63 30 q6 -10 2 -24 M65 18 l8 -6 M64 24 l7 1", "none", horn));
+    P.push(c(50, 56, 32, skin, { stroke: edge, "stroke-width": 1.6 }));
+    P.push(p("M38 36 q4 -4 8 0 M54 36 q4 -4 8 0 M46 42 q4 -4 8 0", "none", { stroke: gold ? "#d99a0f" : "#2a72bf", "stroke-width": 1.5, "stroke-linecap": "round" }));
+    P.push(e(50, 69, 18, 12, snout, { stroke: edge, "stroke-width": 1.2 }));
+    P.push(c(44, 67, 1.6, edge), c(56, 67, 1.6, edge));
+    P.push(sv("g", { class: "av-whisk" }, p("M32 70 q-16 4 -22 -6 q-3 -6 2 -8", "none", { stroke: whisk, "stroke-width": 2, "stroke-linecap": "round" }),
+      p("M68 70 q16 4 22 -6 q3 -6 -2 -8", "none", { stroke: whisk, "stroke-width": 2, "stroke-linecap": "round" })));
+    P.push(sv("g", { class: "av-pearl" }, c(84, 20, 8, gold ? "#ffb1a3" : "#fff3b0", { opacity: 0.35 }), c(84, 20, 4.6, gold ? "#fff1e6" : "#fff6d8", { stroke: gold ? "#d8342b" : "#e8c55a", "stroke-width": 1 })));
+    if (gold) P.push(sv("g", {}, [[22, 24, 0], [78, 76, 0.8], [18, 72, 1.6]].map(([x, y, d]) =>
+      p("M" + x + " " + (y - 4) + " l1 3 l3 1 l-3 1 l-1 3 l-1 -3 l-3 -1 l3 -1 Z", "#fff3b0", { class: "av-glint", style: "animation-delay: " + d + "s" }))));
+    return { parts: P, eye: gold ? "#2b1a05" : "#10233d", mouthY: 74 };
+  }
   // dragon
   P.push(p("M36 30 q-6 -14 -14 -16 q8 6 8 18 Z", "#e9b949", line), p("M64 30 q6 -14 14 -16 q-8 6 -8 18 Z", "#e9b949", line));
   P.push(p("M40 25 l4 -8 l4 7 l4 -8 l4 8 l4 -7 l2 9", "#e9b949", line));
@@ -293,13 +367,13 @@ function accessory(kind, animal) {
       sv("path", { d: "M82 56 v6", stroke: "#e9b949", "stroke-width": 1.5 }));
   }
   if (kind === "phones") {
-    const y = animal === "rabbit" ? 58 : animal === "crane" || animal === "phoenix" || animal === "fox" ? 58 : 55;
+    const y = ["rabbit", "crane", "phoenix", "fox", "vermilion", "tortoise"].includes(animal) ? 60 : 55;
     return sv("g", {}, sv("path", { d: "M17 " + y + " q0 -40 33 -40 q33 0 33 40", fill: "none", stroke: "#2d2f36", "stroke-width": 4, "stroke-linecap": "round" }),
       sv("rect", { x: 11, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }), sv("rect", { x: 79, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }),
       sv("rect", { x: 13.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }), sv("rect", { x: 81.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }));
   }
   if (kind === "crown") {
-    const y = { dragon: 16, rabbit: 26, crane: 26, phoenix: 30, fox: 30, qilin: 22, monkey: 18, koi: 22 }[animal] || 20;
+    const y = { dragon: 16, rabbit: 26, crane: 26, phoenix: 30, fox: 30, qilin: 22, monkey: 18, koi: 22, whitetiger: 20, tortoise: 15, vermilion: 30, azure: 24, golddragon: 22 }[animal] || 20;
     return sv("g", { class: "av-crown" }, sv("path", { d: "M38 " + y + " l3 -11 l5 6 l4 -9 l4 9 l5 -6 l3 11 Z", fill: "#f5c542", stroke: "#a87b12", "stroke-width": 1 }),
       sv("circle", { cx: 50, cy: y - 5, r: 1.6, fill: "#e0412f" }));
   }
@@ -327,7 +401,7 @@ function avStyle() {
   return THEME_AVSTYLE[document.documentElement.getAttribute("data-shape")] || "cute";
 }
 function halo(animal) {
-  const y = { rabbit: 7, fox: 9, phoenix: 9, crane: 9, qilin: 9, cat: 10 }[animal] || 12;
+  const y = { rabbit: 7, fox: 9, phoenix: 9, crane: 9, qilin: 9, cat: 10, tortoise: 8, vermilion: 8, azure: 8, golddragon: 8 }[animal] || 12;
   return sv("g", { class: "av-halo" },
     sv("ellipse", { cx: 50, cy: y, rx: 15, ry: 4.2, fill: "none", stroke: "#fff3b0", "stroke-width": 4.4, opacity: 0.55 }),
     sv("ellipse", { cx: 50, cy: y, rx: 15, ry: 4.2, fill: "none", stroke: "#f5c542", "stroke-width": 2.4 }));

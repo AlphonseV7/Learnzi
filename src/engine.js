@@ -326,8 +326,9 @@ const Engine = (() => {
     return [...new Set([...word])].filter(isCJK).map(c => ({ ch: c, entry: lookup(c)[0] || null }));
   }
   function hskWords(level) { return entries.filter(e => e.h === level); }
-  function wordOfDay(date) {
-    const list = hskWords(1).filter(e => !WEAK.test(e.d.toLowerCase()));
+  /** One word a day from an HSK level (1 unless you chose a higher Chinese level in the welcome). */
+  function wordOfDay(date, level) {
+    const list = hskWords(level || 1).filter(e => !WEAK.test(e.d.toLowerCase()));
     if (!list.length) return null;
     const d = date || new Date();
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);

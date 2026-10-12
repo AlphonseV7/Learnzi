@@ -107,7 +107,7 @@ function writeSection(e0) {
         onComplete: s => {
           const good = s.totalMistakes <= Math.max(1, Math.floor(strokes / 4));
           status.textContent = good ? "Written from memory! +3 XP" + (s.totalMistakes ? " (" + s.totalMistakes + " slips)" : "") : "Finished with " + s.totalMistakes + " slips. Try again for XP.";
-          if (good) gainBonus(3);
+          if (good) { gainBonus(3); earnBadge("write"); }
         } });
     }));
   sec.append(controls);

@@ -1,6 +1,8 @@
 /* LearnZì UI, part 7: loading the dictionary and starting the app. */
 
 function applyAll() {
+  // Your synced settings arrived on a new device: no welcome needed after all.
+  if (state.onboarded && $("#welcome") && wz && wz.step === 0) closeWelcome();
   applyLook();
   updateTopbar();
   const active = document.activeElement;
@@ -72,7 +74,8 @@ function start() {
   }, { passive: true, capture: true });
   armIdle();
   setupTopbar();
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
+  firstRun();
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeTour() && !closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);
   ui.view = VIEWS.includes(first) ? first : "home";

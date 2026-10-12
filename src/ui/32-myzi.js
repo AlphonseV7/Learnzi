@@ -51,6 +51,7 @@ function viewMyZi() {
   v.append(studyCard(null, false));
   v.append(myCardsBox());
   v.append(decksBox("My decks"));
+  v.append(badgesBox());
   v.append(progressPreview());
   return v;
 }

@@ -38,7 +38,9 @@ function viewSettings() {
   nick.addEventListener("input", () => { clearTimeout(nickTimer); nickTimer = setTimeout(saveNick, 700); });
   nick.addEventListener("change", saveNick);
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Profile"),
-    row("nickname", "Nickname", nick)));
+    row("nickname", "Nickname", nick),
+    row("level", "My Chinese", select("level", LEVELS, state.level, k => { commit({ level: k }); }), "Sets the word of the day and the Reader's sample text. Decks and new words a day are under Flashcards."),
+    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => { closePanel(); startTour(); } }, "Replay the tour"))));
 
   // Reading
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Reading"),

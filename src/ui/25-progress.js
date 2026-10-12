@@ -74,6 +74,7 @@ function afterXp(before, gained, quiet, chars) {
     const pill = $("#lvl");
     if (pill) { pill.classList.remove("lvl-pulse"); void pill.offsetWidth; pill.classList.add("lvl-pulse"); }
   } else if (gained > 0 && !quiet) setMood("happy", 2200);
+  if (gained > 0) checkBadges();
 }
 const lookedToday = new Set();
 function gainBonus(n, chars) {

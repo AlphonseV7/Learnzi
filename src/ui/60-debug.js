@@ -96,6 +96,10 @@ function viewDebug() {
   const showSw = h("input", { type: "checkbox", id: "show-locked", role: "switch" });
   showSw.checked = state.showLocked;
   showSw.addEventListener("change", () => { commit({ showLocked: showSw.checked }); toast(showSw.checked ? "Locked items show their names" : "Locked items are secret again"); });
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Welcome and tour"),
+    h("p", { class: "muted small" }, "Run the first-time welcome again (finishing it applies its choices: animal, name, colour, level, decks and new words a day), or just the tour."),
+    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: startWelcome }, "Show the welcome"),
+      h("button", { class: "btn", type: "button", onclick: () => { go("home"); setTimeout(startTour, 300); } }, "Show the tour"))));
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Unlocks"),
     h("div", { class: "set-row" }, h("div", { class: "set-label" }, h("label", { for: "show-locked" }, "Show locked items"),
       h("span", { class: "muted small" }, "Off: anything you haven't unlocked is a shadow with ??? for a name, plus what unlocks it. On: you can see what's coming.")),

@@ -74,7 +74,7 @@ function tuckLater(ms) {
   barTimer = setTimeout(() => {
     const top = $(".topbar");
     if (!top || !barFollows() || !pageScrolled()) return;
-    if (top.matches(":focus-within") || document.querySelector("#navmenu")) { tuckLater(BAR_REST_MS); return; }
+    if (top.matches(":focus-within") || document.querySelector("#navmenu, #tour")) { tuckLater(BAR_REST_MS); return; }
     top.classList.add("tucked");
     setBarOffset(false);
   }, ms);
