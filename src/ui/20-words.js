@@ -164,7 +164,7 @@ function renderPanel() {
     rubyHz(disp(e0), e0.p, "head-hz"),
     alt ? h("div", { class: "alt" }, state.script === "t" ? "Simplified " : "Traditional ", h("span", { class: "hz" }, alt)) : null,
     h("div", { class: "row" },
-      h("button", { class: "btn primary", type: "button", onclick: () => speak(e0.s, e0.p) }, icon("play"), "Listen"),
+      withVoice(h("button", { class: "btn primary", type: "button", onclick: () => speak(e0.s, e0.p) }, icon("play"), "Listen"), { text: e0.s, p: e0.p }),
       starBtn(e0),
       h("button", { class: "btn", type: "button", "aria-expanded": String(ui.picker), onclick: () => { ui.picker = !ui.picker; renderPanel(); } }, "+ Deck"),
       h("button", { class: "btn", type: "button", onclick: () => {

@@ -54,24 +54,6 @@
 .app #results .res.card:hover { border-color: var(--accent); }
 :root[data-shape="arcade"] .app #results .lookup-group .results { gap: 14px; padding: 4px; }
 
-/* now playing: which voice you're hearing, with a button to hear it another way */
-.nowplaying {
-  position: fixed; z-index: 70; left: 50%; top: calc(10px + env(safe-area-inset-top, 0px)); width: min(440px, calc(100vw - 20px));
-  display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 12px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow), 0 10px 30px rgb(0 0 0 / .2);
-  transform: translate(-50%, -140%); opacity: 0; transition: transform .3s var(--ease), opacity .3s; pointer-events: none;
-}
-.nowplaying.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-.np-ico { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); }
-.np-ico svg { width: 14px; height: 14px; }
-.np-text { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
-.np-text > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.nowplaying .btn.small { flex: none; white-space: nowrap; }
-.nowplaying .np-close { width: 32px; height: 32px; flex: none; }
-:root[data-shape="arcade"] .nowplaying { border: 0; box-shadow: 0 -4px 0 0 var(--accent), 0 4px 0 0 var(--accent), -4px 0 0 0 var(--accent), 4px 0 0 0 var(--accent); }
-:root[data-shape="cyber"] .nowplaying { border-color: var(--accent); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
-:root[data-shape="nightmarket"] .nowplaying { border: 2px solid var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
-:root[data-shape="imperial"] .nowplaying { border-color: var(--accent); }
 :root[data-shape="imperial"] .app #results .res.card { padding: 18px 26px 12px; }
 :root[data-shape="lantern"] .app #results .res.card { padding-block: 16px; }
 :root[data-shape="porcelain"] .app #results .res.card { padding: 14px 18px; }

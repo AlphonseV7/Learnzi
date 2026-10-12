@@ -142,12 +142,13 @@ async function playSource(src, clean, p, slow) {
   playBuffers(bufs.map((buf, i) => ({ buf, gain: keys[i].neutral ? 0.7 : 1 })), slow);
   return true;
 }
-/** The order to try sources in, from your Voice setting and the length of the text. */
+/** The order to try sources in: your chosen voice first (Settings → Voice, or the voice button next
+ *  to any Listen button), then the rest. Automatic: whole-word recording, then syllables, then the
+ *  browser; long sentences go to the browser's voice first when the device has a Chinese one. */
 function sourceOrder(n) {
-  if (state.voice === "browser") return ["browser", "word", "syllables"];
-  // Long sentences sound smoother in the browser's voice, when the device has a Chinese one.
-  if (n > 6 && zhVoice) return ["browser", "word", "syllables"];
-  return ["word", "syllables", "browser"];
+  const base = n > 6 && zhVoice ? ["browser", "word", "syllables"] : ["word", "syllables", "browser"];
+  const pick = state.voiceSrc;
+  return pick && pick !== "auto" ? [pick, ...base.filter(x => x !== pick)] : base;
 }
 
 let speakSeq = 0;
@@ -167,7 +168,7 @@ function speak(text, p, opts = {}) {
       if (seq !== speakSeq) return null;      // a newer Listen tap won
       if (await playSource(src, clean, p, opts.slow)) {
         clearTimeout(slowNote);
-        if (seq === speakSeq && !opts.quiet) nowPlaying({ text: clean, p, slow: opts.slow, src });
+        if (seq === speakSeq) syncVoiceBtns(clean, src);
         return src;
       }
     }
@@ -190,41 +191,68 @@ async function sourcesFor(text, p) {
   return out;
 }
 
-// ---------- the now-playing bar: what you're hearing, and a button to hear it another way ----------
-let npTimer = 0;
-async function otherSources(text, p, current) {
-  const out = [], all = ["word", "syllables", "browser"], at = all.indexOf(current);
-  // In turn after the one playing now, so "Try …" walks through every source and back round.
-  for (const src of [...all.slice(at + 1), ...all.slice(0, at)]) {
-    if (src === "browser") { if (hasTTS()) out.push(src); continue; }
-    if (src === "word") {
-      if ([...text].length < 2) continue;
-      const simp = ui.dict === "ready" && !p ? (Engine.lookup(text)[0] || {}).s || text : text;
-      if ((await audioIndex()).has("w|" + simp)) out.push(src);
-      continue;
-    }
-    const keys = pinyinFor(text, p).flatMap(x => syllableKeys(x.p, x.form));
-    const idx = await audioIndex();
-    if (keys.length && keys.every(k => idx.has("s|" + k.key))) out.push(src);
-  }
-  return out;
+// ---------- the voice button: a speaker beside each Listen button; tap it to hear the next voice ----------
+const VOICE_SHORT = { word: "Recording", syllables: "Syllables", browser: "Browser" };
+const zhOnly = text => text.replace(/[^\u3400-\u9fff\uf900-\ufaff]/g, "") || text;
+/** A speaker that shows which voice speaks: smooth waves for a person's whole-word recording,
+ *  dotted waves for a word built from recorded syllables, a zigzag for the device's own voice. */
+function voiceIcon(src) {
+  const line = { fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" };
+  const cone = sv("path", { d: "M3.5 9.2h3.6L12 5.2v13.6l-4.9-4H3.5z", fill: "currentColor" });
+  const waves = src === "syllables"
+    ? [[15.6, 9.4], [16.4, 12], [15.6, 14.6], [18.6, 7.4], [20.2, 12], [18.6, 16.6]].map(([cx, cy], i) => sv("circle", { cx, cy, r: i < 3 ? 1.4 : 1.5, fill: "currentColor" }))
+    : src === "browser"
+      ? [sv("path", Object.assign({ d: "M14.5 12h1.6l1.3-3.6 2.2 7.2 1.3-3.6h1.6" }, line))]
+      : [sv("path", Object.assign({ d: "M15.5 8.6a4.6 4.6 0 0 1 0 6.8" }, line)), sv("path", Object.assign({ d: "M18.3 5.8a8.6 8.6 0 0 1 0 12.4" }, line))];
+  return sv("svg", { class: "voice-ico vi-" + (src || "none"), viewBox: "0 0 24 24", width: 20, height: 20, "aria-hidden": "true" }, cone, waves);
 }
-async function nowPlaying(info) {
-  const others = await otherSources(info.text, info.p, info.src);
-  let bar = $("#nowplaying");
-  if (!bar) { bar = h("div", { class: "nowplaying", id: "nowplaying", role: "status", "aria-live": "polite" }); document.body.append(bar); }
-  const s = VOICE_SOURCES[info.src];
-  const next = others[0];
-  bar.replaceChildren(
-    h("span", { class: "np-ico", "aria-hidden": "true" }, icon("play")),
-    h("span", { class: "np-text" }, h("b", null, s.label), h("span", { class: "muted small" }, h("span", { class: "hz" }, info.text), " · " + s.who)),
-    next ? h("button", { class: "btn small", type: "button", title: "Hear it as: " + VOICE_SOURCES[next].label,
-      onclick: () => speak(info.text, info.p, { slow: info.slow, source: next }) }, "Try " + VOICE_SOURCES[next].label.toLowerCase().replace("built from ", "")) : null,
-    h("button", { class: "btn icon np-close", type: "button", "aria-label": "Close", onclick: () => bar.classList.remove("show") }, icon("close")));
-  requestAnimationFrame(() => bar.classList.add("show"));
-  clearTimeout(npTimer);
-  npTimer = setTimeout(() => bar.classList.remove("show"), 6000);
+/** Which voice will speak this text: your pick if it can, else the next one that can. */
+async function firstVoice(text, p, pickKey) {
+  const avail = await sourcesFor(text, p);
+  const pick = pickKey === "voiceSrc" ? null : state[pickKey];
+  return [pick, ...sourceOrder([...text].length)].find(x => x && avail.includes(x)) || avail[0] || null;
 }
+function drawVoice(b, src, turn) {
+  b.dataset.src = src || "";
+  const name = src ? VOICE_SHORT[src] : "Voice";
+  const label = src ? "Voice: " + VOICE_SOURCES[src].label + " (" + VOICE_SOURCES[src].who + "). Tap to hear the next voice" : "Voice";
+  b.setAttribute("aria-label", label);
+  b.title = label;
+  b.replaceChildren(...[voiceIcon(src), b.classList.contains("icon") ? null : h("span", { class: "voice-name" }, name)].filter(Boolean));
+  if (turn) { b.classList.remove("turn"); void b.offsetWidth; b.classList.add("turn"); }
+}
+/** opts: { text (string or function), p, slow, compact, pickKey ("voiceSrc", or "toneSource" for the
+ *  tone trainer's own choice), play(src) to play it some other way }. */
+function voiceBtn(opts) {
+  const pickKey = opts.pickKey || "voiceSrc";
+  const textNow = () => zhOnly(typeof opts.text === "function" ? opts.text() : opts.text || "");
+  const b = h("button", { class: "btn voice-src " + (opts.compact ? "icon" : "small"), type: "button", "data-pick": pickKey });
+  b.dataset.vtext = textNow();
+  drawVoice(b, null);
+  const show = () => { const t = textNow(); b.dataset.vtext = t; if (t) firstVoice(t, opts.p, pickKey).then(src => drawVoice(b, src)); };
+  b.voiceShow = show;
+  setTimeout(show, 0);
+  b.addEventListener("click", async () => {
+    const t = textNow();
+    if (!t) return;
+    const all = await sourcesFor(t, opts.p);
+    if (!all.length) { toast("No voice can say this on this device."); return; }
+    const cur = b.dataset.src;
+    const next = all[(all.indexOf(cur) + 1) % all.length];
+    if (all.length === 1) toast("Only one voice can say this: " + VOICE_SOURCES[next].label.toLowerCase() + ".");
+    commit({ [pickKey]: next });
+    drawVoice(b, next, true);
+    if (opts.play) opts.play(next); else speak(t, opts.p, { slow: opts.slow, source: next });
+    for (const o of document.querySelectorAll(".voice-src")) if (o !== b && o.dataset.pick === pickKey && o.voiceShow) o.voiceShow();
+  });
+  return b;
+}
+/** After something plays, voice buttons for that text show the voice you actually heard. */
+function syncVoiceBtns(text, src) {
+  for (const b of document.querySelectorAll(".voice-src")) if (b.dataset.vtext === text && b.dataset.src !== src) drawVoice(b, src);
+}
+/** A Listen button with its voice button beside it. */
+const withVoice = (btn, opts) => h("span", { class: "listen-pair" }, btn, voiceBtn(opts));
 
 /** Plays exact numbered pinyin from the syllable recordings (no tone changes), e.g. "ma3" or "xue2 xi2".
  *  Resolves false when a syllable doesn't exist in Mandarin (there's no recording of it). */

@@ -133,6 +133,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates).
 const UPDATES = [
+  ["12 Oct", "Voice button: a speaker beside every Listen button shows which voice you hear; tap it to flick to the next one"],
   ["12 Oct", "Top bar: an XP bar that fills as tiny characters fly in; on phones it follows you down the page and tucks away when you stop scrolling"],
   ["12 Oct", "Avatars: seven new animals up to level 50, a halo, faces that react to you, and imperial exam ranks from 学童 to 状元"],
   ["12 Oct", "Listen: audiobooks that follow along, as an Audio tab next to Watch; tap along to time plain text"],
@@ -154,7 +155,7 @@ const UPDATES = [
 // ---------- saved state (validated whenever it comes from storage or sync) ----------
 const DEFAULTS = {
   v: 2, nickname: "", script: "s", pinyin: true, tones: true, preset: "ink", accent: "", font: "sans", uiFont: "standard",
-  scale: 1, rate: 0.9, voice: "real", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
+  scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
   zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
   saved: [], recent: [], decks: [], activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
@@ -223,6 +224,8 @@ function sanitize(raw) {
   for (const [k, a] of Object.entries(obj(m.act)).slice(-60)) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(a)) ma[k] = [0, 1].map(i => Math.floor(num(a[i], 0, 1e5, 0)));
   s.mle = { on: m.on === true, unlocked: m.unlocked === true, rude: m.rude === true, cards: mc, quizXp: Math.floor(num(m.quizXp, 0, 1e8, 0)), act: ma };
   s.toneSource = ["word", "syllables", "browser"].includes(o.toneSource) ? o.toneSource : "";
+  // Your voice: Automatic, or one you picked (Settings → Voice, or the voice button beside Listen).
+  s.voiceSrc = ["auto", "word", "syllables", "browser"].includes(o.voiceSrc) ? o.voiceSrc : o.voice === "browser" ? "browser" : "auto";
   // The Home clock (checked in full when drawn, see 29-clock).
   s.clock = {};
   for (const [k, v] of Object.entries(obj(o.clock))) {

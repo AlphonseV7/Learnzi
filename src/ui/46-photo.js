@@ -229,7 +229,7 @@ function photoResults() {
     unsureN && !photo.edit ? h("p", { class: "muted small" }, h("span", { class: "unsure-key" }, "字"), " Dotted characters may be misread (" + unsureN + "). Check them against the photo, and use Fix text to correct them.") : null,
     photo.edit ? ta : out,
     h("div", { class: "row" }, editBtn,
-      h("button", { class: "btn", type: "button", disabled: !photo.text.trim(), onclick: () => speak(photo.text) }, icon("play"), "Listen"),
+      withVoice(h("button", { class: "btn", type: "button", disabled: !photo.text.trim(), onclick: () => speak(photo.text) }, icon("play"), "Listen"), { text: () => photo.text }),
       h("button", { class: "btn", type: "button", disabled: !photo.text.trim(), onclick: () => {
         commitReader({ text: photo.text.slice(0, READER_MAX), title: "Photo · " + photoDay(), page: 0 }); go("reader");
       } }, "Open in Reader")));

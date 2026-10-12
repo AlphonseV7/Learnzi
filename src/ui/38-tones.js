@@ -56,27 +56,7 @@ function playDrill() {
   if (!q) return;
   // quiet: the now-playing bar would show the characters and give the answer away.
   // Your chosen voice (the button beside Play) goes first; if it can't say this one, the next one does.
-  speak(q.e.s, q.e.p, { quiet: true, source: state.toneSource || undefined }).then(src => { if (src) showToneSource(src); });
-}
-/** The voice button beside Play: shows which voice you heard; tap it to hear the next voice. */
-function showToneSource(src) {
-  drill.lastSrc = src;
-  const b = $("#tone-src");
-  if (!b) return;
-  b.dataset.src = src;
-  b.querySelector(".tone-src-name").textContent = srcName(src);
-  b.title = VOICE_SOURCES[src].who + ". Tap to switch voice.";
-}
-const srcName = src => (src ? VOICE_SOURCES[src].label.replace("Built from syllables", "Syllables") : "…");
-async function nextToneSource() {
-  const q = drill.qs[drill.i];
-  if (!q) return;
-  const all = await sourcesFor(q.e.s, q.e.p);
-  if (!all.length) return;
-  const cur = ($("#tone-src") || {}).dataset ? $("#tone-src").dataset.src : "";
-  const next = all[(all.indexOf(cur) + 1) % all.length];
-  commit({ toneSource: next });
-  playDrill();
+  speak(q.e.s, q.e.p, { source: state.toneSource || undefined }).then(src => { if (src) drill.lastSrc = src; });
 }
 /** After answering: hear any option, so you can compare the tones. */
 function playOption(q, tones) {
@@ -149,8 +129,7 @@ function viewTones() {
   const card = h("div", { class: "card flashcard tone-card" },
     h("span", { class: "eyebrow" }, drill.mode === "pairs" ? "Which tones?" : "Which tone?"),
     h("div", { class: "fc-front tone-play-row" }, h("button", { class: "fc-play", type: "button", "aria-label": "Play again", onclick: playDrill }, icon("play")),
-      h("button", { class: "btn small tone-src", id: "tone-src", type: "button", "aria-label": "Switch voice", "data-src": drill.lastSrc || "", onclick: nextToneSource },
-        icon("next"), h("span", null, h("span", { class: "muted small" }, "Voice "), h("b", { class: "tone-src-name" }, srcName(drill.lastSrc))))),
+      voiceBtn({ text: q.e.s, p: q.e.p, pickKey: "toneSource", play: playDrill })),
     h("p", { class: "muted small fc-center" }, "Tap to hear it again (Space). After answering, tap any option to hear it."));
   const opts = h("div", { class: "tone-opts" + (drill.mode === "pairs" ? " pairs" : "") });
   q.options.forEach((tones, k) => {

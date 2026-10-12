@@ -3,6 +3,8 @@
 const PAGE_CHARS = 1500;
 const ACCEPT = ".txt,.text,.md,.markdown,.srt,.lrc,.csv,.tsv,text/plain";
 
+/** The page of the Reader you're on, for Listen and its voice button. */
+function readerPageText() { const ps = pagesOf(reader.text || SAMPLE); return ps[Math.min(reader.page, ps.length - 1)] || ""; }
 function pagesOf(text) {
   const pages = [];
   let i = 0;
@@ -119,7 +121,7 @@ function viewReader() {
     h("button", { class: "btn", type: "button", onclick: () => { ta.value = ""; commitReader({ text: "", title: "", page: 0 }); draw(); ta.focus(); } }, "Clear")));
   v.append(h("div", { class: "stack-tight" },
     h("div", { class: "row spread" }, label, h("div", { class: "row" },
-      h("button", { class: "btn primary", type: "button", onclick: () => { const ps = pagesOf(reader.text || SAMPLE); speak(ps[Math.min(reader.page, ps.length - 1)]); } }, icon("play"), "Listen"),
+      withVoice(h("button", { class: "btn primary", type: "button", onclick: () => speak(readerPageText()) }, icon("play"), "Listen"), { text: readerPageText }),
       h("button", { class: "btn", type: "button", onclick: () => { if ("speechSynthesis" in window) speechSynthesis.cancel(); } }, "Stop"),
       pinyin)),
     navTop, out, navBottom));

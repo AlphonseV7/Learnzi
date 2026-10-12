@@ -69,7 +69,7 @@ function viewHome() {
         h("div", { class: "wotd-body" },
           h("span", { class: "wotd-def" }, shortDef(w, 3)),
           h("div", { class: "row" },
-            h("button", { class: "btn", type: "button", onclick: () => speak(w.s, w.p) }, icon("play"), "Listen"),
+            withVoice(h("button", { class: "btn", type: "button", onclick: () => speak(w.s, w.p) }, icon("play"), "Listen"), { text: w.s, p: w.p }),
             starBtn(w)))));
     }
   } else v.append(h("div", { class: "card" }, loadingBlock()));
@@ -181,7 +181,7 @@ function phraseRow(parts, hasExact) {
   return h("div", { class: "card phrase", "data-keep": "" },
     h("div", { class: "row spread" },
       h("span", { class: "eyebrow" }, "Word by word"),
-      h("button", { class: "btn icon", type: "button", "aria-label": "Listen to " + joined, onclick: () => speak(found.map(p => p.e.s).join("")) }, icon("play"))),
+      withVoice(h("button", { class: "btn icon", type: "button", "aria-label": "Listen to " + joined, onclick: () => speak(found.map(p => p.e.s).join("")) }, icon("play")), { text: found.map(p => p.e.s).join(""), compact: true })),
     h("div", { class: "row chips" }, parts.map(p => p.e
       ? h("button", { class: "chip phrase-chip", type: "button", onclick: () => openWord(p.e.s, p.e) },
         h("span", { class: "muted small" }, p.w), rubyHz(disp(p.e), p.e.p))

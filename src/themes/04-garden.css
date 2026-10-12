@@ -78,8 +78,5 @@
 :root[data-shape="peach"] .garden-screen { border-radius: 28px 28px 28px 6px; border-color: var(--accent); }
 /* the voice switch beside the play button */
 .tone-play-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
-.tone-src { gap: 6px; }
-.tone-src svg { width: 14px; height: 14px; }
-.tone-src > span { display: inline-flex; gap: 4px; align-items: baseline; }
 .flashcard.tone-card { min-height: 0; }
 .tone-card .fc-front.tone-play-row { min-height: 0; padding-block: 6px; }

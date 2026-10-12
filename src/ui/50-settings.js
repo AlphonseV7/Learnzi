@@ -120,10 +120,10 @@ function viewSettings() {
   rate.addEventListener("input", () => { rateOut.textContent = (rate.value / 10).toFixed(1) + "×"; });
   rate.addEventListener("change", () => commit({ rate: rate.value / 10 }));
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Voice"),
-    row("voice", "Voice", seg("voice", [["real", "Real recordings"], ["browser", "Browser voice"]], state.voice, k => commit({ voice: k })),
-      "Real recordings are native speakers: whole words when there's a recording, otherwise the word built from recorded syllables. Long sentences use the browser voice when your device has a Chinese one."),
+    row("voice", "Voice", seg("voice", [["auto", "Automatic"], ["word", "Recording"], ["syllables", "Syllables"], ["browser", "Browser"]], state.voiceSrc, k => { commit({ voiceSrc: k }); for (const b of document.querySelectorAll(".voice-src")) if (b.voiceShow) b.voiceShow(); }),
+      "Automatic: a native speaker's recording of the whole word when there is one, otherwise the word built from recorded syllables; long sentences use the browser voice when your device has a Chinese one. Pick one to hear it first everywhere. The speaker beside any Listen button flicks through them too."),
     row("rate", "Browser voice speed", h("div", { class: "row" }, rate, rateOut)),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"),
+    h("div", { class: "row" }, withVoice(h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"), { text: "你好，我在学习汉语。" }),
       h("span", { class: "muted small", id: "voice-note" }, voiceNote()))));
 
   // Sync

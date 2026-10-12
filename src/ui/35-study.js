@@ -73,15 +73,16 @@ function viewStudy() {
 function cardView({ k, e }) {
   const type = k.slice(-1);
   const card = h("div", { class: "card flashcard", "data-type": type });
-  const listen = (label) => h("button", { class: "btn" + (label ? "" : " icon"), type: "button", "aria-label": "Listen", onclick: () => speak(e.s, e.p) }, icon("play"), label || null);
+  const listen = (label) => withVoice(h("button", { class: "btn" + (label ? "" : " icon"), type: "button", "aria-label": "Listen", onclick: () => speak(e.s, e.p) }, icon("play"), label || null), { text: e.s, p: e.p, compact: !label });
   card.append(h("span", { class: "eyebrow" }, TYPES[type] + (progress.cards[k] ? "" : " · new")));
   // Front of the card
   if (type === "m") {
     card.append(h("div", { class: "fc-front" }, rubyHz(disp(e), e.p, "fc-hz")),
       h("p", { class: "muted small" }, "What does it mean?"));
   } else if (type === "l") {
-    card.append(h("div", { class: "fc-front" },
-      h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play"))),
+    card.append(h("div", { class: "fc-front tone-play-row" },
+      h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play")),
+      voiceBtn({ text: e.s, p: e.p })),
       h("p", { class: "muted small" }, "Listen. What's the word, and what does it mean?"));
   } else if (type === "w") {
     card.append(h("div", { class: "fc-front fc-meaning" }, shortDef(e, 3)),

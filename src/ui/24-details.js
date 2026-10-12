@@ -45,7 +45,7 @@ function pronunciationTip(e) {
   return h("div", { class: "tip" },
     h("span", { class: "eyebrow" }, "Pronunciation tip"),
     changed ? h("p", null, "Said as ", pyEl(saidPy, "py tip-py"), " ",
-      h("button", { class: "btn icon", type: "button", "aria-label": "Listen slowly", title: "Listen slowly", onclick: () => speakSlow(e.s) }, icon("play"))) : null,
+      withVoice(h("button", { class: "btn icon", type: "button", "aria-label": "Listen slowly", title: "Listen slowly", onclick: () => speakSlow(e.s) }, icon("play")), { text: e.s, slow: true, compact: true })) : null,
     notes.map(n => h("p", { class: "muted small" }, n)));
 }
 function speakSlow(text, p) { speak(text, p, { slow: true }); }
@@ -183,7 +183,7 @@ function examplesSection(e0) {
       list.append(h("div", { class: "example" }, line,
         h("div", { class: "row spread" }, h("span", { class: "muted small" }, en),
           h("span", { class: "row ex-tools" },
-            h("button", { class: "btn icon", type: "button", "aria-label": "Listen to this sentence", onclick: () => speak(zh) }, icon("play")),
+            withVoice(h("button", { class: "btn icon", type: "button", "aria-label": "Listen to this sentence", onclick: () => speak(zh) }, icon("play")), { text: zh, compact: true }),
             h("a", { class: "small muted", href: "https://tatoeba.org/en/sentences/show/" + zid, target: "_blank", rel: "noopener noreferrer", title: "Sentence from Tatoeba (CC BY 2.0 FR)" }, "Tatoeba")))));
     }
   });
