@@ -7,6 +7,8 @@
 .cl-hm { font-size: 3.6rem; letter-spacing: -.02em; }
 .cl-sec { font-size: 1.4rem; color: var(--ink-soft); }
 .cl-ampm { font-size: .95rem; color: var(--accent); font-weight: 700; }
+/* seconds and AM/PM take no room when they are off, so the time stays centred */
+.cl-sec:empty, .cl-ampm:empty { display: none; }
 .cl-analogue { width: 150px; height: 150px; }
 .cl-rim { fill: var(--surface-2); stroke: var(--accent); stroke-width: 1.5; }
 .cl-num { font-family: var(--font-hanzi); font-size: 7px; fill: var(--ink); }
