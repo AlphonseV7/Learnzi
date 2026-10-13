@@ -21,12 +21,11 @@
   position: relative; border-radius: calc(var(--radius) - 2px); overflow: hidden; line-height: 0;
   border: 3px solid color-mix(in srgb, var(--accent) 70%, var(--ink)); box-shadow: inset 0 0 0 2px rgb(255 255 255 / .35), 0 3px 10px rgb(0 0 0 / .15);
 }
-.garden-svg { width: 100%; height: auto; display: block; }
+/* the painting fills its frame edge to edge (a little of the sky and ground is trimmed when it's shorter) */
+.garden-svg { width: 100%; height: auto; aspect-ratio: 9 / 4; display: block; background: #efe6d2; }
 @media (max-width: 899px) {
-  .garden-svg { max-height: 190px; }
-  .garden-screen { display: grid; place-items: center; background: #bfe3f2; }
-  /* during a round on a phone the garden shrinks so the question stays in view */
-  .tones-layout.active .garden-svg { max-height: 120px; }
+  /* during a round on a phone the garden is shorter so the question stays in view */
+  .tones-layout.active .garden-svg { aspect-ratio: auto; height: 124px; }
   .tones-layout.active .garden-line, .tones-layout.active .garden-card > p:last-child { display: none; }
   .tones-layout.active .garden-card { gap: 6px; padding-block: 12px; }
 }
