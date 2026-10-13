@@ -172,7 +172,7 @@ function renderPanel() {
         closePanel();
         if (isSaved(e0)) { ui.highlight = keyOf(e0); openDeck("starred"); } else go("myzi");
       } }, "My Zì", icon("next")),
-      e0.h ? h("span", { class: "badge hsk" }, "HSK " + e0.h) : null,
+      hskBadges(e0),
       showDetail("freq") ? freqBadge(e0) : null),
     ui.picker ? deckPicker(e0) : null));
   const addBox = el => { if (el) { el.classList.add("pv-box", "card"); pv.append(el); } };

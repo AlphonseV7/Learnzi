@@ -128,7 +128,7 @@ function viewSettings() {
         a("https://creativecommons.org/licenses/by-sa/4.0/", "CC BY-SA"), "."),
       h("p", null, "Grammar: ", a("https://resources.allsetlearning.com/chinese/grammar/", "AllSet Learning Chinese Grammar Wiki"), " ©2021 AllSet Learning, licensed ",
         a("https://creativecommons.org/licenses/by-nc-sa/3.0/", "CC BY-NC-SA 3.0"), " (non-commercial). LearnZì's grammar files are a converted copy (October 2023 edition) under the same licence."),
-      h("p", null, "HSK levels: hsk-words (MIT). Word frequencies: jieba (MIT). Fonts: Google Fonts (SIL Open Font License); pixel Chinese font ",
+      h("p", null, "HSK 3.0 word list (2025 syllabus): ", a("https://hearmandarin.com/datasets/", "HearMandarin"), " (CC BY 4.0). Older HSK 2.0 levels: hsk-words (MIT). Word frequencies: jieba (MIT). Fonts: Google Fonts (SIL Open Font License); pixel Chinese font ",
         a("https://github.com/ACh-K/Cubic-11", "Cubic 11"), " (SIL Open Font License)."),
       h("p", null, "App code: MIT licence. No trackers, analytics or ads."))));
   return v;

@@ -13,7 +13,7 @@ original, used by tools/test_packed.js).
 import base64, glob, gzip, hashlib, json, os, sys
 
 dist = sys.argv[1]
-PACK = ["dict.txt", "sentences.txt", "chars.json", "audio/index.txt", "ocr/ort-wasm-simd-threaded.wasm"] \
+PACK = ["dict.txt", "sentences.txt", "chars.json", "hsk3.txt", "audio/index.txt", "ocr/ort-wasm-simd-threaded.wasm"] \
     + sorted(os.path.relpath(p, dist) for p in glob.glob(os.path.join(dist, "strokes", "s*.json"))) \
     + sorted(os.path.relpath(p, dist) for p in glob.glob(os.path.join(dist, "grammar", "*.json")))
 # The photo reader's two models were already stored as base64 text: pack the model bytes inside them.

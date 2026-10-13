@@ -123,7 +123,7 @@ function resRow(e, tag, boxed) {
   return h(tag || "button", { class: "res" + (boxed ? " card" : ""), type: tag ? null : "button", onclick: () => openWord(e.s, e) },
     rubyHz(disp(e), e.p),
     h("span", { class: "meta" }, h("span", { class: "def" }, shortDef(e, 3))),
-    e.h ? h("span", { class: "badge hsk" }, "HSK " + e.h) : h("span"));
+    hskBadges(e, true)[0] || h("span"));
 }
 function fillResults(box) {
   box.replaceChildren();

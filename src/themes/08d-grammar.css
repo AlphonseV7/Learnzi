@@ -59,3 +59,6 @@
 .g-table th { background: var(--surface-2); }
 .g-credit { margin: 4px 2px 0; }
 .g-credit a { color: inherit; }
+
+/* the older HSK 2.0 level beside the HSK 3.0 band: quieter */
+.badge.hsk.old { background: var(--surface-2); color: var(--ink-soft); }

@@ -149,7 +149,7 @@ function viewStats() {
   v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "Coming up, next 14 days"),
     h("p", { class: "muted small" }, "Cards from the decks you study, by the day they come due."), forecastChart()));
   // Word strength per deck
-  const ids = ["starred", "welcome", ...state.decks.map(d => d.id), "hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6"].filter(isActive);
+  const ids = allDeckIds().filter(isActive);
   const all = activeWords();
   const counts = [0, 0, 0, 0];
   all.forEach(e => counts[strength(e)]++);

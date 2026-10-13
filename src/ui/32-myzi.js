@@ -62,7 +62,7 @@ function viewDecks() {
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
   v.append(studyCard(null, false));
 
-  const all = ["starred", "welcome", ...state.decks.map(d => d.id), "hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6"];
+  const all = allDeckIds();
   const studying = all.filter(isActive), others = all.filter(id => !isActive(id));
   const form = h("div", { class: "row new-deck", hidden: true });
   const name = h("input", { type: "text", id: "deck-name", maxlength: "40", placeholder: "Deck name, e.g. Food" });
@@ -161,7 +161,7 @@ function afterDeck() {
 /** Home: the decks you're studying, each with its progress bar. */
 /** label: "Your decks" on Home, "My decks" on My Zì. */
 function decksBox(label = "Your decks") {
-  const ids = ["starred", "welcome", ...state.decks.map(d => d.id), "hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6"].filter(isActive);
+  const ids = allDeckIds().filter(isActive);
   const box = h("div", { class: "card stack" },
     h("div", { class: "row spread" }, label === "My decks" ? h("h2", { class: "h-card" }, label) : h("span", { class: "eyebrow" }, label),
       h("button", { class: "plain-btn build-link small", type: "button", onclick: () => go("decks") }, "All decks")));

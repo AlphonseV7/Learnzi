@@ -14,6 +14,7 @@ function applyAll() {
 async function loadDict() {
   try {
     let got = 0, lastPaint = 0;
+    const hsk3 = fetchPackedText("hsk3.txt").catch(() => "");   // small: the HSK 3.0 word list
     const text = await fetchPackedText(DICT_URL, n => {
       got += n;
       ui.progress = Math.min(0.99, got / DICT_BYTES);
@@ -23,6 +24,7 @@ async function loadDict() {
     document.querySelectorAll(".dict-progress").forEach(el => { el.textContent = progressText(); });
     await new Promise(r => setTimeout(r, 40));
     if (Engine.parse(text) < 1000) throw new Error("dictionary looks empty");
+    hsk3Ready(await hsk3);
     ui.dict = "ready";
   } catch (err) {
     ui.dict = "error";

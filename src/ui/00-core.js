@@ -9,7 +9,7 @@ const READER_KEY = "learnzi.reader.v1";
 const PROGRESS_KEY = "learnzi.progress.v1";
 const READER_MAX = 75000; // characters; keeps the synced reader document under the store's size limit
 const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug", "grammar", "gpoint"];
-const DECK_ID = /^(starred|welcome|hsk[1-6]|u[0-9a-z]{4,24})$/;
+const DECK_ID = /^(starred|welcome|hsk[1-6]|nhsk[1-7]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
 // Your Chinese level from the welcome: which decks start, new words a day, word of the day, Reader sample.
 const LEVELS = {
@@ -198,6 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "HSK 3.0 decks (the 2025 syllabus, bands 1 to 7–9, about 10,900 words); the older lists are now HSK 2.0 · 1–6; words show both levels"],
   ["13 Oct", "Storage: the dictionary, sentences, stroke shapes, grammar and photo reader are stored compressed (about 31 MB smaller, exactly the same data)"],
   ["13 Oct", "Grammar: about 500 grammar points from the AllSet Learning Chinese Grammar Wiki in Study → Grammar, and a Grammar box in the word pop-up"],
   ["13 Oct", "Pixel Chinese characters (Cubic 11) in Retro Arcade; Chinese font \"Theme's own\" is the new default"],

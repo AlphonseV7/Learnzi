@@ -12,6 +12,7 @@ function savedByDeck(saved) {
   const welcome = new Set(deckWords("welcome").map(keyOf));
   add("welcome", e => welcome.has(keyOf(e)));
   for (const d of state.decks) { const ks = new Set(d.words.map(w => w.s + "|" + w.p)); add(d.id, e => ks.has(keyOf(e))); }
+  for (let n = 1; n <= 7; n++) add("nhsk" + n, e => hsk3Band(e) === n);
   for (let n = 1; n <= 6; n++) add("hsk" + n, e => e.h === n);
   return keys.size ? out : [];
 }

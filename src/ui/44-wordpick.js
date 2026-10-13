@@ -37,7 +37,7 @@ function wordDeckCard(opts) {
       h("label", { for: cid, class: "pw-main" }, rubyHz(disp(e), e.p), h("span", { class: "def small" }, shortDef(e, 2))),
       h("span", { class: "pw-tags" },
         clip ? h("span", { class: "badge pw-time num", title: "Where it's said in the video" }, fmtTime(clip.v[0])) : null,
-        e.h ? h("span", { class: "badge hsk" }, "HSK " + e.h) : null,
+        hskBadges(e, true),
         inAnyDeck(e) ? h("span", { class: "badge" }, "In a deck") : st === 3 ? h("span", { class: "badge" }, "Known") : null),
       h("button", { class: "btn icon small", type: "button", "aria-label": "Open " + disp(e), title: "Open this word", onclick: () => openWord(e.s, e) }, icon("next")));
     cb.addEventListener("change", () => { if (cb.checked) holder.picked.add(k); else holder.picked.delete(k); row.classList.toggle("off", !cb.checked); sync(); });
