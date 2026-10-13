@@ -7,7 +7,7 @@ function applyAll() {
   updateTopbar();
   const active = document.activeElement;
   const typing = active && ["reader-input", "q", "nickname", "note-input", "new-deck-name", "deck-name", "deck-rename"].includes(active.id);
-  if (!typing && ui.view !== "study") render(false);
+  if (!typing && (ui.view !== "study" || !study.active)) render(false);
   else if (ui.view === "lookup") fillResults($("#results"));
   if (!(active && active.id === "note-input")) renderPanel();
 }

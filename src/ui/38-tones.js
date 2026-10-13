@@ -54,7 +54,6 @@ function startDrill(mode) {
 function playDrill() {
   const q = drill.qs[drill.i];
   if (!q) return;
-  // quiet: the now-playing bar would show the characters and give the answer away.
   // Your chosen voice (the button beside Play) goes first; if it can't say this one, the next one does.
   speak(q.e.s, q.e.p, { source: state.toneSource || undefined }).then(src => { if (src) drill.lastSrc = src; });
 }

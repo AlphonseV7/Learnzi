@@ -58,7 +58,9 @@ async function factoryReset() {
   const now = Date.now();
   // Fresh copies, newer than anything synced, so they replace it everywhere (progress via its reset epoch).
   progress = sanitizeProgress({ cards: {}, act: {}, adj: [now, 0], epoch: now, updatedAt: now });
-  state = sanitize({}); state.updatedAt = now;
+  // Your decks are marked deleted (so other devices drop them too) and the empty notes are newest.
+  const deckGone = { ...state.deckGone, ...Object.fromEntries(state.decks.map(d => [d.id, now])) };
+  state = sanitize({}); state.updatedAt = now; state.deckGone = deckGone; state.notesAt = now;
   reader = sanitizeReader({}); reader.updatedAt = now;
   writeJSON(PROGRESS_KEY, progress); writeJSON(LS_KEY, state); writeJSON(READER_KEY, reader);
   try {

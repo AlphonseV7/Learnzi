@@ -26,7 +26,6 @@ const SAMPLES = {
   high: "随着科技的发展，越来越多的人习惯在网上学习语言。这种方式虽然方便，却也需要很强的自律能力。专家认为，与其每天花几个小时死记硬背，不如坚持每天练习二十分钟，并把学到的内容运用到真实的生活中。",
 };
 const readerSample = () => SAMPLES[state.level] || SAMPLE;
-const BUILD = "Day 4 build · avatars";
 
 // ---------- debug clock (Debug settings → Time). Kept on this device only. ----------
 const CLOCK_KEY = "learnzi.debugclock.v1";
@@ -149,8 +148,12 @@ const UIFONTS = {
   lora: { label: "Lora (serif)", css: "Lora:wght@400;600;700", body: '"Lora", Georgia, serif' },
   system: { label: "Device default", css: null, body: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' },
 };
-// Recent updates, newest first (Debug settings → Updates).
+// Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Sync: each deck and your notes now sync on their own, so big decks and lots of notes keep syncing; a review saves only what changed"],
+  ["13 Oct", "A dot on the cog shows when sync is paused"],
+  ["13 Oct", "Study menu: Review, My decks, My cards; Home's button says Review"],
+  ["13 Oct", "Fixed: Review opened while the dictionary was loading stayed empty"],
   ["13 Oct", "Silver River: cut-crystal boxes, a sheen of light, pages that come into focus, a breathing Milky Way and starlit XP bars"],
   ["13 Oct", "Fixed: flashcard answers sometimes showed the word \"null\""],
   ["13 Oct", "New theme at level 40: Silver River (银河), the Milky Way with the Weaver Girl and Cowherd stars"],
@@ -194,11 +197,64 @@ const DEFAULTS = {
   v: 2, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "sans", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
   zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
-  saved: [], recent: [], decks: [], activeDecks: ["starred", "welcome"], updatedAt: 0,
+  saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 const num = (v, lo, hi, d) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
 const obj = raw => (raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {});
 const cleanLine = (v, max) => (typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max) : "");
+/** Size in bytes once stored (UTF-8), the way the sync store counts it: a Chinese character is 3. */
+function utf8Len(str) {
+  let n = 0;
+  for (const ch of str) { const c = ch.codePointAt(0); n += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4; }
+  return n;
+}
+// The sync store takes at most 256 KB per document. Each of your decks is its own document and your
+// notes are one more, so these budgets keep every one of them comfortably under that.
+const DECK_WORDS = 3000, DECK_BYTES = 200000, NOTES_BYTES = 200000;
+/** One of your own decks, checked. Words come first; video moments are kept while the deck stays
+ *  within DECK_BYTES (a moment that doesn't fit just isn't kept, the word stays). m: when it last
+ *  changed, so two devices can merge decks one by one (newest wins). */
+function sanitizeDeck(d, fallbackM = 0) {
+  // A deck made in Watch remembers its videos (name and size, to find the file again) and, per word,
+  // the moment it's said: v = [start, end, which video], x = the line (shown as plain text).
+  const videos = Array.isArray(d.videos) ? d.videos.filter(x => x && typeof x.name === "string").slice(0, 20)
+    .map(x => ({ name: cleanLine(x.name, 120), size: Math.floor(num(x.size, 0, 1e13, 0)), ...(x.a === true ? { a: true } : {}) })) : [];
+  const name = cleanLine(d.name, 40) || "Deck";
+  let bytes = 120 + utf8Len(name) + utf8Len(JSON.stringify(videos));
+  const src = Array.isArray(d.words) ? d.words.filter(w => w && typeof w.s === "string" && typeof w.p === "string") : [];
+  const words = [], from = [];
+  for (const w of src) {
+    if (words.length >= DECK_WORDS) break;
+    const out = { s: w.s.slice(0, 32), p: w.p.slice(0, 120) };
+    const cost = utf8Len(out.s) + utf8Len(out.p) + 16;
+    if (bytes + cost > DECK_BYTES) break;
+    bytes += cost; words.push(out); from.push(w);
+  }
+  words.forEach((out, i) => {
+    const w = from[i];
+    if (!(Array.isArray(w.v) && w.v.length === 3 && Number.isInteger(w.v[2]) && w.v[2] >= 0 && w.v[2] < videos.length)) return;
+    const st = num(w.v[0], 0, 86400, 0), en = num(w.v[1], 0, 86400, 0), x = cleanLine(w.x, 80);
+    const cost = utf8Len(x) + 40;
+    if (en > st && bytes + cost <= DECK_BYTES) { out.v = [Math.round(st * 100) / 100, Math.round(en * 100) / 100, w.v[2]]; out.x = x; bytes += cost; }
+  });
+  const at = num(d.at, 0, 1e13, 0);
+  const deck = { id: d.id, name, words, at, m: num(d.m, 0, 1e13, 0) || fallbackM || at };
+  if (videos.length) deck.videos = videos;
+  return deck;
+}
+/** Your notes on words, checked, within NOTES_BYTES. */
+function sanitizeNotes(raw) {
+  const out = {};
+  let bytes = 0;
+  for (const [k, v] of Object.entries(obj(raw)).slice(0, 300)) {
+    if (!/^[^|]{1,32}\|[^|]{1,120}$/.test(k) || typeof v !== "string" || !v.trim()) continue;
+    const t = v.slice(0, 300), cost = utf8Len(k) + utf8Len(t) + 8;
+    if (bytes + cost > NOTES_BYTES) break;
+    out[k] = t; bytes += cost;
+  }
+  return out;
+}
+const notesBytes = notes => Object.entries(notes).reduce((n, [k, v]) => n + utf8Len(k) + utf8Len(v) + 8, 0);
 
 function sanitize(raw) {
   const o = obj(raw);
@@ -292,34 +348,20 @@ function sanitize(raw) {
   // Boxes you folded away (1) or opened (0), by box name.
   s.folds = {};
   for (const [k, v] of Object.entries(obj(o.folds)).slice(0, 120)) if (/^[a-z0-9-]{1,40}$/.test(k) && (v === 0 || v === 1)) s.folds[k] = v;
-  s.notes = {};
-  for (const [k, v] of Object.entries(obj(o.notes)).slice(0, 300)) {
-    if (/^[^|]{1,32}\|[^|]{1,120}$/.test(k) && typeof v === "string" && v.trim()) s.notes[k] = v.slice(0, 300);
-  }
-  // Your own decks (at most 50 decks and 6,000 words in all, to keep the synced document small).
-  let room = 6000;
-  let clipRoom = 120000;   // keeps the synced settings small: about 1,000 video moments
+  // Notes and your own decks are synced in their own documents (see 10-sync); notesAt is when the
+  // notes last changed. Copies from before that had neither, so they count from the settings' time.
+  const was = num(o.updatedAt, 0, 1e13, 0);
+  s.notes = sanitizeNotes(o.notes);
+  s.notesAt = num(o.notesAt, 0, 1e13, 0) || (Object.keys(s.notes).length ? was : 0);
+  // Your own decks: at most 50, with up to 3,000 words each.
   s.decks = Array.isArray(o.decks)
-    ? o.decks.filter(d => d && typeof d.id === "string" && /^u[0-9a-z]{4,24}$/.test(d.id)).slice(0, 50).map(d => {
-      // A deck made in Watch remembers its videos (name and size, to find the file again) and, per word,
-      // the moment it's said: v = [start, end, which video], x = the line (shown as plain text).
-      const videos = Array.isArray(d.videos) ? d.videos.filter(x => x && typeof x.name === "string").slice(0, 20)
-        .map(x => ({ name: cleanLine(x.name, 120), size: Math.floor(num(x.size, 0, 1e13, 0)), ...(x.a === true ? { a: true } : {}) })) : [];
-      const words = Array.isArray(d.words) ? d.words.filter(w => w && typeof w.s === "string" && typeof w.p === "string").slice(0, Math.max(0, room))
-        .map(w => {
-          const out = { s: w.s.slice(0, 32), p: w.p.slice(0, 120) };
-          if (Array.isArray(w.v) && w.v.length === 3 && clipRoom > 0 && Number.isInteger(w.v[2]) && w.v[2] >= 0 && w.v[2] < videos.length) {
-            const st = num(w.v[0], 0, 86400, 0), en = num(w.v[1], 0, 86400, 0);
-            if (en > st) { out.v = [Math.round(st * 100) / 100, Math.round(en * 100) / 100, w.v[2]]; out.x = cleanLine(w.x, 80); clipRoom -= 20 + out.x.length; }
-          }
-          return out;
-        }) : [];
-      room -= words.length;
-      const deck = { id: d.id, name: cleanLine(d.name, 40) || "Deck", words, at: num(d.at, 0, 1e13, 0) };
-      if (videos.length) deck.videos = videos;
-      return deck;
-    })
+    ? o.decks.filter(d => d && typeof d.id === "string" && /^u[0-9a-z]{4,24}$/.test(d.id)).slice(0, 50).map(d => sanitizeDeck(d, was))
     : [];
+  // Decks you deleted (id → when), so a device that still has one doesn't bring it back. Kept 120 days.
+  s.deckGone = {};
+  for (const [k, v] of Object.entries(obj(o.deckGone)).slice(0, 300)) {
+    if (/^u[0-9a-z]{4,24}$/.test(k) && Number.isFinite(v) && v > Date.now() - 120 * 864e5) s.deckGone[k] = v;
+  }
   s.activeDecks = Array.isArray(o.activeDecks)
     ? [...new Set(o.activeDecks.filter(x => typeof x === "string" && DECK_ID.test(x)))].slice(0, 60)
     : ["starred", "welcome"];
@@ -402,12 +444,29 @@ function migrateReaderText(raw) {
   return false;
 }
 
+// Decks and notes have their own synced documents; everything else is in "state".
+const LIBRARY_KEYS = ["decks", "deckGone", "notes", "notesAt"];
 function commit(patch) {
+  const now = Date.now();
+  if (patch.decks) patch = { ...patch, ...stampDecks(state.decks, patch.decks, now) };
+  if (patch.notes) patch = { ...patch, notesAt: now };
   Object.assign(state, patch);
-  state.updatedAt = Date.now();
+  const settings = Object.keys(patch).some(k => !LIBRARY_KEYS.includes(k));
+  if (settings) state.updatedAt = now;
   writeJSON(LS_KEY, state);
-  Sync.queue("state");
+  if (settings) Sync.queue("state");
+  if (patch.decks) Sync.queue("decks");
+  if (patch.notes) Sync.queue("notes");
   updateTopbar();
+}
+/** Mark which decks changed (m = now) and remember deleted ones, for merging between devices. */
+function stampDecks(before, after, now) {
+  const old = new Map(before.map(d => [d.id, d]));
+  const decks = after.map(d => (old.get(d.id) === d ? d : { ...d, m: now }));
+  const kept = new Set(after.map(d => d.id));
+  const deckGone = { ...state.deckGone };
+  for (const id of old.keys()) if (!kept.has(id)) deckGone[id] = now;
+  return { decks, deckGone };
 }
 function commitProgress() {
   progress.updatedAt = Date.now();

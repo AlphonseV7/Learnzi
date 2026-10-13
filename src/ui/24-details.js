@@ -202,6 +202,7 @@ function notesSection(e0) {
       const notes = { ...state.notes };
       const text = ta.value.slice(0, 300);
       if (text.trim()) notes[key] = text; else delete notes[key];
+      if (text.trim() && notesBytes(notes) > NOTES_BYTES) { toast("My notes are full. Shorten or remove another note to keep this one."); return; }
       commit({ notes });
     }, 600);
   });

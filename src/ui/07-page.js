@@ -4,9 +4,9 @@
 const PAGES = {
   home: () => ({ title: "Home", zh: "主页", py: "zhu3 ye4", desc: "Your day at a glance. Fold, move or remove any box." }),
   lookup: () => ({ title: "Look up", zh: "查词", py: "cha2 ci2", desc: "Search by characters (simplified or traditional), pinyin with or without tones, or English." }),
-  decks: () => ({ title: "Decks", zh: "卡组", py: "ka3 zu3", desc: "Flashcard decks. A word you know in one deck counts in every deck." }),
+  decks: () => ({ title: "My decks", zh: "我的卡组", py: "wo3 de5 ka3 zu3", desc: "Flashcard decks. A word you know in one deck counts in every deck." }),
   deck: () => { const b = BUILTIN[ui.deckId]; return { title: deckExists(ui.deckId) ? deckName(ui.deckId) : "Deck", zhPlain: b ? b.zh : null, desc: b ? b.note : "Your own deck.", back: ["Decks", "decks"] }; },
-  study: () => ({ title: "Study", zh: "学习", py: "xue2 xi2", desc: "Today's flashcards, with new words mixed in." }),
+  study: () => ({ title: "Review", zh: "复习", py: "fu4 xi2", desc: "Today's flashcards, with new words mixed in." }),
   reader: () => ({ title: "Reader", zh: "阅读", py: "yue4 du2", desc: "Paste Chinese text or import a text file. Tap a word to see its meaning; tap it again to hear it." }),
   watch: () => (isAudio()
     ? { title: "Listen", zh: "听书", py: "ting1 shu1", desc: "Play an audiobook or recording from your device with its Chinese text. Tap any word to pause and look it up. Each sentence you hear earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Watch)." }

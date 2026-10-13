@@ -56,7 +56,7 @@ function viewMyZi() {
   return v;
 }
 
-/** Study → Decks: every deck, the ones you're studying first. */
+/** Study → My decks: every deck, the ones you're studying first. */
 function viewDecks() {
   const v = h("section", { class: "view" });
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
@@ -165,7 +165,7 @@ function decksBox(label = "Your decks") {
   const box = h("div", { class: "card stack" },
     h("div", { class: "row spread" }, label === "My decks" ? h("h2", { class: "h-card" }, label) : h("span", { class: "eyebrow" }, label),
       h("button", { class: "plain-btn build-link small", type: "button", onclick: () => go("decks") }, "All decks")));
-  if (!ids.length) { box.append(h("p", { class: "muted" }, "No decks yet. Open Study → Decks to start one.")); return box; }
+  if (!ids.length) { box.append(h("p", { class: "muted" }, "No decks yet. Open Study → My decks to start one.")); return box; }
   for (const id of ids.slice(0, 4)) {
     const sum = deckSummary(id);
     box.append(h("button", { class: "deck-mini", type: "button", onclick: () => openDeck(id) },

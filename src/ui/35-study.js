@@ -59,7 +59,13 @@ function grade(g) {
 
 function viewStudy() {
   const v = h("section", { class: "view study" });
-  if (!study.active) { setTimeout(() => startStudy(), 0); return v; }
+  if (!study.active) {
+    // Opened before the dictionary finished loading: show its progress; the session starts once it's
+    // ready (applyAll in 90-start draws this page again).
+    if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
+    setTimeout(() => startStudy(), 0);
+    return v;
+  }
   const total = study.done + study.queue.length + (study.cur ? 1 : 0);
   v.append(h("div", { class: "row spread study-top" },
     h("button", { class: "btn", type: "button", onclick: leaveStudy }, icon("back"), study.deck ? deckName(study.deck) : "My Zì"),
@@ -137,7 +143,7 @@ function summaryView() {
         stat(study.done, study.done === 1 ? "card" : "cards"),
         stat(Math.round((right / study.done) * 100) + "%", "remembered"),
         stat("+" + study.xp, "XP"),
-        stat(streak(), streak() === 1 ? "day streak" : "day streak")));
+        stat(streak(), "day streak")));
   }
   box.append(levelBar(lv));
   const more = plan.due.length + plan.fresh.length;

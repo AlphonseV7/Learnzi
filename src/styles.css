@@ -350,6 +350,9 @@ input[type="range"] { width: min(220px, 52vw); }
 }
 .lvl .hz { font-size: .95rem; }
 .gear[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+/* sync has stopped: a small dot on the cog (Settings → Profile explains) */
+.gear.sync-warn { position: relative; }
+.gear.sync-warn::after { content: ""; position: absolute; top: 2px; right: 2px; width: 9px; height: 9px; border-radius: 50%; background: var(--t2); box-shadow: 0 0 0 2px var(--surface); pointer-events: none; }
 @media (max-width: 480px) {
   .me-name { font-size: 1.1rem; }
 }

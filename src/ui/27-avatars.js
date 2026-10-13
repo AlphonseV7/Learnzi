@@ -28,7 +28,6 @@ const AV = {
   sparkles: { on: { label: "Sparkles", streak: 3 } },
   halo: { on: { label: "Halo", lv: 15 } },
 };
-const BIRDS = new Set(["crane", "phoenix", "vermilion"]);
 const STARTERS = ["panda", "cat", "tiger", "rabbit", "dragon"];
 /** Your starter is level 1; the other four follow at 2, 3, 4 and 5 in this order. */
 function starterLevel(id) {

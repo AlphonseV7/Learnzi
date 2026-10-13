@@ -5,7 +5,6 @@
 
 const mleId = t => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "x";
 const MLE = MLE_WORDS.map(([t, m, x, p, o, d, n, f]) => ({ id: mleId(t), t, m, x, p, o, d, n: n || "", rude: d === "rude" || f === "rude", older: f === "older" }));
-const MLE_BY_ID = new Map(MLE.map(w => [w.id, w]));
 const mleOn = () => !!(state.mle && state.mle.on);
 const mleWords = (deck) => MLE.filter(w => (state.mle.rude || !w.rude) && (!deck || w.d === deck));
 const mleXp = () => Object.values(state.mle.cards).reduce((t, c) => t + c[6], 0) + state.mle.quizXp;

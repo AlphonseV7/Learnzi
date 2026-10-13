@@ -59,7 +59,7 @@ function viewHome() {
       h("div", { class: "stack-tight" },
         h("b", null, ready ? ready + (ready === 1 ? " card ready" : " cards ready") : "All caught up"),
         h("span", { class: "muted small" }, streak() ? streak() + "-day streak" : "Study today to start a streak")),
-      ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Study now") : null));
+      ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Review") : null));
   }
   if (ui.dict === "ready") {
     const w = Engine.wordOfDay(undefined, (LEVELS[state.level] || LEVELS.new).hsk);

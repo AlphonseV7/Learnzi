@@ -117,7 +117,7 @@ function viewSettings() {
   const a = (href, text) => h("a", { href, target: "_blank", rel: "noopener noreferrer" }, text);
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "About"),
     h("div", { class: "credits" },
-      h("p", null, "LearnZì · " + BUILD + " · " + (ui.dict === "ready" ? Engine.size.toLocaleString("en-GB") + " dictionary entries" : "dictionary loading")),
+      h("p", null, "LearnZì · updated " + UPDATES[0][0] + " · " + (ui.dict === "ready" ? Engine.size.toLocaleString("en-GB") + " dictionary entries" : "dictionary loading")),
       h("p", null, "Dictionary: ", a("https://cc-cedict.org/wiki/", "CC-CEDICT"), " by MDBG and contributors, licensed ",
         a("https://creativecommons.org/licenses/by-sa/4.0/", "CC BY-SA 4.0"), ". LearnZì's dictionary file is a derived work under the same licence."),
       h("p", null, "Spaced repetition: the FSRS-4.5 memory model from the Open Spaced Repetition project (MIT), written into LearnZì from its published formulas."),

@@ -12,8 +12,7 @@ const AUDIO = {
   playing: [],
   NW: 48, NS: 8,
 };
-const bucketOf = (key, n) => { let t = 0; for (const ch of key) t += ch.codePointAt(0); return t % n; };
-// Same sum as the packer: the code point of every character.
+/** Where each recording sits in the packed audio files: "w|word" or "s|syllable" → [file, start, length]. */
 function audioIndex() {
   if (!AUDIO.index) {
     AUDIO.index = fetch("audio/index.txt").then(r => (r.ok ? r.text() : "")).then(t => {
@@ -164,7 +163,7 @@ function sourceOrder(n) {
 
 let speakSeq = 0;
 /** Say Chinese text. p (numbered pinyin) picks the reading of a word with more than one.
- *  opts.source starts with a particular source (the "Change" button on the now-playing bar). */
+ *  opts.source starts with a particular source (the voice button beside Listen, or the tone trainer's). */
 function speak(text, p, opts = {}) {
   if (!text) return Promise.resolve(null);
   const clean = text.replace(/[^\u3400-\u9fff\uf900-\ufaff]/g, "") || text;
