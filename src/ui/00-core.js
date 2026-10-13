@@ -2,7 +2,7 @@
  * Security: every piece of text from the dictionary, the user, imported files or the sync store
  * goes into the page as a text node (textContent). There is no innerHTML anywhere in this app. */
 
-const DICT_URL = "dict.txt";
+const DICT_URL = "dict.txt";   // fetched packed: dict.txt.gz.txt (see fetchPacked)
 const DICT_BYTES = Number("__DICT_BYTES__") || 9500000;
 const LS_KEY = "learnzi.state.v1";
 const READER_KEY = "learnzi.reader.v1";
@@ -90,6 +90,51 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
 }
 
+// ---------- packed data files ----------
+/* The big data files (dictionary, sentences, stroke shapes, grammar, the photo reader's parts) are
+ * stored compressed so more fits in the app's 256 MB: gzip, which is lossless and carries a checksum (a
+ * damaged copy is refused, never read wrongly), written as base64 text (<name>.gz.txt) because the host
+ * only serves web file types. tools/pack_data.py makes them and checks each unpacks to the original
+ * byte for byte. Unpacking uses the browser's own DecompressionStream; a very old browser without it
+ * loads fflate 0.8.2 (MIT, pinned with its fingerprint) instead. */
+const FFLATE = { src: "https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js", sri: "sha384-DT0Ls0mO7JmjTnT+oBuMhEJzYJO1zUqzuuMXNdnOmOQRIpN2BgSjvBV/j50NngIT" };
+let fflateLoad = null;
+function fromBase64(input) {
+  const s = (typeof input === "string" ? input : new TextDecoder().decode(input)).replace(/\s+/g, "");
+  if (Uint8Array.fromBase64) return Uint8Array.fromBase64(s);
+  const bin = atob(s), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function gunzip(bytes) {
+  if (typeof DecompressionStream === "function") {
+    return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());
+  }
+  if (!fflateLoad) fflateLoad = new Promise((ok, fail) => {
+    const sc = document.createElement("script");
+    sc.src = FFLATE.src; sc.integrity = FFLATE.sri; sc.crossOrigin = "anonymous";
+    sc.onload = () => ok(window.fflate); sc.onerror = () => { fflateLoad = null; fail(new Error("unpacker")); };
+    document.head.append(sc);
+  });
+  return (await fflateLoad).gunzipSync(bytes);
+}
+/** A packed file's original bytes. onBytes(n) reports download progress (packed bytes). */
+async function fetchPacked(path, onBytes) {
+  const res = await fetch(path + ".gz.txt");
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  let raw;
+  if (onBytes && res.body && res.body.getReader) {
+    const rd = res.body.getReader(), parts = [];
+    let n = 0;
+    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); n += value.length; onBytes(value.length); }
+    raw = new Uint8Array(n); let o = 0;
+    for (const part of parts) { raw.set(part, o); o += part.length; }
+  } else raw = new Uint8Array(await res.arrayBuffer());
+  return gunzip(fromBase64(raw));
+}
+const fetchPackedText = (path, onBytes) => fetchPacked(path, onBytes).then(b => new TextDecoder("utf-8").decode(b));
+const fetchPackedJSON = path => fetchPackedText(path).then(t => JSON.parse(t));
+
 // ---------- settings data ----------
 // mode: the theme's own look ("auto" = follows the device). alt: the colour dots of its other mode.
 const PRESETS = {
@@ -153,6 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Storage: the dictionary, sentences, stroke shapes, grammar and photo reader are stored compressed (about 31 MB smaller, exactly the same data)"],
   ["13 Oct", "Grammar: about 500 grammar points from the AllSet Learning Chinese Grammar Wiki in Study → Grammar, and a Grammar box in the word pop-up"],
   ["13 Oct", "Pixel Chinese characters (Cubic 11) in Retro Arcade; Chinese font \"Theme's own\" is the new default"],
   ["13 Oct", "Sync: each deck and your notes now sync on their own, so big decks and lots of notes keep syncing; a review saves only what changed"],

@@ -15,7 +15,7 @@ const AUDIO = {
 /** Where each recording sits in the packed audio files: "w|word" or "s|syllable" → [file, start, length]. */
 function audioIndex() {
   if (!AUDIO.index) {
-    AUDIO.index = fetch("audio/index.txt").then(r => (r.ok ? r.text() : "")).then(t => {
+    AUDIO.index = fetchPackedText("audio/index.txt").catch(() => { AUDIO.index = null; return ""; }).then(t => {
       const m = new Map();
       for (const line of t.split("\n")) {
         const c = line.split("\t");

@@ -29,7 +29,11 @@ for name, code in (("engine.js", engine), ("srs.js", srs), ("ui", ui)):
 dict_path = os.path.join(dist, "dict.txt")
 if not os.path.exists(dict_path):
     sys.exit("Build dist/dict.txt first (see build_dict.py)")
-ui = ui.replace("__DICT_BYTES__", str(os.path.getsize(dict_path)))
+# The dictionary is downloaded packed (tools/pack_data.py): its progress bar counts the packed bytes.
+packed = dict_path + ".gz.txt"
+if not os.path.exists(packed) or os.path.getmtime(packed) < os.path.getmtime(dict_path):
+    sys.exit("Pack the data files first: python3 -I tools/pack_data.py dist")
+ui = ui.replace("__DICT_BYTES__", str(os.path.getsize(packed)))
 page = shell.replace("/*@CSS*/", css).replace("/*@ENGINE*/", engine).replace("/*@SRS*/", srs).replace("/*@UI*/", ui)
 with open(os.path.join(dist, "index.html"), "w", encoding="utf8") as f:
     f.write(page)

@@ -1,10 +1,12 @@
 /* LearnZì UI, part 6a: reading Chinese text in a photo, entirely on this device.
  * Models: PP-OCRv5 mobile text detection and recognition (PaddleOCR, Apache-2.0; the recognition model's
  * last layers stored as 8-bit numbers to halve its size, see tools/build_ocr.py), run by ONNX Runtime Web
- * (MIT, pinned 1.23.2). Every file is served with the app from ocr/ and kept in the browser's cache after
- * the first use. The photo never leaves the device. */
+ * (MIT, pinned 1.23.2). Every file is served with the app from ocr/ (the runtime and both models packed,
+ * see fetchPacked) and kept, unpacked, in the browser's cache after the first use. The photo never
+ * leaves the device. */
 
-const OCR = { base: "ocr/", files: { det: "det.ort.txt", rec: "rec.onnx.txt", keys: "keys.txt", wasm: "ort-wasm-simd-threaded.wasm" }, cache: "learnzi-ocr-1", approxMB: 31 };
+const OCR = { base: "ocr/", files: { det: "det.ort", rec: "rec.onnx", keys: "keys.txt", wasm: "ort-wasm-simd-threaded.wasm" }, packed: ["det.ort", "rec.onnx", "ort-wasm-simd-threaded.wasm"],
+  cache: "learnzi-ocr-2", oldCaches: ["learnzi-ocr-1"], approxMB: 20.5 };
 let ocrEngine = null;   // a promise of { det, rec, keys }
 
 function loadScriptOnce(src) {
@@ -16,11 +18,22 @@ function loadScriptOnce(src) {
     document.head.append(s);
   });
 }
-/** Fetch a file as bytes, from the browser's cache when we have it, reporting bytes as they arrive. */
+/** Fetch a file as bytes, from the browser's cache when we have it, reporting bytes as they arrive.
+ *  Packed files are unpacked once and cached unpacked. */
 async function ocrFetch(name, onBytes) {
   const url = new URL(OCR.base + name, document.baseURI).href;
   let cache = null;
-  try { cache = await caches.open(OCR.cache); const hit = await cache.match(url); if (hit) { const b = await hit.arrayBuffer(); onBytes(b.byteLength); return b; } } catch { cache = null; }
+  try {
+    for (const old of OCR.oldCaches) await caches.delete(old);   // the earlier, unpacked copies
+    cache = await caches.open(OCR.cache); const hit = await cache.match(url);
+    if (hit) { const b = await hit.arrayBuffer(); onBytes(b.byteLength / 2); return b; }
+  } catch { cache = null; }
+  if (OCR.packed.includes(name)) {
+    const bytes = await fetchPacked(OCR.base + name, onBytes);
+    const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    if (cache) try { await cache.put(url, new Response(buf.slice(0))); } catch { /* storage full or not allowed: fine */ }
+    return buf;
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error("fetch " + name + " " + res.status);
   let buf;
@@ -35,15 +48,7 @@ async function ocrFetch(name, onBytes) {
   if (cache) try { await cache.put(url, new Response(buf.slice(0))); } catch { /* storage full or not allowed: fine */ }
   return buf;
 }
-/** The model files are published as base64 text (artifacts only serve web file types). */
-function fromBase64(buf) {
-  const s = new TextDecoder().decode(buf).replace(/\s+/g, "");
-  if (Uint8Array.fromBase64) return Uint8Array.fromBase64(s);
-  const bin = atob(s), out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-/** Get the reader ready (first time: download about 26 MB). onProgress(fraction) while downloading. */
+/** Get the reader ready (first time: download about 20 MB). onProgress(fraction) while downloading. */
 function ocrLoad(onProgress = () => {}) {
   if (!ocrEngine) {
     ocrEngine = (async () => {
@@ -59,8 +64,8 @@ function ocrLoad(onProgress = () => {}) {
       ort.env.wasm.wasmPaths = new URL(OCR.base, document.baseURI).href;
       ort.env.wasm.wasmBinary = wasm;
       const opts = { executionProviders: ["wasm"], graphOptimizationLevel: "all" };
-      const sDet = await ort.InferenceSession.create(fromBase64(det), opts);
-      const sRec = await ort.InferenceSession.create(fromBase64(rec), opts);
+      const sDet = await ort.InferenceSession.create(new Uint8Array(det), opts);
+      const sRec = await ort.InferenceSession.create(new Uint8Array(rec), opts);
       // The key list already holds the "blank" (first line) and the space (last line).
       const list = new TextDecoder().decode(keys).split("\n");
       if (list.length && list[list.length - 1] === "" && list.length > 18385) list.pop();

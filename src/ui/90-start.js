@@ -13,25 +13,12 @@ function applyAll() {
 }
 async function loadDict() {
   try {
-    const res = await fetch(DICT_URL);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    let text;
-    if (res.body && res.body.getReader) {
-      const rd = res.body.getReader();
-      const chunks = [];
-      let got = 0, lastPaint = 0;
-      for (;;) {
-        const { done, value } = await rd.read();
-        if (done) break;
-        chunks.push(value); got += value.length;
-        ui.progress = Math.min(0.99, got / DICT_BYTES);
-        if (got - lastPaint > 250000) { lastPaint = got; document.querySelectorAll(".dict-progress").forEach(el => { el.textContent = progressText(); }); }
-      }
-      const all = new Uint8Array(got);
-      let o = 0;
-      for (const c of chunks) { all.set(c, o); o += c.length; }
-      text = new TextDecoder("utf-8").decode(all);
-    } else text = await res.text();
+    let got = 0, lastPaint = 0;
+    const text = await fetchPackedText(DICT_URL, n => {
+      got += n;
+      ui.progress = Math.min(0.99, got / DICT_BYTES);
+      if (got - lastPaint > 250000) { lastPaint = got; document.querySelectorAll(".dict-progress").forEach(el => { el.textContent = progressText(); }); }
+    });
     ui.progress = 1;
     document.querySelectorAll(".dict-progress").forEach(el => { el.textContent = progressText(); });
     await new Promise(r => setTimeout(r, 40));

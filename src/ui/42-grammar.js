@@ -17,7 +17,7 @@ const strs = a => (Array.isArray(a) ? a.filter(x => typeof x === "string").map(x
 function loadGrammar() {
   if (grammar.list) return Promise.resolve(grammar.list);
   if (!grammar.loading) {
-    grammar.loading = fetch("grammar/index.json").then(r => (r.ok ? r.json() : null)).then(j => {
+    grammar.loading = fetchPackedJSON("grammar/index.json").then(j => {
       const pts = j && Array.isArray(j.points) ? j.points : [];
       grammar.list = pts.filter(p => Array.isArray(p) && typeof p[0] === "string" && /^ASG[0-9A-Z]{5}$/.test(p[0]) && typeof p[1] === "string")
         .map(p => ({ id: p[0], title: p[1].slice(0, 160), level: GLEVELS.includes(p[2]) ? p[2] : "B1", cmp: p[3] === "c", pattern: typeof p[4] === "string" ? p[4].slice(0, 200) : "",
@@ -34,7 +34,7 @@ function loadGrammar() {
 /** The articles of one level (loaded when you open a point of that level). */
 function loadGrammarLevel(level) {
   const k = level.toLowerCase();
-  if (!grammar.arts[k]) grammar.arts[k] = fetch("grammar/" + k + ".json").then(r => (r.ok ? r.json() : {})).catch(() => { delete grammar.arts[k]; return {}; });
+  if (!grammar.arts[k]) grammar.arts[k] = fetchPackedJSON("grammar/" + k + ".json").catch(() => { delete grammar.arts[k]; return {}; });
   return grammar.arts[k];
 }
 function openGrammar(id) {
