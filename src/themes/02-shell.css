@@ -32,6 +32,10 @@
 .me-card-name { font-family: var(--font-display); font-size: 1.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .btn.small { padding: 5px 12px; font-size: .82rem; }
 .lookup-recent .res { width: 100%; }
+/* Recent lookups: one box, with a small box per word inside (like the decks inside Studying) */
+.lookup-recent .results { gap: 8px; }
+.app #results .res.deck-mini { display: grid; gap: 14px; padding: 10px 14px; }
+@media (hover: hover) { .app #results .res.deck-mini:hover { border-color: var(--accent); } }
 
 :root[data-shape="arcade"] .navmenu { border: 0; box-shadow: 0 -4px 0 0 var(--accent), 0 4px 0 0 var(--accent), -4px 0 0 0 var(--accent), 4px 0 0 0 var(--accent), 8px 8px 0 0 rgb(0 0 0 / .5); }
 :root[data-shape="cyber"] .navmenu { border-color: var(--accent); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }

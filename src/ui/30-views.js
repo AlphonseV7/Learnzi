@@ -8,6 +8,8 @@ function updateTopbar() {
     pill.querySelector(".hz").textContent = mleOn() ? "🔥" : "字";
     pill.setAttribute("aria-label", "Zì level " + lv.level + ": " + lv.into + " of " + lv.need + " XP to the next level. Open My Zì");
     pill.title = lv.into + " / " + lv.need + " XP to level " + (lv.level + 1);
+    // the XP numbers keep one width for the whole level (room for "need/need"), so gaining XP never resizes the capsule
+    pill.style.setProperty("--xpd", String(String((mleOn() ? mleLevel() : lv).need).length));
   }
   xpBarShow(mleOn() ? mleLevel() : lv);
   const badge = $("#clock-badge");
@@ -24,7 +26,7 @@ function updateTopbar() {
   const name = $("#me-name");
   if (name) name.textContent = state.nickname || "LearnZì";
   const me = $("#me");
-  if (me) me.setAttribute("aria-label", (state.nickname ? state.nickname + ": " : "") + "your profile and avatar");
+  if (me) me.setAttribute("aria-label", (state.nickname ? state.nickname + ": " : "") + "your avatar and look: open Customise");
 }
 function render(animate) {
   const fn = { home: viewHome, lookup: viewLookup, reader: viewReader, photo: viewPhoto, watch: viewWatch, myzi: viewMyZi, mycards: viewMyCards, decks: viewDecks, study: viewStudy, tones: viewTones, me: viewMe, settings: viewSettings, debug: viewDebug, deck: viewDeck, stats: viewStats, grammar: viewGrammar, gpoint: viewGrammarPoint }[ui.view];
@@ -120,7 +122,8 @@ function viewLookup() {
   return v;
 }
 function resRow(e, tag, boxed) {
-  return h(tag || "button", { class: "res" + (boxed ? " card" : ""), type: tag ? null : "button", onclick: () => openWord(e.s, e) },
+  // boxed: true = its own box (search results), "mini" = a small box inside a bigger one (Recent lookups)
+  return h(tag || "button", { class: "res" + (boxed === "mini" ? " deck-mini" : boxed ? " card" : ""), type: tag ? null : "button", onclick: () => openWord(e.s, e) },
     rubyHz(disp(e), e.p),
     h("span", { class: "meta" }, h("span", { class: "def" }, shortDef(e, 3))),
     hskBadges(e, true)[0] || h("span"));
@@ -131,8 +134,8 @@ function fillResults(box) {
   const q = ui.query.trim();
   if (!q) {
     const recent = state.recent.map(s => Engine.lookup(s)[0]).filter(Boolean);
-    const card = h("div", { class: "stack lookup-group lookup-recent" }, h("h2", { class: "h-card" }, "Recent lookups"),
-      recent.length ? h("div", { class: "results" }, recent.map(e => resRow(e, null, true))) : h("div", { class: "empty" }, "Words you look up appear here."));
+    const card = h("div", { class: "card stack lookup-group lookup-recent" }, h("h2", { class: "h-card" }, "Recent lookups"),
+      recent.length ? h("div", { class: "results" }, recent.map(e => resRow(e, null, "mini"))) : h("div", { class: "empty" }, "Words you look up appear here."));
     box.append(card);
     foldify(box, "lookup", ":scope > .card, :scope > .lookup-group");
     return;

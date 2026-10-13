@@ -104,16 +104,17 @@ function reviewsChart() {
   });
   return columns(items, { stacked: true, empty: "Tap a day for its numbers." });
 }
-function forecastChart() {
+function forecastChart(days = 14, whenEmpty = "") {
   const nowMs = clock();
   const today = SRS.dayStartMin(nowMs, 0);
-  const counts = new Array(14).fill(0);
+  const counts = new Array(days).fill(0);
   const words = new Set(activeWords().map(keyOf));
   for (const [k, c] of Object.entries(progress.cards)) {
     if (!words.has(k.slice(0, k.lastIndexOf("|")))) continue;
     const day = Math.max(0, Math.floor((c[2] - today) / 1440));
-    if (day < 14) counts[day]++;
+    if (day < days) counts[day]++;
   }
+  if (whenEmpty && !counts.some(Boolean)) return h("p", { class: "muted small" }, whenEmpty);
   const items = counts.map((n, i) => {
     const d = new Date(nowMs - 4 * 3600e3); d.setDate(d.getDate() + i);
     const name = i === 0 ? "Today" : i === 1 ? "Tomorrow" : d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric" });

@@ -451,6 +451,11 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
 .fc-front { display: grid; place-items: center; min-height: 9rem; text-align: center; padding-block: 8px; }
 .fc-hz { font-size: clamp(3.2rem, 14vw, 5rem); line-height: 1.15; }
 .fc-hz rt { font-size: .28em; }
+.fc-say { cursor: pointer; border-radius: 12px; -webkit-tap-highlight-color: transparent; }
+.fc-say:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.fc-say.said { animation: fcSaid .32s var(--ease); }
+@keyframes fcSaid { 40% { transform: scale(.94); } }
+@media (prefers-reduced-motion: reduce) { .fc-say.said { animation: none; } }
 .fc-meaning { font-size: 1.35rem; font-weight: 600; line-height: 1.35; max-width: 30rem; margin-inline: auto; }
 .fc-play { width: 6.5rem; height: 6.5rem; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; box-shadow: var(--shadow); }
 .fc-play svg { width: 40px; height: 40px; }
@@ -489,8 +494,13 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
 }
 .search-row { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-off, 0px)); transition: top .3s var(--ease); z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--bg); padding-block: 6px; }
 .search-row .search { position: relative; flex: 1; min-width: 0; padding: 0; top: auto; }
-.random { flex: none; height: 52px; }
-@media (max-width: 480px) { .random { width: 52px; padding: 0; justify-content: center; font-size: 0; font-size-adjust: none; } .random svg { width: 22px; height: 22px; } }
+/* the camera and dice buttons: a matching pair of squares as tall as the search field */
+.search-row { align-items: stretch; }
+.search-row > .btn { flex: none; height: auto; min-height: 44px; aspect-ratio: 1; width: auto; padding: 0; justify-content: center; margin: 0; }
+.search-row > .btn svg { width: 24px; height: 24px; }
+.random { gap: 8px; }
+@media (min-width: 481px) { .search-row > .random { aspect-ratio: auto; padding: 0 18px; } }
+@media (max-width: 480px) { .random { font-size: 0; font-size-adjust: none; } }
 .phrase { display: grid; gap: 10px; }
 .phrase-chip { display: inline-grid; justify-items: center; gap: 0; padding: 6px 12px; border-radius: 12px; }
 .phrase-chip.missing { color: var(--ink-soft); border-style: dashed; }

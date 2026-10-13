@@ -48,7 +48,7 @@ function start() {
     lastGear = now;
   });
   $("#clock-badge").addEventListener("click", () => go("debug"));
-  $("#me").addEventListener("click", () => go("myzi"));
+  $("#me").addEventListener("click", () => go("me"));   // avatar and name: Customise; level and XP: My Zì
   $("#lvl").addEventListener("click", () => go("myzi"));
   $("#scrim").addEventListener("click", closePanel);
   window.addEventListener("hashchange", () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== ui.view) go(v); });

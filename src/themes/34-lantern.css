@@ -5,7 +5,7 @@
 :root[data-shape="lantern"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 800; letter-spacing: .01em; }
 :root[data-shape="lantern"] h1 { color: var(--accent); text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
 :root[data-shape="lantern"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); }
-:root[data-shape="lantern"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "◆ "; color: var(--accent); font-size: .8em; }
+:root[data-shape="lantern"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "◆\a0"; color: var(--accent); font-size: .8em; }
 /* panels: cut corners, a gold lattice cap top and bottom, paper ribs, lit from inside */
 :root[data-shape="lantern"] :is(.card, .action, .deck-row, .deck-mini, .flashcard, .example) {
   clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);

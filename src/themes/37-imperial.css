@@ -5,7 +5,7 @@
 :root[data-shape="imperial"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: .06em; color: var(--accent); }
 :root[data-shape="imperial"] h1 { text-shadow: 0 2px 0 color-mix(in srgb, #000 40%, transparent); }
 :root[data-shape="imperial"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); letter-spacing: 0; }
-:root[data-shape="imperial"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❖ "; }
+:root[data-shape="imperial"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❖\a0"; }
 /* panels: upturned eaves on top, notched base, a gold outline that follows the shape */
 :root[data-shape="imperial"] :is(.card, .action, .deck-row, .deck-mini, .empty) {
   --clip: polygon(0 0, 18px 9px, calc(100% - 18px) 9px, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));

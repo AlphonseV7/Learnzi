@@ -56,14 +56,60 @@ function viewMyZi() {
   return v;
 }
 
-/** Study → My decks: every deck, the ones you're studying first. */
+/** A "Sort" menu remembered in state.sorts[key]. */
+function sortSelect(key, id) {
+  const sel = h("select", { id, "aria-label": "Sort" });
+  for (const [k, label] of SORTS[key]) { const o = h("option", { value: k }, label); if (k === sortOf(key)) o.selected = true; sel.append(o); }
+  sel.addEventListener("change", () => { commit({ sorts: { ...state.sorts, [key]: sel.value } }); render(false); const n = $("#" + id); if (n) n.focus(); });
+  return h("label", { class: "row sort-pick" }, h("span", { class: "eyebrow" }, "Sort"), sel);
+}
+const deckKind = id => (/^u/.test(id) ? "mine" : /^nhsk/.test(id) ? "hsk3" : /^hsk/.test(id) ? "hsk2" : "other");
+/** My decks: progress across the decks you're studying (each word counted once) and the week ahead. */
+function decksProgressBox() {
+  const words = activeWords(), counts = [0, 0, 0, 0];
+  for (const e of words) counts[strength(e)]++;
+  const learned = counts[2] + counts[3];
+  return h("div", { class: "card stack decks-progress" },
+    h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Progress"),
+      h("button", { class: "btn", type: "button", onclick: () => go("stats") }, "See all stats")),
+    h("div", { class: "stats" },
+      stat(words.length, words.length === 1 ? "word studying" : "words studying"),
+      stat(learned, "learned"),
+      stat((words.length ? Math.round(learned / words.length * 100) : 0) + "%", "of them learned")),
+    strengthBar(counts, words.length), strengthLegend(counts),
+    h("span", { class: "eyebrow" }, "Coming up this week"),
+    forecastChart(7, "No reviews coming up yet. Once you've studied some cards, this shows how many come back each day."));
+}
+/** Study → My decks: every deck, the ones you're studying first; show some kinds and sort them. */
 function viewDecks() {
   const v = h("section", { class: "view" });
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
   v.append(studyCard(null, false));
+  v.append(decksProgressBox());
 
+  // show and sort
+  const show = sortOf("decksShow"), by = sortOf("decksBy");
   const all = allDeckIds();
-  const studying = all.filter(isActive), others = all.filter(id => !isActive(id));
+  const n = k => all.filter(id => k === "all" || deckKind(id) === k).length;
+  v.append(h("div", { class: "card stack decks-tools" }, h("h2", { class: "h-card" }, "Show and sort"),
+    h("div", { class: "row chips" }, SORTS.decksShow.map(([k, label]) =>
+      h("button", { class: "chip filter-chip", type: "button", "aria-pressed": String(show === k), onclick: () => { commit({ sorts: { ...state.sorts, decksShow: k } }); render(false); } },
+        label, h("span", { class: "muted small num" }, " " + n(k))))),
+    sortSelect("decksBy", "decks-sort")));
+
+  const sums = new Map();
+  const sum = id => { if (!sums.has(id)) sums.set(id, deckSummary(id)); return sums.get(id); };
+  const pct = id => { const s = sum(id); return s.total ? (s.counts[2] + s.counts[3]) / s.total : 0; };
+  const sorters = {
+    name: (a, b) => deckName(a).localeCompare(deckName(b), "en", { numeric: true }),
+    due: (a, b) => sum(b).due - sum(a).due,
+    least: (a, b) => pct(a) - pct(b),
+    most: (a, b) => pct(b) - pct(a),
+    size: (a, b) => sum(b).total - sum(a).total,
+  };
+  const pick = ids => { const out = ids.filter(id => show === "all" || deckKind(id) === show); return sorters[by] ? out.sort(sorters[by]) : out; };
+  const studying = pick(all.filter(isActive)), others = pick(all.filter(id => !isActive(id)));
+  const what = show === "all" ? "" : " " + SORTS.decksShow.find(x => x[0] === show)[1];
   const form = h("div", { class: "row new-deck", hidden: true });
   const name = h("input", { type: "text", id: "deck-name", maxlength: "40", placeholder: "Deck name, e.g. Food" });
   const make = () => { const d = createDeck(name.value); if (d) { toast("Created " + d.name + ". Add words from any word's Deck button."); render(false); } };
@@ -74,10 +120,11 @@ function viewDecks() {
       h("button", { class: "btn", type: "button", onclick: () => { form.hidden = !form.hidden; if (!form.hidden) name.focus(); } }, "+ New deck")),
     form,
     studying.length ? h("div", { class: "decks" }, studying.map(deckItem))
-      : h("div", { class: "empty" }, "You're not studying any decks. Start one below.")));
-  if (others.length) {
+      : h("div", { class: "empty" }, show === "all" ? "You're not studying any decks. Start one below." : "You're not studying any" + what + " decks.")));
+  if (others.length || show !== "all") {
     v.append(h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "More decks"),
-      h("div", { class: "decks" }, others.map(deckItem))));
+      others.length ? h("div", { class: "decks" }, others.map(deckItem))
+        : h("div", { class: "empty" }, show === "mine" ? "No other decks of your own. Make one with + New deck." : "No more" + what + " decks.")));
   }
   return v;
 }

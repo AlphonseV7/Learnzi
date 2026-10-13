@@ -34,6 +34,18 @@ function cardsMatch(e, q) {
   const ql = q.toLowerCase().replace(/\s+/g, "");
   return e.s.includes(q) || (e.t || "").includes(q) || plain.includes(ql) || e.p.toLowerCase().replace(/\s+/g, "").includes(ql) || (e.d || "").toLowerCase().includes(q.toLowerCase());
 }
+/** Sort the words in My cards (state.sorts.cardsBy); the list arrives newest saved first. */
+function sortCards(list, by, nowMs) {
+  if (by === "saved") return list;
+  const next = e => { let m = Infinity; for (const k of cardKeys(e)) { const c = progress.cards[k]; if (c) m = Math.min(m, SRS.isDue(c, nowMs) ? -1 : c[2]); } return m; };
+  const plain = e => Engine.toMarks(e.p).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const hskOf = e => (hsk3Band(e) || 99) * 10 + (e.h || 9);
+  const key = new Map(list.map(e => [e, by === "due" ? next(e) : by === "weak" ? strength(e) * 1e9 + Math.min(next(e), 9e8)
+    : by === "strong" ? -strength(e) : by === "hsk" ? hskOf(e) : 0]));
+  const stable = new Map(list.map((e, i) => [e, i]));
+  if (by === "pinyin") { const p = new Map(list.map(e => [e, plain(e)])); return list.sort((a, b) => p.get(a).localeCompare(p.get(b), "en") || stable.get(a) - stable.get(b)); }
+  return list.sort((a, b) => key.get(a) - key.get(b) || stable.get(a) - stable.get(b));
+}
 function viewMyCards() {
   const v = h("section", { class: "view" });
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
@@ -54,6 +66,7 @@ function viewMyCards() {
   const counts = { all: pool.length, due: 0, new: 0, learning: 0, familiar: 0, known: 0 };
   for (const e of pool) { const st = statusOf(e); counts[st]++; if (st === "due") counts[["new", "learning", "familiar", "known"][strength(e)]]++; }
   const shown = pool.filter(e => (ui.cardsStatus === "all" || (ui.cardsStatus === "due" ? statusOf(e) === "due" : ["new", "learning", "familiar", "known"][strength(e)] === ui.cardsStatus)) && cardsMatch(e, ui.cardsQ.trim()));
+  sortCards(shown, sortOf("cardsBy"), nowMs);
 
   // the overview
   const sc = [0, 0, 0, 0]; saved.forEach(e => sc[strength(e)]++);
@@ -62,28 +75,29 @@ function viewMyCards() {
     strengthBar(sc, saved.length), strengthLegend(sc),
     h("p", { class: "muted small" }, "Each word has a Meaning card (M). Listening (L), Recall (R) and Writing (W) cards join as you get to know it. Colours: blue new, orange learning, filled due, green known.")));
 
-  // filters
+  // find, filter and sort
   const q = h("input", { type: "text", id: "cards-q", placeholder: "Search my cards: 字, pinyin or English", value: ui.cardsQ, "aria-label": "Search my cards", spellcheck: "false", autocomplete: "off" });
   let qt = 0;
   q.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { ui.cardsQ = q.value; ui.cardsShow = 100; render(false); const n = $("#cards-q"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   const chip = (on, label, n, pick) => h("button", { class: "chip filter-chip", type: "button", "aria-pressed": String(on), onclick: pick }, label, n !== null ? h("span", { class: "muted small num" }, " " + n) : null);
-  v.append(h("div", { class: "card stack cards-filters" }, q,
+  v.append(h("div", { class: "card stack cards-filters" }, h("h2", { class: "h-card" }, "Find and sort"), q,
     decks.length ? h("div", { class: "stack-tight" }, h("span", { class: "eyebrow" }, "Deck"),
       h("div", { class: "row chips" }, chip(ui.cardsDeck === "all", "All", saved.length, () => { ui.cardsDeck = "all"; ui.cardsShow = 100; render(false); }),
         decks.map(([id, name, ks]) => chip(ui.cardsDeck === id, name, ks.size, () => { ui.cardsDeck = id; ui.cardsShow = 100; render(false); })))) : null,
     h("div", { class: "stack-tight" }, h("span", { class: "eyebrow" }, "Status"),
-      h("div", { class: "row chips" }, CARD_FILTERS.map(([k, label]) => chip(ui.cardsStatus === k, label, counts[k], () => { ui.cardsStatus = k; ui.cardsShow = 100; render(false); }))))));
+      h("div", { class: "row chips" }, CARD_FILTERS.map(([k, label]) => chip(ui.cardsStatus === k, label, counts[k], () => { ui.cardsStatus = k; ui.cardsShow = 100; render(false); })))),
+    sortSelect("cardsBy", "cards-sort")));
 
-  // the list
-  if (!shown.length) { v.append(h("div", { class: "empty" }, "No saved words match.")); return v; }
-  const list = h("div", { class: "results" });
+  // the list: one box holding a small box per word
+  const list = h("div", { class: "results cards-list" });
   for (const e of shown.slice(0, ui.cardsShow)) {
     const [label, kind] = wordStatus(e, nowMs);
-    list.append(h("div", { class: "zrow card-row", "data-key": keyOf(e) }, resRow(e),
+    list.append(h("div", { class: "zrow card-row deck-mini", "data-key": keyOf(e) }, resRow(e),
       h("span", { class: "card-row-side" }, cardBadges(e, nowMs), h("span", { class: "status s-" + kind }, label)), starBtn(e)));
   }
-  v.append(h("div", { class: "row spread" }, h("h2", { class: "h-card" }, shown.length === 1 ? "1 word" : shown.length + " words")), list);
-  if (shown.length > ui.cardsShow) v.append(h("button", { class: "btn", type: "button", onclick: () => { ui.cardsShow += 200; render(false); } }, "Show more (" + (shown.length - ui.cardsShow) + " left)"));
+  v.append(h("div", { class: "card stack cards-words" }, h("h2", { class: "h-card" }, shown.length === 1 ? "1 word" : shown.length + " words"),
+    shown.length ? list : h("div", { class: "empty" }, "No saved words match."),
+    shown.length > ui.cardsShow ? h("button", { class: "btn", type: "button", onclick: () => { ui.cardsShow += 200; render(false); } }, "Show more (" + (shown.length - ui.cardsShow) + " left)") : null));
   return v;
 }
 const countCards = words => words.reduce((n, e) => n + ["m", "l", "r", "w"].filter(t => progress.cards[cardBase(e) + "|" + t]).length, 0);

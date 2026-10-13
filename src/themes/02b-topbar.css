@@ -4,7 +4,7 @@
    with the numbers inside it (the bright line along the bottom is the edge of the fill). */
 .topbar .lvl { position: relative; isolation: isolate; height: 40px; min-width: 128px; padding: 0 14px; gap: 6px; justify-content: center; font-size: .9rem; }
 .topbar .lvl .hz { font-size: 1.12rem; }
-.topbar .lvl > :not(.xpbar) { position: relative; z-index: 1; }
+.topbar .lvl > :not(.xpbar, .xp-pop) { position: relative; z-index: 1; }
 :root.desk .topbar .lvl { height: 42px; min-width: 180px; padding: 0 16px; }
 :root:not(.desk) .topbar .lvl { min-width: 0; padding: 0 14px; }
 /* phones: the numbers sit under the level, so the capsule stays narrow and your name has room */
@@ -12,6 +12,8 @@
 :root:not(.desk) .topbar .lvl .xp-num { grid-column: 1 / -1; justify-self: center; margin: 0; font-size: .6rem; }
 :root[data-shape="cyber"]:not(.desk) .topbar .lvl { letter-spacing: 0; }
 .xp-num { flex: none; font-size: .72rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; letter-spacing: -.01em; margin-left: 2px; }
+/* one fixed width per level: every digit the same width, room for the most digits it can show */
+.topbar .xp-num { font-variant-numeric: tabular-nums; min-width: calc((var(--xpd, 4) * 2 + 1) * 1ch); text-align: center; }
 .xpbar { position: absolute; inset: 0; z-index: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
 .xpbar > i {
   position: absolute; left: 0; top: 0; bottom: 0; display: block; width: 0;
@@ -78,6 +80,16 @@
 .cards-filters input[type="text"] { width: 100%; }
 .card-row { grid-template-columns: minmax(0, 1fr) auto auto; }
 .card-row-side { display: grid; justify-items: end; gap: 4px; }
+/* each word is a small box inside the list box, like the decks inside Studying */
+.cards-list { gap: 8px; }
+.view .cards-list > .card-row.deck-mini { gap: 6px; padding: 4px 8px 4px 0; align-items: center; }
+:root[data-shape="porcelain"] .view .cards-list > .card-row.deck-mini { padding: 12px 14px 12px 6px; }
+.card-row.deck-mini > .res { padding: 8px 4px 8px 12px; border: 0; background: none; }
+.cards-filters select, .decks-tools select { flex: 1; min-width: 0; max-width: 16rem; }
+.sort-pick { gap: 10px; align-items: center; flex-wrap: nowrap; }
+.decks-tools .chips { gap: 6px; }
+/* My decks: the week ahead, smaller than on the Stats page */
+.decks-progress .plot { height: 90px; }
 .cbs { display: inline-flex; gap: 3px; }
 .cb { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; font-size: .68rem; font-weight: 800; border: 1.5px solid currentColor; }
 .cb-new { color: var(--t4); }

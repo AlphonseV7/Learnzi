@@ -18,7 +18,7 @@
 :root[data-shape="silver"] :is(h1, h2, h3, .brand-name, .me-name) { font-weight: 700; letter-spacing: .01em; }
 :root[data-shape="silver"] h1 { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
 :root[data-shape="silver"] :is(h1, h2, h3) :is(.py, rt, .hz) { -webkit-text-fill-color: initial; }
-:root[data-shape="silver"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✦ "; color: var(--aurora, #5fe6ff); }
+:root[data-shape="silver"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✦\a0"; color: var(--aurora, #5fe6ff); }
 /* Cut crystal: every big panel is frosted glass cut into an uneven shard, with long shallow cuts (not
    Cyberedge's 45° chamfers). Three shapes take turns so neighbours never match. Layers on each panel:
    the glass (see-through, blurring the sky), a lighter facet just under the top cut, a sheen of light

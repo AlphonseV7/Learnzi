@@ -6,7 +6,7 @@
 :root[data-shape="porcelain"] h1 { font-size: 2.3rem; }
 :root[data-shape="porcelain"] .h-card { font-size: 1.35rem; }
 :root[data-shape="porcelain"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); font-style: normal; }
-:root[data-shape="porcelain"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❀ "; color: var(--accent); font-style: normal; }
+:root[data-shape="porcelain"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "❀\a0"; color: var(--accent); font-style: normal; }
 /* plates: scalloped top and bottom edges, two fine cobalt rims inside, a flower knot at the top */
 :root[data-shape="porcelain"] :is(.card, .action, .deck-row, .deck-mini, .lu-card) {
   position: relative; border: 0; border-radius: 22px; padding: 22px;

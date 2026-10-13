@@ -23,7 +23,7 @@
 :root[data-shape="cyber"] h1 { font-size: 1.45rem; text-shadow: -2px 0 color-mix(in srgb, var(--accent-2) 70%, transparent), 2px 0 color-mix(in srgb, var(--accent) 70%, transparent); }
 :root[data-shape="cyber"] h2 { font-size: 1rem; }
 :root[data-shape="cyber"] .h-card { font-size: .95rem; color: var(--accent); }
-:root[data-shape="cyber"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "// "; color: var(--accent-2); }
+:root[data-shape="cyber"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "//\a0"; color: var(--accent-2); }
 :root[data-shape="cyber"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); text-transform: none; }
 :root[data-shape="cyber"] .eyebrow { color: var(--accent-2); letter-spacing: .18em; }
 

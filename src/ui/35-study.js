@@ -80,6 +80,16 @@ function viewStudy() {
   return v;
 }
 
+/** Tap (or Enter on) the big characters to hear the word again, with a little press. */
+function sayOnTap(el, e) {
+  const play = () => { speak(e.s, e.p); el.classList.remove("said"); void el.offsetWidth; el.classList.add("said"); };
+  el.classList.add("fc-say");
+  el.setAttribute("role", "button"); el.tabIndex = 0; el.setAttribute("aria-label", "Play the word " + disp(e));
+  el.addEventListener("click", play);
+  el.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); play(); } });
+  el.addEventListener("animationend", () => el.classList.remove("said"));
+  return el;
+}
 function cardView({ k, e }) {
   const type = k.slice(-1);
   const card = h("div", { class: "card flashcard", "data-type": type });
@@ -87,7 +97,7 @@ function cardView({ k, e }) {
   card.append(h("span", { class: "eyebrow" }, TYPES[type], progress.cards[k] ? null : h("span", { class: "fc-new" }, " · new")));
   // Front of the card
   if (type === "m") {
-    const hz = rubyHz(disp(e), e.p, "fc-hz");
+    const hz = sayOnTap(rubyHz(disp(e), e.p, "fc-hz"), e);
     card.append(h("div", { class: "fc-front" }, hz),
       h("p", { class: "muted small" }, "What does it mean?"));
     drawSoon(hz, !study.revealed);   // after answering, the drawn characters just stay
@@ -111,7 +121,7 @@ function cardView({ k, e }) {
   }
   // Back of the card
   const senses = Engine.senses(e).slice(0, 4).map(plainSense);
-  const answerHz = type !== "m" ? rubyHz(disp(e), e.p, "fc-hz") : null;
+  const answerHz = type !== "m" ? sayOnTap(rubyHz(disp(e), e.p, "fc-hz"), e) : null;
   if (answerHz && type !== "w") drawSoon(answerHz);
   card.append(h("div", { class: "fc-answer" },
     answerHz,

@@ -198,6 +198,10 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Top bar: the XP capsule keeps one size; tap your avatar or name for Customise, your level for My Zì"],
+  ["13 Oct", "Review: tap the character on a card to hear it again"],
+  ["13 Oct", "My decks: a Progress box (words learned, the week ahead) and Show and sort; My cards: sorting, and each word in its own box"],
+  ["13 Oct", "Look up: Recent lookups in one box; the camera and dice buttons match"],
   ["13 Oct", "Silver River: smaller cuts on small boxes, so none gets squeezed; a box's buttons move under its title when they don't fit beside it"],
   ["13 Oct", "Flashcards: drawn characters now stay drawn instead of switching to the font, with no flicker"],
   ["13 Oct", "Flashcards: characters draw themselves stroke by stroke (Settings → Flashcards to turn off); +XP counts up; new cards glow"],
@@ -256,9 +260,16 @@ const UPDATES = [
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
+  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
+/** How My decks and My cards are shown and sorted (state.sorts): each key's allowed values, first is the default. */
+const SORTS = {
+  decksShow: [["all", "All"], ["mine", "My own"], ["hsk3", "HSK 3.0"], ["hsk2", "HSK 2.0"]],
+  decksBy: [["default", "Default order"], ["name", "Name"], ["due", "Most due"], ["least", "Least learned"], ["most", "Most learned"], ["size", "Biggest"]],
+  cardsBy: [["saved", "Recently saved"], ["due", "Due first"], ["weak", "Weakest first"], ["strong", "Strongest first"], ["pinyin", "Pinyin A–Z"], ["hsk", "HSK level"]],
+};
+const sortOf = key => (state.sorts && state.sorts[key]) || SORTS[key][0][0];
 const num = (v, lo, hi, d) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
 const obj = raw => (raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {});
 const cleanLine = (v, max) => (typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max) : "");
@@ -408,6 +419,8 @@ function sanitize(raw) {
     if (/^[a-z]{1,16}$/.test(k) && Array.isArray(v)) s.hidden[k] = v.filter(x => typeof x === "string" && /^[a-z0-9-]{1,40}$/.test(x)).slice(0, 40);
   }
   // Boxes you folded away (1) or opened (0), by box name.
+  s.sorts = {};
+  for (const [k, v] of Object.entries(obj(o.sorts))) if (SORTS[k] && SORTS[k].some(x => x[0] === v)) s.sorts[k] = v;
   s.folds = {};
   for (const [k, v] of Object.entries(obj(o.folds)).slice(0, 120)) if (/^[a-z0-9-]{1,40}$/.test(k) && (v === 0 || v === 1)) s.folds[k] = v;
   // Notes and your own decks are synced in their own documents (see 10-sync); notesAt is when the
@@ -446,7 +459,7 @@ const CARD_KEY = /^[^|]{1,32}\|[^|]{1,120}\|[mlrw]$/;
 function sanitizeProgress(raw) {
   const o = obj(raw), src = obj(o.cards), srcAct = obj(o.act);
   const cards = {}, act = {};
-  // Up to 50,000 cards (about five years at 10 new words a day). Synced in 16 parts, see 10-sync.
+  // Up to 50,000 cards (about five years at 10 new words a day). Synced in 32 parts, see 10-sync.
   for (const k of Object.keys(src).sort().slice(0, 50000)) {
     const a = src[k];
     if (!CARD_KEY.test(k) || !Array.isArray(a) || a.length !== 9 || !a.every(n => typeof n === "number" && Number.isFinite(n))) continue;

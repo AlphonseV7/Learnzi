@@ -3,7 +3,7 @@
 :root[data-shape="peach"] :is(h1, h2, h3, .brand-name, .me-name) { font-style: italic; font-weight: 700; letter-spacing: 0; }
 :root[data-shape="peach"] h1 { color: var(--accent); }
 :root[data-shape="peach"] :is(h1, h2, h3) :is(.py, rt) { font-family: var(--font-body); font-style: normal; }
-:root[data-shape="peach"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✿ "; color: var(--accent); font-style: normal; }
+:root[data-shape="peach"] :is(.h-card .fold-label, .h-card:not(.fold-title))::before { content: "✿\a0"; color: var(--accent); font-style: normal; }
 :root[data-shape="peach"] :is(.card, .action, .deck-row, .deck-mini, .lu-card) {
   position: relative; border-color: color-mix(in srgb, var(--accent) 22%, var(--line)); border-radius: 36px 36px 36px 6px;
   background: radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 55%), var(--surface);
