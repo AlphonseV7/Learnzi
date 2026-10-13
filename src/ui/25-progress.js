@@ -41,7 +41,9 @@ function rankFor(level) {
   return { rank: RANKS[i], next: RANKS[i + 1] || null };
 }
 /** The rank title you show: the one you chose in Customise → Ranks (if you've reached it), else your newest. */
+const TRAVELLER = { lv: 1, s: "旅人", p: "lv3 ren2", en: "Traveller", note: "Finished the whole Journey and found every scroll" };
 function shownRank(level) {
+  if (state.title === TRAVELLER.s && chapterDone(5)) return TRAVELLER;
   const chosen = state.title && RANKS.find(r => r.s === state.title && r.lv <= level);
   return chosen || rankFor(level).rank;
 }
@@ -95,6 +97,7 @@ function gainBonus(n, chars) {
 function rewardLookup(s) {
   if (lookedToday.has(s)) return;
   lookedToday.add(s);
+  jCount("lookups");
   gainBonus(2, s);
 }
 

@@ -29,7 +29,7 @@ function updateTopbar() {
   if (me) me.setAttribute("aria-label", (state.nickname ? state.nickname + ": " : "") + "your avatar and look: open Customise");
 }
 function render(animate) {
-  const fn = { home: viewHome, lookup: viewLookup, reader: viewReader, photo: viewPhoto, watch: viewWatch, myzi: viewMyZi, mycards: viewMyCards, decks: viewDecks, study: viewStudy, tones: viewTones, me: viewMe, settings: viewSettings, debug: viewDebug, deck: viewDeck, stats: viewStats, grammar: viewGrammar, gpoint: viewGrammarPoint }[ui.view];
+  const fn = { home: viewHome, lookup: viewLookup, reader: viewReader, photo: viewPhoto, watch: viewWatch, myzi: viewMyZi, mycards: viewMyCards, decks: viewDecks, study: viewStudy, tones: viewTones, me: viewMe, settings: viewSettings, debug: viewDebug, deck: viewDeck, stats: viewStats, grammar: viewGrammar, gpoint: viewGrammarPoint, journey: viewJourney, scrolls: viewScrolls, scroll: viewScroll }[ui.view];
   const v = mleOn() ? (MLE_VIEWS[ui.view] || fn)() : fn();
   if (FOLD_VIEWS.includes(ui.view)) foldify(v, ui.view, ":scope > .card", !OPEN_VIEWS.includes(ui.view));
   const head = pageHead(ui.view, v);
@@ -62,6 +62,8 @@ function viewHome() {
         h("b", null, ready ? ready + (ready === 1 ? " card ready" : " cards ready") : "All caught up"),
         h("span", { class: "muted small" }, streak() ? streak() + "-day streak" : "Study today to start a streak")),
       ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Review") : null));
+    const jbox = journeyHomeBox();
+    if (jbox) v.append(jbox);
   }
   if (ui.dict === "ready") {
     const w = Engine.wordOfDay(undefined, (LEVELS[state.level] || LEVELS.new).hsk);

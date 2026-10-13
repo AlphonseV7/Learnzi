@@ -8,7 +8,7 @@ const LS_KEY = "learnzi.state.v1";
 const READER_KEY = "learnzi.reader.v1";
 const PROGRESS_KEY = "learnzi.progress.v1";
 const READER_MAX = 75000; // characters; keeps the synced reader document under the store's size limit
-const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug", "grammar", "gpoint"];
+const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug", "grammar", "gpoint", "journey", "scrolls", "scroll"];
 const DECK_ID = /^(starred|welcome|hsk[1-6]|nhsk[1-7]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
 // Your Chinese level from the welcome: which decks start, new words a day, word of the day, Reader sample.
@@ -198,6 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["14 Oct", "The Journey 旅程: 20 quests on an ink-wash map you climb with your avatar, 20 scrolls about Chinese and its culture, and chapter rewards (My Zì → Journey)"],
   ["13 Oct", "Water garden: repainted as an ink-wash picture that fills its frame, from bare rocks by day to a moonlit night"],
   ["13 Oct", "Tone trainer: a 3 lives round with lives in your theme's style and a knocked-out avatar at game over; every tone comes up equally; HSK 1–4 words; XP counts up like on flashcards"],
   ["13 Oct", "Ranks: show any rank you've reached as your title (Customise → Avatar → Ranks)"],
@@ -265,7 +266,7 @@ const UPDATES = [
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", toneRound: "ten", toneBest: {}, mle: null,
+  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", toneRound: "ten", toneBest: {}, journey: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 /** How My decks and My cards are shown and sorted (state.sorts): each key's allowed values, first is the default. */
@@ -410,6 +411,12 @@ function sanitize(raw) {
   s.toneSource = ["word", "syllables", "browser"].includes(o.toneSource) ? o.toneSource : "";
   // the tone trainer: 10 questions or 3 lives, and your best 3-lives score for each kind
   s.toneRound = o.toneRound === "lives" ? "lives" : "ten";
+  // the Journey (41-journey): quests done, where your avatar last stood, its own tallies, scrolls read
+  const jo = obj(o.journey), jd = {}, jcn = {}, jr = {};
+  for (const [k, v] of Object.entries(obj(jo.done)).slice(0, 40)) if (/^[a-z0-9]{2,12}$/.test(k) && Number.isFinite(v)) jd[k] = Math.floor(v);
+  for (const [k, v] of Object.entries(obj(jo.counts)).slice(0, 20)) if (/^[a-z]{2,12}$/.test(k)) { const n = Math.floor(num(v, 0, 1000, 0)); if (n) jcn[k] = n; }
+  for (const [k, v] of Object.entries(obj(jo.read)).slice(0, 40)) if (/^[0-9]{1,2}$/.test(k) && Number.isFinite(v)) jr[k] = Math.floor(v);
+  s.journey = { done: jd, seen: Math.floor(num(jo.seen, 0, 20, 0)), counts: jcn, read: jr };
   s.toneBest = {};
   for (const k of ["single", "pairs"]) { const n = Math.floor(num(obj(o.toneBest)[k], 0, 100000, 0)); if (n) s.toneBest[k] = n; }
   // Your voice: Automatic, or one you picked (Settings → Voice, or the voice button beside Listen).

@@ -67,7 +67,7 @@ function viewMe() {
  *  newest rank (state.title), until you pick another or go back to your newest. */
 function rankLadder(level) {
   const newest = rankFor(level).rank, shown = shownRank(level);
-  const use = s => { commit({ title: s }); render(false); toast(s ? "Your title is now " + RANKS.find(r => r.s === s).en + " " + s : "Your title follows your newest rank again"); };
+  const use = s => { commit({ title: s }); render(false); toast(s ? "Your title is now " + (RANKS.find(r => r.s === s) || TRAVELLER).en + " " + s : "Your title follows your newest rank again"); };
   const list = h("ol", { class: "rank-ladder" });
   for (const r of RANKS) {
     const got = level >= r.lv, secret = !got && !state.showLocked;
@@ -84,5 +84,8 @@ function rankLadder(level) {
     h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, the top rank takes about a year. Tap Use on any rank you've reached to show it as your title."),
     shown !== newest ? h("div", { class: "row spread rank-choice" }, h("span", { class: "muted small" }, "Showing " + shown.en + " instead of your newest rank, " + newest.en + "."),
       h("button", { class: "btn small", type: "button", onclick: () => use("") }, "Use my newest rank")) : null,
-    list);
+    list,
+    chapterDone(5) ? h("div", { class: "rank-special stack-tight" }, h("span", { class: "eyebrow" }, "Special title"),
+      h("div", { class: "row spread" }, h("span", null, h("b", { class: "hz" }, TRAVELLER.s), " " + Engine.toMarks(TRAVELLER.p) + " · " + TRAVELLER.en + ", for finishing the Journey"),
+        shown === TRAVELLER ? h("span", { class: "badge num" }, "Me") : h("button", { class: "btn small", type: "button", onclick: () => use(TRAVELLER.s) }, "Use"))) : null);
 }

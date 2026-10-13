@@ -23,7 +23,8 @@ const AV = {
   // level up, sleepy when left alone, wink when tapped, oops on a forgotten card).
   expr: { calm: { label: "Calm" }, happy: { label: "Happy" }, wink: { label: "Wink" }, sleepy: { label: "Sleepy" }, surprised: { label: "Surprised" }, oops: { label: "Oops" }, ko: { label: "Knocked out" } },
   eyes: { normal: { label: "Normal", lv: 1 }, glow: { label: "Glowing", lv: 5 }, star: { label: "Starry", streak: 7 } },
-  acc: { none: { label: "None", lv: 1 }, scarf: { label: "Red scarf", lv: 2 }, bamboo: { label: "Bamboo sprig", lv: 4 }, lantern: { label: "Lantern", lv: 6 }, phones: { label: "Headphones", lv: 8 }, crown: { label: "Crown", lv: 10 } },
+  acc: { none: { label: "None", lv: 1 }, scarf: { label: "Red scarf", lv: 2 }, bamboo: { label: "Bamboo sprig", lv: 4 }, lantern: { label: "Lantern", lv: 6 }, phones: { label: "Headphones", lv: 8 }, crown: { label: "Crown", lv: 10 },
+    brush: { label: "Scholar's brush", quest: 1 }, flute: { label: "Bamboo flute", quest: 2 }, hat: { label: "Scholar's hat", quest: 5 } },
   aura: { none: { label: "None", lv: 1 }, ring: { label: "Gold ring", lv: 7 }, petals: { label: "Falling petals", lv: 9 } },
   sparkles: { on: { label: "Sparkles", streak: 3 } },
   halo: { on: { label: "Halo", lv: 15 } },
@@ -50,9 +51,10 @@ function unlocked(item) {
   if (state.unlockAll) return true;      // Debug settings → Unlock everything
   if (item.lv) return levelNow().level >= item.lv;
   if (item.streak) return bestStreak() >= item.streak;
+  if (item.quest) return chapterDone(item.quest);      // Journey chapter rewards (41-journey)
   return true;
 }
-const lockText = item => (item.lv ? "Level " + item.lv : item.streak + "-day streak");
+const lockText = item => (item.lv ? "Level " + item.lv : item.quest ? "Journey chapter " + item.quest : item.streak + "-day streak");
 /** Locked items are a shadow with ??? for a name (and the level or streak that unlocks them),
  *  unless Debug settings → Show locked items is on. */
 const keepSecret = item => !state.showLocked && !unlocked(item);
@@ -377,6 +379,23 @@ function accessory(kind, animal) {
       sv("rect", { x: 11, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }), sv("rect", { x: 79, y: y - 7, width: 10, height: 16, rx: 4, fill: "#2d2f36" }),
       sv("rect", { x: 13.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }), sv("rect", { x: 81.5, y: y - 4, width: 5, height: 10, rx: 2, style: "fill: var(--accent)" }));
   }
+  if (kind === "brush") {   // Journey chapter 1: a calligraphy brush tucked behind the ear
+    return sv("g", { transform: "rotate(-24 12 50)" }, sv("rect", { x: 8, y: 26, width: 4.6, height: 30, rx: 1.6, fill: "#8a5a2b", stroke: "#4a2e14", "stroke-width": 0.8 }),
+      sv("rect", { x: 7.6, y: 30, width: 5.4, height: 2, fill: "#e9b949" }),
+      sv("path", { d: "M7.6 56 Q10.3 67 10.3 70 Q10.3 67 13 56 Z", fill: "#2b2a28" }), sv("path", { d: "M10.3 64 Q10.3 67 10.3 70", stroke: "#b8322a", "stroke-width": 1 }));
+  }
+  if (kind === "flute") {   // Journey chapter 2: a bamboo flute held across the chin
+    return sv("g", { transform: "rotate(-12 50 80)" }, sv("rect", { x: 20, y: 78, width: 60, height: 5.4, rx: 2.7, fill: "#c9a45c", stroke: "#7a5a22", "stroke-width": 0.9 }),
+      [30, 38, 46, 54, 62].map(x => sv("circle", { cx: x, cy: 80.7, r: 1.1, fill: "#4a3410" })),
+      sv("rect", { x: 70, y: 78, width: 2, height: 5.4, fill: "#b8322a" }), sv("path", { d: "M71 83 q2 6 -1 10", stroke: "#b8322a", "stroke-width": 1.2, fill: "none" }));
+  }
+  if (kind === "hat") {     // Journey chapter 5: a scholar's black gauze hat with its two wings
+    const y = { dragon: 16, rabbit: 26, crane: 26, phoenix: 30, fox: 30, qilin: 22, monkey: 18, koi: 22, whitetiger: 20, tortoise: 15, vermilion: 30, azure: 24, golddragon: 22 }[animal] || 20;
+    return sv("g", {}, sv("path", { d: "M34 " + (y + 4) + " Q34 " + (y - 10) + " 50 " + (y - 11) + " Q66 " + (y - 10) + " 66 " + (y + 4) + " Z", fill: "#1d1d22", stroke: "#000", "stroke-width": 1 }),
+      sv("rect", { x: 32, y: y + 2, width: 36, height: 4, rx: 1.5, fill: "#2b2b33" }),
+      sv("path", { d: "M33 " + (y - 1) + " L16 " + (y - 4) + " L16 " + (y + 1) + " L33 " + (y + 3) + " Z M67 " + (y - 1) + " L84 " + (y - 4) + " L84 " + (y + 1) + " L67 " + (y + 3) + " Z", fill: "#1d1d22" }),
+      sv("circle", { cx: 50, cy: y - 2, r: 1.6, fill: "#e9b949" }));
+  }
   if (kind === "crown") {
     const y = { dragon: 16, rabbit: 26, crane: 26, phoenix: 30, fox: 30, qilin: 22, monkey: 18, koi: 22, whitetiger: 20, tortoise: 15, vermilion: 30, azure: 24, golddragon: 22 }[animal] || 20;
     return sv("g", { class: "av-crown" }, sv("path", { d: "M38 " + y + " l3 -11 l5 6 l4 -9 l4 9 l5 -6 l3 11 Z", fill: "#f5c542", stroke: "#a87b12", "stroke-width": 1 }),
@@ -449,7 +468,7 @@ function avatarSvg(a, size, label) {
     a.expr === "ko" ? sv("g", { class: "av-dizzy" }, [0, 120, 240].map(r => sv("path", { transform: "rotate(" + r + " 50 18)",
       d: "M50 6 L51.2 9.6 L54.8 10.8 L51.2 12 L50 15.6 L48.8 12 L45.2 10.8 L48.8 9.6 Z", fill: "#f5c542", stroke: "#b8862a", "stroke-width": 0.5 }))) : null,
     a.expr === "oops" ? sv("path", { class: "av-sweat", d: "M79 30 q-4 6 0 8 q4 -2 0 -8 Z", fill: "#8cc7e8", stroke: "#4f95bd", "stroke-width": 0.8 }) : null,
-    ["scarf", "bamboo", "lantern", "phones", "crown"].filter(x => a.accs.includes(x)).map(x => accessory(x, a.animal)),
+    ["scarf", "bamboo", "lantern", "phones", "brush", "flute", "hat", "crown"].filter(x => a.accs.includes(x)).map(x => accessory(x, a.animal)),
     a.halo ? halo(a.animal) : null);
   const sparks = a.sparkles ? sv("g", {}, [[16, 22, 0], [84, 18, 0.7], [88, 70, 1.4], [12, 74, 2.1]].map(([x, y, d]) =>
     sv("path", { class: "av-sparkle", d: "M" + x + " " + (y - 5) + " L" + (x + 1.4) + " " + (y - 1.4) + " L" + (x + 5) + " " + y + " L" + (x + 1.4) + " " + (y + 1.4) + " L" + x + " " + (y + 5) + " L" + (x - 1.4) + " " + (y + 1.4) + " L" + (x - 5) + " " + y + " L" + (x - 1.4) + " " + (y - 1.4) + " Z", fill: "#f5c542", style: "animation-delay: " + d + "s" }))) : null;

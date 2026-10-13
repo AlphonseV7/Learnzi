@@ -9,6 +9,7 @@ const CLOCK = {
     pixel: { label: "Pixel LED", lv: 4 },
     flip: { label: "Flip", lv: 6 },
     neon: { label: "Neon", lv: 8 },
+    seal: { label: "Ink seal", quest: 3 },
   },
   fx: {
     none: { label: "None" },
@@ -94,6 +95,14 @@ const CLOCK_FACES = {
     } };
   },
   neon(c) { return CLOCK_FACES.analogue(c, true); },
+  seal(c) {   // Journey chapter 3: the time carved into a red seal, with 时 in the corner
+    const main = h("span", { class: "cl-seal-time num" }), sec = h("span", { class: "cl-seal-sec num" });
+    const el = h("div", { class: "cl-seal" }, h("span", { class: "cl-seal-zh hz", "aria-hidden": "true" }, "时"), main, sec);
+    return { el, update(d) {
+      main.textContent = (c.h24 ? pad2(d.getHours()) : String(d.getHours() % 12 || 12)) + ":" + pad2(d.getMinutes());
+      sec.textContent = c.secs ? pad2(d.getSeconds()) : "";
+    } };
+  },
   hanzi(c) {
     const part = h("span", { class: "cl-part" }), main = h("span", { class: "cl-zh" }), sec = h("span", { class: "muted small num" });
     const el = h("div", { class: "cl-hanzi" }, part, main, sec);

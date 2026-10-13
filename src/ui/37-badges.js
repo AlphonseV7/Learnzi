@@ -33,6 +33,7 @@ function earnBadge(id, quiet) {
   if (!b || hasBadge(id) || mleOn()) return false;
   commit({ badges: { ...state.badges, [id]: Date.now() } });
   if (!quiet) { stampQueue.push(b); if (!stamping) nextStamp(); }
+  if (!quiet) setTimeout(() => checkJourney(), 2600);   // a seal can finish a quest: say so after the stamp
   if (ui.view === "myzi") setTimeout(() => render(false), quiet ? 0 : 1900);
   return true;
 }
@@ -40,6 +41,7 @@ function earnBadge(id, quiet) {
 function checkBadges(quiet) {
   let n = 0;
   for (const b of BADGES) if (b.test && !hasBadge(b.id)) { try { if (b.test() && earnBadge(b.id, quiet)) n++; } catch { /* not ready yet */ } }
+  checkJourney(quiet);
   return n;
 }
 /** Studying now: the early bird (before 7) and night owl (midnight to 4, when the study day ends). */
@@ -65,6 +67,8 @@ function nextStamp() {
 function badgesOnStart() {
   const n = checkBadges(true);
   if (n) toast(n === 1 ? "You've earned a badge. See My Zì → My badges." : "You've earned " + n + " badges. See My Zì → My badges.");
+  const q = doneCount(), seen = jState().seen;
+  if (q > seen && !mleOn()) setTimeout(() => actionToast("Your journey: " + q + (q === 1 ? " quest" : " quests") + " done and " + q + (q === 1 ? " scroll" : " scrolls") + " found.", "See the map", () => go("journey")), n ? 3200 : 600);
 }
 
 /** My Zì: the seals, earned ones stamped in red, the rest as shadows. Tap one for its story. */

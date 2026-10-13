@@ -84,7 +84,7 @@ function writeSection(e0) {
   const btn = (label, fn, cls) => h("button", { class: "btn" + (cls ? " " + cls : ""), type: "button", onclick: fn }, label);
   let step = 0;
   const controls = h("div", { class: "row writer-controls" },
-    btn("Play", () => { fresh().animateCharacter({ onComplete: () => { status.textContent = ""; } }); status.textContent = "Watch the order of the strokes."; }, "primary"),
+    btn("Play", () => { jCount("strokes", ch); fresh().animateCharacter({ onComplete: () => { status.textContent = ""; } }); status.textContent = "Watch the order of the strokes."; }, "primary"),
     btn("Step", () => {
       if (!strokes) return;
       if (step === 0) fresh({ showCharacter: false });
@@ -133,6 +133,7 @@ function charactersSection(e0) {
     CharData.story(c.ch).then(s => {
       if (!s || !storyBox.isConnected) return;
       const [type, hint, semantic, phonetic, radical] = s;
+      if (hint || type) jCount("stories", c.ch);
       const part = (ch, role) => {
         const e = Engine.lookup(ch)[0];
         return h("button", { class: "chip part", type: "button", onclick: () => pushWord(ch) }, h("span", { class: "hz" }, ch),

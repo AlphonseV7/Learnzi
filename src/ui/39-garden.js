@@ -179,6 +179,9 @@ function gardenScene(stage, newStage) {
     sv("g", { transform: "translate(" + x + " " + y + ")" }, P("M0 0 q-5 -6 -7 -1 q2 3 7 1 Z", { fill: night ? "#9aa6c4" : C.ink, opacity: 0.8, class: "g-wing" }),
       P("M0 0 q5 -6 7 -1 q-2 3 -7 1 Z", { fill: night ? "#9aa6c4" : C.ink, opacity: 0.8, class: "g-wing r" }))))));
   if (stage >= 15) o.push(g(15, [sv("g", { filter: "url(#" + k + "brush)" }, P("M54 146 Q92 118 130 146 L126 148 Q92 126 58 148 Z", { fill: C.bridge }))]));
+  if (stage >= 15 && typeof chapterDone === "function" && chapterDone(4)) o.push(sv("g", { class: "g-reward" },   // Journey chapter 4
+    P("M92 126 V132", { stroke: "#2b2a28", "stroke-width": 0.6 }), sv("circle", { cx: 92, cy: 136, r: 6, fill: "#ff6a3c", opacity: 0.35, filter: "url(#" + k + "glow)", class: "g-glow" }),
+    sv("ellipse", { cx: 92, cy: 136, rx: 2.4, ry: 3, fill: "#e0452b" })));
   if (stage >= 16) o.push(g(16, [sv("g", { transform: "translate(250 108)", filter: "url(#" + k + "brush)" },
     sv("rect", { x: -16, y: -4, width: 2.6, height: 20, fill: C.ink }), sv("rect", { x: 13.4, y: -4, width: 2.6, height: 20, fill: C.ink }),
     P("M-26 -3 Q-14 -6 0 -18 Q14 -6 26 -3 Q14 -6 0 -10 Q-14 -6 -26 -3 Z", { fill: C.ink }), sv("rect", { x: -18, y: 15, width: 36, height: 3, fill: C.ink }))]));

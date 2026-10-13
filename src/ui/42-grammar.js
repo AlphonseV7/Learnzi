@@ -179,6 +179,7 @@ function viewGrammarPoint() {
     return v;
   }
   if (!p) { setTimeout(() => go("grammar"), 0); return v; }
+  setTimeout(() => jCount("grammar", p.id), 0);
   const body = h("div", { class: "card stack g-article" });
   v.append(h("div", { class: "card stack-tight g-meta" },
       h("div", { class: "row" }, levelChip(p.level), h("span", { class: "muted small" }, GLEVEL_NOTE[p.level]), p.hsk ? h("span", { class: "badge hsk" }, "HSK " + p.hsk) : null, p.cmp ? h("span", { class: "badge" }, "Comparison") : null),

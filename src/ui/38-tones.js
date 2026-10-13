@@ -109,6 +109,8 @@ function answerDrill(k) {
 }
 function nextDrill() {
   drill.i++; drill.picked = null; drill.lost = false;
+  const finished = drill.round === "lives" ? !drill.lives : drill.i >= drill.qs.length;
+  if (finished && drill.mode === "pairs") jCount("pairs");
   if (drill.round === "lives") {
     if (!drill.lives) {
       drill.over = true;

@@ -45,6 +45,7 @@ function grade(g) {
   if (!old) a[2]++;
   if (g === 1) a[3]++;
   commitProgress();
+  if (!state.pinyin) jCount("nopinyin");
   const gained = SRS.XP_FOR[g];
   study.xp += gained;
   study.done++;
