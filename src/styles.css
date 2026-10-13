@@ -3,20 +3,20 @@
 @font-face { font-family: "Cubic 11"; src: url("fonts/cubic11.woff2") format("woff2"); font-display: swap; }
 /* Layout: icon rail (desktop) or bottom tab bar (phone) | main view | word panel (wide screens) or bottom sheet (phones). */
 :root {
-  --bg: #f6f7f4;
-  --surface: #ffffff;
-  --surface-2: #eceee8;
-  --ink: #1c211e;
-  --ink-soft: #5d655f;
-  --line: #d9ddd5;
-  --accent: #c2362b;
+  --bg: #ecebe5;
+  --surface: #f6f4ee;
+  --surface-2: #e3e2da;
+  --ink: #121714;
+  --ink-soft: #565e58;
+  --line: #d6d4cb;
+  --accent: #ba2d23;
   --accent-ink: #ffffff;
   --accent-soft: #f6e1dd;
-  --t1: #cf2f26;
-  --t2: #d97b0f;
-  --t3: #24894a;
-  --t4: #2a62c9;
-  --t5: #848a85;
+  --t1: #c6251e;
+  --t2: #cf7200;
+  --t3: #198243;
+  --t4: #235bc1;
+  --t5: #7c827d;
   --shadow: 0 1px 2px rgb(20 30 25 / 0.06), 0 8px 24px rgb(20 30 25 / 0.08);
   --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
   --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -45,16 +45,16 @@
 }
 /* Preset themes chosen inside the app override the viewer's light/dark setting. */
 :root[data-preset="jade"] {
-  --bg: #eef4f1; --surface: #fbfdfc; --surface-2: #dfe9e4; --ink: #15241f; --ink-soft: #4f635b;
-  --line: #c9d8d1; --accent: #23735f; --accent-ink: #ffffff; --accent-soft: #d3e8e0;
-  --t1: #c8352b; --t2: #c97a12; --t3: #1f8a4c; --t4: #2a5fc0; --t5: #7d8a84;
+  --bg: #e4ece8; --surface: #f0f6f3; --surface-2: #d3e0da; --ink: #0f1d19; --ink-soft: #4b5e57;
+  --line: #c1d0c9; --accent: #1d6e5b; --accent-ink: #ffffff; --accent-soft: #d3e8e0;
+  --t1: #c22f26; --t2: #c27400; --t3: #148446; --t4: #255abb; --t5: #77847e;
   --shadow: 0 1px 2px rgb(20 50 40 / .06), 0 8px 24px rgb(20 50 40 / .08);
   color-scheme: light;
 }
 :root[data-preset="porcelain"] {
-  --bg: #f4f6fb; --surface: #ffffff; --surface-2: #e4e9f5; --ink: #141b2e; --ink-soft: #536079;
-  --line: #d3dae9; --accent: #1f45a8; --accent-ink: #ffffff; --accent-soft: #dce4f7;
-  --t1: #c9302c; --t2: #d27a12; --t3: #23874a; --t4: #1f45a8; --t5: #7f8798;
+  --bg: #e8ecf4; --surface: #f5f7fb; --surface-2: #dde3ef; --ink: #0c1325; --ink-soft: #4f5b74;
+  --line: #cdd4e3; --accent: #1a3fa1; --accent-ink: #ffffff; --accent-soft: #dce4f7;
+  --t1: #c32927; --t2: #cb7400; --t3: #1a8144; --t4: #1a3fa1; --t5: #798192;
   --shadow: 0 1px 2px rgb(20 30 60 / .06), 0 8px 24px rgb(20 30 60 / .08);
   color-scheme: light;
 }
@@ -73,9 +73,9 @@
   color-scheme: dark;
 }
 :root[data-preset="ink"] {
-  --bg: #f6f7f4; --surface: #ffffff; --surface-2: #eceee8; --ink: #1c211e; --ink-soft: #5d655f;
-  --line: #d9ddd5; --accent: #c2362b; --accent-ink: #ffffff; --accent-soft: #f6e1dd;
-  --t1: #cf2f26; --t2: #d97b0f; --t3: #24894a; --t4: #2a62c9; --t5: #848a85;
+  --bg: #ecebe5; --surface: #f6f4ee; --surface-2: #e3e2da; --ink: #121714; --ink-soft: #565e58;
+  --line: #d6d4cb; --accent: #ba2d23; --accent-ink: #ffffff; --accent-soft: #f6e1dd;
+  --t1: #c6251e; --t2: #cf7200; --t3: #198243; --t4: #235bc1; --t5: #7c827d;
   --shadow: 0 1px 2px rgb(20 30 25 / 0.06), 0 8px 24px rgb(20 30 25 / 0.08);
   color-scheme: light;
 }
@@ -816,9 +816,9 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 
 /* ---------- bonus themes (unlocked by level) ---------- */
 :root[data-preset="peach"] {
-  --bg: #fbf1f1; --surface: #fffafa; --surface-2: #f6e3e5; --ink: #2e1d22; --ink-soft: #7a5a62;
-  --line: #ecd3d8; --accent: #c2456b; --accent-ink: #ffffff; --accent-soft: #f7dbe3;
-  --t1: #cc3a32; --t2: #c87a12; --t3: #5f8a26; --t4: #3f6fb5; --t5: #8f8287;
+  --bg: #f2e6e5; --surface: #faf1f0; --surface-2: #eddcdd; --ink: #27161b; --ink-soft: #74545c;
+  --line: #e2cbcf; --accent: #bb3f65; --accent-ink: #ffffff; --accent-soft: #f7dbe3;
+  --t1: #c5332c; --t2: #c17400; --t3: #59841e; --t4: #3969af; --t5: #897c81;
   --shadow: 0 1px 2px rgb(80 30 40 / .06), 0 8px 24px rgb(80 30 40 / .08);
   color-scheme: light;
 }
@@ -927,6 +927,10 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 .rank-ladder .got .rank-zh { color: var(--accent); }
 .rank-ladder .ahead { opacity: .55; }
 .rank-ladder .now .rank-row { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.rank-ladder li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.rank-ladder .rank-use { margin-right: 4px; }
+.rank-ladder li.got:not(.now) .rank-row { grid-template-columns: 3.6rem minmax(0, 1fr); }
+.rank-choice { gap: 8px; align-items: center; }
 .rank-text { min-width: 0; }
 .lu-me { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; }
 .lu-me p { margin: 0; }

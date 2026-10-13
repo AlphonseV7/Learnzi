@@ -1,5 +1,5 @@
 /* LearnZì UI, part 9: hidden Debug settings (double-tap the cog while on Settings).
- * Updates, XP and level tools, a pretend clock for flashcard testing, and a glitch effect. */
+ * Updates, XP and level tools and a pretend clock for flashcard testing. (The glitch box is in Settings.) */
 
 function shiftText(ms) {
   const h = Math.round(ms / 3600e3);
@@ -108,10 +108,6 @@ function viewDebug() {
       h("span", { class: "muted small" }, "Every animal, eye, accessory, aura, extra, bonus theme, clock face and clock effect, whatever your level or streak. Turn it off to go back; your XP isn't changed.")),
       h("span", { class: "toggle" }, unlockSw, h("span")))));
 
-  // Glitch
-  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Glitch"),
-    h("p", { class: "muted small" }, "Breaks the screen, then goes completely black. Tap the black screen 5 times or press Escape to come back."),
-    h("div", { class: "row" }, glitchButton())));
   return v;
 }
 function debugXp(n) {

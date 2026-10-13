@@ -28,45 +28,45 @@
 
 /* themes made dark, by day */
 :root[data-preset="lantern"][data-mode="light"] {
-  --bg: #fbf3e7; --surface: #fffaf2; --surface-2: #f3e4cf; --ink: #2b1a12; --ink-soft: #765a48;
-  --line: #e6d0b5; --accent: #a85a12; --accent-ink: #ffffff; --accent-soft: #f5dfc0;
-  --t1: #c8352b; --t2: #b86a0a; --t3: #2f8a3e; --t4: #2f5fc4; --t5: #8a7d74;
+  --bg: #f2e8d9; --surface: #fdf3e3; --surface-2: #edd9be; --ink: #25140d; --ink-soft: #715644;
+  --line: #dec8ad; --accent: #a35508; --accent-ink: #ffffff; --accent-soft: #f5dfc0;
+  --t1: #c22f26; --t2: #b36500; --t3: #298539; --t4: #2b5abf; --t5: #85786f;
   --shadow: 0 1px 2px rgb(80 40 10 / .06), 0 8px 24px rgb(80 40 10 / .1);
   color-scheme: light;
 }
 :root[data-preset="nightmarket"][data-mode="light"] {
-  --bg: #f6f4fb; --surface: #ffffff; --surface-2: #ebe7f5; --ink: #1b1930; --ink-soft: #5a5676;
-  --line: #d9d3ea; --accent: #d3205f; --accent-ink: #ffffff; --accent-soft: #fbd8e5;
-  --t1: #d22f2b; --t2: #c27410; --t3: #1d8a4f; --t4: #2a5fc8; --t5: #807d94;
+  --bg: #eae8f1; --surface: #f5f3f9; --surface-2: #e2dcee; --ink: #100e24; --ink-soft: #534f6f;
+  --line: #d1cbe2; --accent: #ca1158; --accent-ink: #ffffff; --accent-soft: #fbd8e5;
+  --t1: #c92423; --t2: #b96b00; --t3: #0f8348; --t4: #2358c0; --t5: #79768d;
   --shadow: 0 1px 2px rgb(30 20 60 / .06), 0 8px 24px rgb(30 20 60 / .08);
   color-scheme: light;
 }
 :root[data-preset="imperial"][data-mode="light"] {
-  --bg: #f8f0e0; --surface: #fffaef; --surface-2: #f0e2c6; --ink: #2a160e; --ink-soft: #785840;
-  --line: #e0cca4; --accent: #946512; --accent-ink: #ffffff; --accent-soft: #f1deb3;
-  --t1: #c0392b; --t2: #b8700c; --t3: #2f7d3a; --t4: #2f5bb8; --t5: #8c7c6c;
+  --bg: #f3e8d4; --surface: #fef3de; --surface-2: #ead8b3; --ink: #241009; --ink-soft: #73543c;
+  --line: #d8c49c; --accent: #90610b; --accent-ink: #ffffff; --accent-soft: #f1deb3;
+  --t1: #ba3326; --t2: #b36b00; --t3: #2b7937; --t4: #2c57b4; --t5: #877767;
   --shadow: 0 1px 2px rgb(80 40 10 / .06), 0 8px 24px rgb(80 40 10 / .1);
   color-scheme: light;
 }
 :root[data-preset="arcade"][data-mode="light"] {
-  --bg: #eceeff; --surface: #ffffff; --surface-2: #dde0ff; --ink: #10103a; --ink-soft: #4a4c88;
-  --line: #4040b8; --accent: #c8155f; --accent-ink: #ffffff; --accent-soft: #fbd6e5;
-  --t1: #d81b3c; --t2: #c26a00; --t3: #12894a; --t4: #1d6fd0; --t5: #7c7ea8;
+  --bg: #e5e8fe; --surface: #f2f3ff; --surface-2: #d2d5fd; --ink: #060229; --ink-soft: #444581;
+  --line: #3a38b0; --accent: #bf0058; --accent-ink: #ffffff; --accent-soft: #fbd6e5;
+  --t1: #cf0635; --t2: #b96100; --t3: #008042; --t4: #1268c8; --t5: #7577a0;
   --shadow: none;
   color-scheme: light;
 }
 :root[data-preset="cyber"][data-mode="light"] {
-  --bg: #edf2f6; --surface: #fbfdff; --surface-2: #dfe8ef; --ink: #07131e; --ink-soft: #465e70;
-  --line: #b6cad8; --accent: #007f9e; --accent-ink: #ffffff; --accent-soft: #cfeaf2; --accent-2: #c0168f;
-  --t1: #d0193a; --t2: #b07000; --t3: #0d8446; --t4: #1e5fc4; --t5: #6c7a88;
+  --bg: #e4eaf0; --surface: #f0f5fa; --surface-2: #d3dfe8; --ink: #010711; --ink-soft: #41586a;
+  --line: #aec2d0; --accent: #007998; --accent-ink: #ffffff; --accent-soft: #cfeaf2; --accent-2: #c0168f;
+  --t1: #c90834; --t2: #aa6a00; --t3: #007e40; --t4: #1759bd; --t5: #667482;
   --shadow: none;
   color-scheme: light;
 }
 /* MLE mode by day: pale concrete, the same hazard-yellow buttons */
 :root[data-preset="ends"][data-mode="light"] {
-  --bg: #e4e3df; --surface: #fbfaf6; --surface-2: #ecebe6; --ink: #111216; --ink-soft: #50535c;
-  --line: #b9bac0; --accent: #8f6c00; --accent-ink: #ffffff; --accent-soft: #fff1b0; --hazard: #ffd21f;
-  --t1: #d42c2c; --t2: #b86e00; --t3: #148a4a; --t4: #1c6fc4; --t5: #6f747e;
+  --bg: #e4e3de; --surface: #f6f4ee; --surface-2: #e2e1db; --ink: #090a0e; --ink-soft: #4c4f58;
+  --line: #b1b2b8; --accent: #8b6800; --accent-ink: #ffffff; --accent-soft: #fff1b0; --hazard: #ffd21f;
+  --t1: #ce2527; --t2: #b46a00; --t3: #0b8647; --t4: #176bc0; --t5: #6a6f79;
   --spray: #d0207f; --spray2: #0a6fae;
   --shadow: 4px 4px 0 #000;
   --e-sky: #fff3c4; --e-block: #b7bac2; --e-wall: #c9cacf; --e-mortar: #b2b4ba; --e-win: .3; --e-lamp: #6f737c; --e-glow: 0;
@@ -131,9 +131,9 @@
 
 /* Silver River by day: dawn sky, pale lavender with the last stars fading */
 :root[data-preset="silver"][data-mode="light"] {
-  --bg: #f3f0fb; --surface: #fdfcff; --surface-2: #ebe6f8; --ink: #1d1a3a; --ink-soft: #5d5880;
-  --line: #dcd5f0; --accent: #5b46c9; --accent-ink: #ffffff; --accent-soft: #e4ddfa; --aurora: #0b7894;
-  --t1: #c8323f; --t2: #a85d06; --t3: #1a7a48; --t4: #2560c4; --t5: #6c6886;
+  --bg: #ebe7f5; --surface: #f6f2fe; --surface-2: #e2dbf2; --ink: #161232; --ink-soft: #57527a;
+  --line: #d4cde8; --accent: #563fc2; --accent-ink: #ffffff; --accent-soft: #e4ddfa; --aurora: #0b7894;
+  --t1: #c12a39; --t2: #a25700; --t3: #0f7442; --t4: #1f5abd; --t5: #666280;
   --shadow: 0 1px 2px rgb(40 20 90 / .06), 0 8px 24px rgb(40 20 90 / .08);
   color-scheme: light;
 }

@@ -138,16 +138,16 @@ const fetchPackedJSON = path => fetchPackedText(path).then(t => JSON.parse(t));
 // ---------- settings data ----------
 // mode: the theme's own look ("auto" = follows the device). alt: the colour dots of its other mode.
 const PRESETS = {
-  ink: { label: "Ink", note: "Brush and paper", mode: "auto", dots: ["#f6f7f4", "#c2362b", "#24894a", "#2a62c9"], alt: ["#121513", "#ef5a4c", "#4cc477", "#6b9bff"] },
-  jade: { label: "Jade", note: "Polished stone", mode: "light", dots: ["#eef4f1", "#23735f", "#c8352b", "#2a5fc0"], alt: ["#0d1613", "#5cc4a4", "#ff6b5f", "#6b9bff"] },
-  porcelain: { label: "Porcelain", note: "Blue and white", mode: "light", dots: ["#f4f6fb", "#1f45a8", "#c9302c", "#23874a"], alt: ["#0c111f", "#86a3ff", "#ff6f66", "#52c983"] },
-  lantern: { label: "Lantern", note: "Warm glow", mode: "dark", dots: ["#1d1312", "#e9a945", "#ff7a66", "#82a8ff"], alt: ["#fbf3e7", "#a85a12", "#c8352b", "#2f5fc4"] },
-  nightmarket: { label: "Night Market", note: "Neon signs", mode: "dark", dots: ["#0f1220", "#ff5c8a", "#5fe0a0", "#6fb2ff"], alt: ["#f6f4fb", "#d3205f", "#1d8a4f", "#2a5fc8"] },
-  peach: { label: "Peach Blossom", note: "Blossom and petals", mode: "light", dots: ["#fbf1f1", "#c2456b", "#7a9a3a", "#3f6fb5"], alt: ["#1b1115", "#ff8db0", "#9ccc5a", "#7ea8ff"] },
-  imperial: { label: "Imperial", note: "Gold and lacquer", mode: "dark", dots: ["#1a0f0d", "#d9a93f", "#e05a4a", "#7fb0ff"], alt: ["#f8f0e0", "#946512", "#c0392b", "#2f5bb8"] },
-  arcade: { label: "Retro Arcade", note: "Pixels", mode: "dark", dots: ["#07071a", "#ffd23f", "#ff4f64", "#3ef07a"], alt: ["#eceeff", "#c8155f", "#4040b8", "#12894a"] },
-  cyber: { label: "Cyberedge", note: "Neon polygons", mode: "dark", dots: ["#05070d", "#00f0ff", "#ff2bd6", "#ffb000"], alt: ["#edf2f6", "#007f9e", "#c0168f", "#b07000"] },
-  silver: { label: "Silver River", note: "银河, the Milky Way", mode: "dark", dots: ["#090a1c", "#a18cff", "#5fe6ff", "#ff8fc7"], alt: ["#f3f0fb", "#5b46c9", "#0f8aa8", "#c2387f"] },
+  ink: { label: "Ink", note: "Brush and paper", mode: "auto", dots: ["#ecebe5", "#c2362b", "#24894a", "#2a62c9"], alt: ["#121513", "#ef5a4c", "#4cc477", "#6b9bff"] },
+  jade: { label: "Jade", note: "Polished stone", mode: "light", dots: ["#e4ece8", "#23735f", "#c8352b", "#2a5fc0"], alt: ["#0d1613", "#5cc4a4", "#ff6b5f", "#6b9bff"] },
+  porcelain: { label: "Porcelain", note: "Blue and white", mode: "light", dots: ["#e8ecf4", "#1f45a8", "#c9302c", "#23874a"], alt: ["#0c111f", "#86a3ff", "#ff6f66", "#52c983"] },
+  lantern: { label: "Lantern", note: "Warm glow", mode: "dark", dots: ["#1d1312", "#e9a945", "#ff7a66", "#82a8ff"], alt: ["#f2e8d9", "#a85a12", "#c8352b", "#2f5fc4"] },
+  nightmarket: { label: "Night Market", note: "Neon signs", mode: "dark", dots: ["#0f1220", "#ff5c8a", "#5fe0a0", "#6fb2ff"], alt: ["#eae8f1", "#d3205f", "#1d8a4f", "#2a5fc8"] },
+  peach: { label: "Peach Blossom", note: "Blossom and petals", mode: "light", dots: ["#f2e6e5", "#c2456b", "#7a9a3a", "#3f6fb5"], alt: ["#1b1115", "#ff8db0", "#9ccc5a", "#7ea8ff"] },
+  imperial: { label: "Imperial", note: "Gold and lacquer", mode: "dark", dots: ["#1a0f0d", "#d9a93f", "#e05a4a", "#7fb0ff"], alt: ["#f3e8d4", "#946512", "#c0392b", "#2f5bb8"] },
+  arcade: { label: "Retro Arcade", note: "Pixels", mode: "dark", dots: ["#07071a", "#ffd23f", "#ff4f64", "#3ef07a"], alt: ["#e5e8fe", "#c8155f", "#4040b8", "#12894a"] },
+  cyber: { label: "Cyberedge", note: "Neon polygons", mode: "dark", dots: ["#05070d", "#00f0ff", "#ff2bd6", "#ffb000"], alt: ["#e4eaf0", "#007f9e", "#c0168f", "#b07000"] },
+  silver: { label: "Silver River", note: "银河, the Milky Way", mode: "dark", dots: ["#090a1c", "#a18cff", "#5fe6ff", "#ff8fc7"], alt: ["#ebe7f5", "#5b46c9", "#0f8aa8", "#c2387f"] },
   custom: { label: "Custom", note: "Your own colours", mode: "own", dots: [] },
 };
 const MODES = [["theme", "Theme's own"], ["light", "Light"], ["dark", "Dark"], ["auto", "Match device"]];
@@ -188,7 +188,7 @@ const TONE_PALETTES = {
 };
 // English fonts (all other text: menus, buttons, headings, meanings).
 const UIFONTS = {
-  standard: { label: "Figtree + Bricolage (standard)", css: null,
+  standard: { label: "Theme's own", css: null,
     body: '"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif', display: '"Bricolage Grotesque", "Figtree", system-ui, sans-serif' },
   nunito: { label: "Nunito (rounded)", css: "Nunito:wght@400;600;700;800", body: '"Nunito", system-ui, sans-serif' },
   lexend: { label: "Lexend (easy reading)", css: "Lexend:wght@400;600;700", body: '"Lexend", system-ui, sans-serif' },
@@ -198,6 +198,9 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Ranks: show any rank you've reached as your title (Customise → Avatar → Ranks)"],
+  ["13 Oct", "Light looks are softer on the eyes in every theme, with text kept as easy to read; new setups match the device's light or dark"],
+  ["13 Oct", "Accent colour: a note that it stays when you change theme; English font: Theme's own; the Glitch box is now in Settings"],
   ["13 Oct", "Top bar: the XP capsule keeps one size; tap your avatar or name for Customise, your level for My Zì"],
   ["13 Oct", "Review: tap the character on a card to hear it again"],
   ["13 Oct", "My decks: a Progress box (words learned, the week ahead) and Show and sort; My cards: sorting, and each word in its own box"],
@@ -260,7 +263,7 @@ const UPDATES = [
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, mle: null,
+  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 /** How My decks and My cards are shown and sorted (state.sorts): each key's allowed values, first is the default. */
@@ -373,7 +376,8 @@ function sanitize(raw) {
   // Avatar drawn in the theme's own look (pixel, neon, ink sketch) or always the standard one.
   s.avMatch = o.avMatch !== false;
   s.zen = o.zen !== false;
-  s.mode = MODES.some(m => m[0] === o.mode) ? o.mode : "theme";
+  // new setups match the device; a saved choice (including "Theme's own") is kept
+  s.mode = MODES.some(m => m[0] === o.mode) ? o.mode : "auto";
   s.subSize = ["s", "m", "l", "xl"].includes(o.subSize) ? o.subSize : "m";
   s.shapes = o.shapes !== false;
   s.writing = o.writing === true;
@@ -385,6 +389,8 @@ function sanitize(raw) {
   s.voice = o.voice === "browser" ? "browser" : "real";
   s.unlockAll = o.unlockAll === true;
   s.showLocked = o.showLocked === true;
+  // the rank title you chose to show ("" = always your newest); checked against your level when shown
+  s.title = typeof o.title === "string" && /^[\u4e00-\u9fff]{2}$/.test(o.title) ? o.title : "";
   // First-time welcome and tour: done for anyone who used LearnZì before they existed.
   s.onboarded = o.onboarded === true || (o.onboarded === undefined && num(o.updatedAt, 0, 1e15, 0) > 0);
   s.toured = o.toured === true || (o.toured === undefined && s.onboarded);

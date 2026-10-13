@@ -1,4 +1,4 @@
-/* LearnZì UI, part 9b: an Easter egg. Hold Debug → "Glitch out" for 7 seconds: the screen goes black and
+/* LearnZì UI, part 9b: an Easter egg. Hold Settings → Glitch → "Glitch out" for 7 seconds: the screen goes black and
  * a code-rain lock appears with three sigils. Each tap turns a sigil 45°. Turn them the right way
  * (the faint 三 · 六 · 一 is the clue: 3, 6 and 1 turns) and the app glitches, goes offline, reboots
  * and opens Special mode. Special mode itself comes later; for now it says so. */

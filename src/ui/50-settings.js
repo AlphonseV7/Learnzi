@@ -70,7 +70,7 @@ function viewSettings() {
     row("font", "Chinese font", select("font", FONTS, state.font, k => { commit({ font: k }); applyLook(); }),
       h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
     row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),
-      "Menus, buttons, headings and meanings"),
+      "Menus, buttons, headings and meanings. Theme's own: each theme's lettering, like the pixel letters of Retro Arcade; any other font replaces it in every theme."),
     row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut))));
 
   // Study
@@ -109,8 +109,12 @@ function viewSettings() {
     h("div", { class: "row" }, withVoice(h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"), { text: "你好，我在学习汉语。" }),
       h("span", { class: "muted small", id: "voice-note" }, voiceNote()))));
 
-  // Box layout, then Reset: replay the tour and the factory reset (51-reset)
+  // Box layout, Glitch, then Reset: replay the tour and the factory reset (51-reset)
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Box layout"), boxLayoutRow()));
+  // Glitch (moved from Debug): a tap breaks the screen; holding the button still opens the secret (61-secret)
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Glitch"),
+    h("p", { class: "muted small" }, "Breaks the screen, then goes completely black. Tap the black screen 5 times or press Escape to come back."),
+    h("div", { class: "row" }, glitchButton())));
   v.append(resetBox());
 
   // About

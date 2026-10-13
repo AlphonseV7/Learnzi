@@ -63,19 +63,26 @@ function viewMe() {
   return v;
 }
 /** Every rank. The ones you haven't reached are a shadow with ??? and their level (Debug → Show locked
- *  items reveals them). Tap a reached one to open the word. */
+ *  items reveals them). Tap a reached one to open the word; Use shows it as your title instead of your
+ *  newest rank (state.title), until you pick another or go back to your newest. */
 function rankLadder(level) {
-  const cur = rankFor(level).rank;
+  const newest = rankFor(level).rank, shown = shownRank(level);
+  const use = s => { commit({ title: s }); render(false); toast(s ? "Your title is now " + RANKS.find(r => r.s === s).en + " " + s : "Your title follows your newest rank again"); };
   const list = h("ol", { class: "rank-ladder" });
   for (const r of RANKS) {
     const got = level >= r.lv, secret = !got && !state.showLocked;
-    list.append(h("li", { class: (got ? "got" : "ahead") + (r === cur ? " now" : "") + (secret ? " is-secret" : "") },
+    list.append(h("li", { class: (got ? "got" : "ahead") + (r === shown ? " now" : "") + (secret ? " is-secret" : "") },
       h("button", { class: "plain-btn rank-row", type: "button", disabled: secret, onclick: () => openWord(r.s),
-        "aria-label": secret ? "Locked rank, unlocks at level " + r.lv : r.en + ", " + r.s + ", level " + r.lv + (r === cur ? ", my rank" : got ? ", reached" : "") },
+        "aria-label": secret ? "Locked rank, unlocks at level " + r.lv : r.en + ", " + r.s + ", level " + r.lv + (r === shown ? ", my title" : got ? ", reached" : "") },
         h("span", { class: "hz rank-zh" }, secret ? "??" : r.s),
-        h("span", { class: "stack-tight rank-text" }, h("b", null, secret ? "???" : r.en), secret ? null : h("span", { class: "muted small" }, Engine.toMarks(r.p) + " · " + r.note)),
-        h("span", { class: "badge num" }, r === cur ? "Me" : "Lv " + r.lv))));
+        h("span", { class: "stack-tight rank-text" }, h("b", null, secret ? "???" : r.en),
+          secret ? null : h("span", { class: "muted small" }, (got && r !== shown ? "Lv " + r.lv + " · " : "") + Engine.toMarks(r.p) + " · " + r.note)),
+        got && r !== shown ? null : h("span", { class: "badge num" }, r === shown ? "Me" : "Lv " + r.lv)),
+      got && r !== shown ? h("button", { class: "btn small rank-use", type: "button", "aria-label": "Use " + r.en + " as my title", onclick: () => use(r === newest ? "" : r.s) }, "Use") : null));
   }
   return h("div", { class: "card stack" }, h("h2", { class: "h-card" }, "Ranks ", h("span", { class: "hz" }, "科举")),
-    h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, the top rank takes about a year."), list);
+    h("p", { class: "muted small" }, "Climb the exams that scholars sat for over a thousand years. With daily study, the top rank takes about a year. Tap Use on any rank you've reached to show it as your title."),
+    shown !== newest ? h("div", { class: "row spread rank-choice" }, h("span", { class: "muted small" }, "Showing " + shown.en + " instead of your newest rank, " + newest.en + "."),
+      h("button", { class: "btn small", type: "button", onclick: () => use("") }, "Use my newest rank")) : null,
+    list);
 }

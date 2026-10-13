@@ -22,13 +22,14 @@ function themeEditor(v) {
   const color = h("input", { type: "color", id: "accent", "aria-label": "Accent colour" });
   color.value = state.accent || (getComputedStyle(document.documentElement).getPropertyValue("--accent").trim().match(/^#[0-9a-f]{6}$/i) || ["#c2362b"])[0];
   color.addEventListener("input", () => { state.accent = color.value.toLowerCase(); applyLook(); });
-  color.addEventListener("change", () => commit({ accent: color.value.toLowerCase() }));
+  color.addEventListener("change", () => { commit({ accent: color.value.toLowerCase() }); render(false); });
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Theme"), sw,
     setRow("mode", "Light or dark", setSeg("mode", MODES, state.mode, k => { commit({ mode: k }); applyLook(); render(false); }),
       state.preset === "custom" ? "Custom uses the colours you pick, so this doesn't change it" : "Every theme has a light and a dark look. Theme's own uses the one it was made with."),
     state.preset === "custom" && state.custom ? customEditor() : null,
     state.preset === "custom" ? null : setRow("accent", "Accent colour", h("div", { class: "row" }, color,
-      h("button", { class: "btn", type: "button", onclick: () => { commit({ accent: "" }); applyLook(); render(false); } }, "Reset")))));
+      h("button", { class: "btn", type: "button", onclick: () => { commit({ accent: "" }); applyLook(); render(false); } }, "Reset")),
+      state.accent ? "Your colour stays when you change theme. Reset to use each theme's own." : "Each theme brings its own. Pick a colour and it stays when you change theme.")));
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Theme extras"),
     setRow("zen", "Background scene", setToggle("zen", state.zen, on => { commit({ zen: on }); applyLook(); }), "A faint scene behind the app that matches the theme"),
     setRow("shapes", "Theme shapes", setToggle("shapes", state.shapes, on => { commit({ shapes: on }); applyLook(); refreshAvatars(); }), "Hand-drawn, soft, cut-corner, neon, pixel or polygon edges, plus theme fonts, depending on the theme"),

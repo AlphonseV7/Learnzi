@@ -40,9 +40,14 @@ function rankFor(level) {
   while (i + 1 < RANKS.length && RANKS[i + 1].lv <= level) i++;
   return { rank: RANKS[i], next: RANKS[i + 1] || null };
 }
+/** The rank title you show: the one you chose in Customise → Ranks (if you've reached it), else your newest. */
+function shownRank(level) {
+  const chosen = state.title && RANKS.find(r => r.s === state.title && r.lv <= level);
+  return chosen || rankFor(level).rank;
+}
 /** A tappable line: 秀才 xiùcai · County graduate. Tapping opens the word. */
 function rankChip(level, cls) {
-  const { rank } = rankFor(level);
+  const rank = shownRank(level);
   return h("button", { class: "rank-chip plain-btn" + (cls ? " " + cls : ""), type: "button", title: rank.note + ". Tap to open the word.",
     "aria-label": "Rank: " + rank.en + ", " + rank.s + ". Open the word", onclick: ev => { ev.stopPropagation(); openWord(rank.s); } },
     h("span", { class: "hz rank-zh" }, rank.s), h("span", { class: "rank-py" }, Engine.toMarks(rank.p)), h("span", { class: "rank-en" }, rank.en));
