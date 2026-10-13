@@ -1,6 +1,6 @@
 /* LearnZì UI, part 3: how words are drawn, My Zì saving, and the word panel. */
 
-const ui = { view: "home", query: "", stack: [], focus: null, dict: "loading", progress: 0, highlight: null, myziSort: "new", deckId: null, deckShow: 100, picker: false, meTab: "avatar", cardsDeck: "all", cardsStatus: "all", cardsQ: "", cardsShow: 100 };
+const ui = { view: "home", query: "", stack: [], focus: null, dict: "loading", progress: 0, highlight: null, myziSort: "new", deckId: null, deckShow: 100, picker: false, meTab: "avatar", cardsDeck: "all", cardsStatus: "all", cardsQ: "", cardsShow: 100, gram: null, gramQ: "", gramLevel: "" };
 const disp = e => (state.script === "t" ? e.t : e.s);
 const other = e => (state.script === "t" ? e.s : e.t);
 const keyOf = e => e.s + "|" + e.p;
@@ -196,6 +196,7 @@ function renderPanel() {
   addBox(charactersSection(e0));
   if (showDetail("words")) addBox(wordsWithSection(e0));
   addBox(clipBlock(e0, true));
+  if (showDetail("grammar")) addBox(grammarSection(e0));
   if (showDetail("examples")) addBox(examplesSection(e0));
   if (showDetail("notes")) addBox(notesSection(e0));
   // Every part is its own box that folds away; the longer ones start folded.

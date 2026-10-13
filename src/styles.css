@@ -1,3 +1,6 @@
+/* Cubic 11 (SIL Open Font License; licence text in fonts/cubic11-OFL.txt): pixel Chinese characters,
+   downloaded only when a page uses it (Retro Arcade, or the Pixel Chinese font). */
+@font-face { font-family: "Cubic 11"; src: url("fonts/cubic11.woff2") format("woff2"); font-display: swap; }
 /* Layout: icon rail (desktop) or bottom tab bar (phone) | main view | word panel (wide screens) or bottom sheet (phones). */
 :root {
   --bg: #f6f7f4;

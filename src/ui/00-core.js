@@ -8,7 +8,7 @@ const LS_KEY = "learnzi.state.v1";
 const READER_KEY = "learnzi.reader.v1";
 const PROGRESS_KEY = "learnzi.progress.v1";
 const READER_MAX = 75000; // characters; keeps the synced reader document under the store's size limit
-const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug"];
+const VIEWS = ["home", "lookup", "reader", "photo", "watch", "myzi", "mycards", "decks", "deck", "stats", "study", "tones", "me", "settings", "debug", "grammar", "gpoint"];
 const DECK_ID = /^(starred|welcome|hsk[1-6]|u[0-9a-z]{4,24})$/;
 const SAMPLE = "你好！我叫小明。我是学生，我在北京学习汉语。今天天气很好，我和朋友去公园喝茶。你喜欢喝茶吗？";
 // Your Chinese level from the welcome: which decks start, new words a day, word of the day, Reader sample.
@@ -126,11 +126,14 @@ const THEME_FONTS = {
 const HEX = /^#[0-9a-f]{6}$/i;
 // Chinese fonts (characters only).
 const FONTS = {
+  theme: { label: "Theme's own (pixel in Retro Arcade, otherwise Sans)", css: null, stack: null },
   sans: { label: "Sans", css: null, stack: '"Noto Sans SC", "Noto Sans TC", "PingFang SC", "Microsoft YaHei", sans-serif' },
   serif: { label: "Serif", css: "Noto+Serif+SC:wght@400;600&family=Noto+Serif+TC:wght@400;600", stack: '"Noto Serif SC", "Noto Serif TC", "Songti SC", SimSun, serif' },
   kai: { label: "Kai (handwritten)", css: "LXGW+WenKai+TC", stack: '"LXGW WenKai TC", KaiTi, STKaiti, serif' },
   brush: { label: "Brush", css: "Ma+Shan+Zheng", stack: '"Ma Shan Zheng", KaiTi, STKaiti, serif' },
   playful: { label: "Playful", css: "ZCOOL+KuaiLe", stack: '"ZCOOL KuaiLe", "Noto Sans SC", sans-serif' },
+  // Cubic 11 (SIL Open Font License), a pixel font with every HSK 1–5 character; served with the app.
+  pixel: { label: "Pixel (Cubic 11)", css: null, stack: '"Cubic 11", "Noto Sans SC", "PingFang SC", sans-serif' },
 };
 // Tone colour sets (tone 1, 2, 3, 4, neutral). "theme" uses the theme's own colours.
 const TONE_PALETTES = {
@@ -150,6 +153,8 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Grammar: about 500 grammar points from the AllSet Learning Chinese Grammar Wiki in Study → Grammar, and a Grammar box in the word pop-up"],
+  ["13 Oct", "Pixel Chinese characters (Cubic 11) in Retro Arcade; Chinese font \"Theme's own\" is the new default"],
   ["13 Oct", "Sync: each deck and your notes now sync on their own, so big decks and lots of notes keep syncing; a review saves only what changed"],
   ["13 Oct", "A dot on the cog shows when sync is paused"],
   ["13 Oct", "Study menu: Review, My decks, My cards; Home's button says Review"],
@@ -194,7 +199,7 @@ const UPDATES = [
 
 // ---------- saved state (validated whenever it comes from storage or sync) ----------
 const DEFAULTS = {
-  v: 2, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "sans", uiFont: "standard",
+  v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
   zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
@@ -266,7 +271,8 @@ function sanitize(raw) {
   s.tones = typeof o.tones === "boolean" ? o.tones : false;
   s.preset = Object.hasOwn(PRESETS, o.preset) ? o.preset : "ink";
   s.accent = typeof o.accent === "string" && /^#[0-9a-f]{6}$/i.test(o.accent) ? o.accent.toLowerCase() : "";
-  s.font = Object.hasOwn(FONTS, o.font) ? o.font : "sans";
+  // "Theme's own" arrived with settings version 3; before that Sans was simply the default.
+  s.font = Object.hasOwn(FONTS, o.font) && !(o.font === "sans" && !(o.v >= 3)) ? o.font : "theme";
   s.uiFont = Object.hasOwn(UIFONTS, o.uiFont) ? o.uiFont : "standard";
   s.scale = num(o.scale, 0.85, 1.3, 1);
   s.rate = num(o.rate, 0.5, 1.3, 0.9);
@@ -308,7 +314,7 @@ function sanitize(raw) {
   s.strokeSpeed = [0.5, 1, 2].includes(o.strokeSpeed) ? o.strokeSpeed : 1;
   s.radical = o.radical !== false;
   s.details = {};
-  for (const k of ["tips", "write", "story", "words", "freq", "examples", "notes"]) if (obj(o.details)[k] === false) s.details[k] = false;
+  for (const k of ["tips", "write", "story", "words", "freq", "grammar", "examples", "notes"]) if (obj(o.details)[k] === false) s.details[k] = false;
   s.voice = o.voice === "browser" ? "browser" : "real";
   s.unlockAll = o.unlockAll === true;
   s.showLocked = o.showLocked === true;

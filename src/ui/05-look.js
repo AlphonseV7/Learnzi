@@ -71,8 +71,6 @@ function applyLook() {
     r.style.setProperty("--accent-soft", "color-mix(in srgb, " + state.accent + " 20%, var(--surface))");
     r.style.setProperty("--accent-ink", inkFor(state.accent));
   } else ["--accent", "--accent-soft", "--accent-ink"].forEach(p => r.style.removeProperty(p));
-  r.style.setProperty("--font-hanzi", FONTS[state.font].stack);
-  loadFontCss(FONTS[state.font].css);
   // The standard English font lets a theme bring its own (Retro Arcade, Cyberedge); any other choice wins.
   const uf = UIFONTS[state.uiFont];
   if (state.uiFont === "standard") ["--font-body", "--font-display"].forEach(p => r.style.removeProperty(p));
@@ -88,6 +86,10 @@ function applyLook() {
   const shape = state.shapes ? base : "plain";
   r.setAttribute("data-shape", shape);
   if (state.uiFont === "standard") loadFontCss(THEME_FONTS[shape]);
+  // Chinese font: your choice, or the theme's own (pixel characters in Retro Arcade).
+  const zh = FONTS[state.font === "theme" ? (shape === "arcade" ? "pixel" : "sans") : state.font];
+  r.style.setProperty("--font-hanzi", zh.stack);
+  loadFontCss(zh.css);
   renderScene();
   if (typeof mleChrome === "function" && document.querySelector(".nav")) mleChrome();
   document.body.classList.toggle("no-pinyin", !state.pinyin);

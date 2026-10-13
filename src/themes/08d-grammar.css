@@ -1,0 +1,61 @@
+/* ---------- Grammar (Study → Grammar, and the Grammar box in the word pop-up) ---------- */
+.g-levels { gap: 6px; flex-wrap: wrap; }
+.grammar input[type="search"] { width: 100%; }
+.g-level-head { gap: 10px; align-items: center; }
+.g-level-head .num { margin-left: auto; }
+.grammar > *, .g-article > *, .g-meta > * { min-width: 0; }
+.gpoint .title-row { overflow-wrap: anywhere; min-width: 0; }
+.g-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.g-item {
+  display: grid; gap: 2px; text-align: left; width: 100%; padding: 9px 12px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface); color: inherit; font: inherit; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.g-item:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.g-item-top { display: flex; gap: 8px; align-items: baseline; }
+.g-item-title { font-weight: 600; overflow-wrap: anywhere; }
+.g-item-pat, .g-p, .g-pat-line, .g-tr, .g-py { overflow-wrap: anywhere; }
+.g-item-pat { font-family: var(--font-hanzi), var(--font-body); }
+.g-level { font-family: var(--font-body); font-weight: 800; letter-spacing: .04em; min-width: 2.2em; text-align: center; flex: none; }
+.g-a1 { background: color-mix(in srgb, var(--t3) 18%, var(--surface)); color: var(--ink); }
+.g-a2 { background: color-mix(in srgb, var(--t3) 30%, var(--surface)); color: var(--ink); }
+.g-b1 { background: color-mix(in srgb, var(--t4) 20%, var(--surface)); color: var(--ink); }
+.g-b2 { background: color-mix(in srgb, var(--t4) 34%, var(--surface)); color: var(--ink); }
+.g-c1 { background: color-mix(in srgb, var(--t1) 24%, var(--surface)); color: var(--ink); }
+.g-meta .row { gap: 8px; flex-wrap: wrap; align-items: center; }
+.g-words .chip .hz { font-size: 1.1rem; }
+.chip.static { cursor: default; }
+.g-article { gap: 12px; }
+.g-article .g-h2 { margin-top: 6px; }
+.g-h3 { font-size: 1rem; margin: 4px 0 0; color: var(--ink-soft); }
+.g-p { margin: 0; line-height: 1.6; }
+.g-em { font-style: normal; font-weight: 700; color: var(--accent); }
+.g-link { color: var(--accent); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; padding: 0; font: inherit; }
+/* structure: the pattern in a box */
+.g-pat { display: grid; gap: 4px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); border-left: 3px solid var(--accent); }
+.g-pat-line { font-family: var(--font-hanzi), var(--font-body); font-size: 1.05rem; line-height: 1.5; }
+/* examples */
+.g-exs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.g-ex { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.g-ex:last-child { border-bottom: 0; }
+.g-ex-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.g-exs > *, .g-ex > *, .g-ex-line > * { min-width: 0; }
+.g-ex-line .g-zh { flex: 1 1 12em; overflow-wrap: anywhere; }
+.g-zh { font-family: var(--font-hanzi); font-size: 1.25rem; line-height: 1.7; }
+.g-ex .w rt { display: none; }   /* the example's own pinyin line (more exact) shows instead */
+.g-py { color: var(--ink-soft); font-size: .92rem; }
+.no-pinyin .g-py { display: none; }
+.g-tr { font-size: .95rem; }
+.g-say { margin-left: auto; }
+.g-speaker { font-weight: 800; color: var(--ink-soft); }
+.g-mark { font-weight: 800; font-size: 1.05rem; width: 1.4em; text-align: center; }
+.g-mark.ok { color: var(--t3); }
+.g-mark.no { color: var(--t1); }
+.g-ex.wrong .g-zh { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--t1) 60%, transparent); }
+.g-ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; line-height: 1.5; }
+.g-table-wrap { overflow-x: auto; max-width: 100%; }
+.g-table { border-collapse: collapse; font-size: .92rem; min-width: 100%; }
+.g-table th, .g-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.g-table th { background: var(--surface-2); }
+.g-credit { margin: 4px 2px 0; }
+.g-credit a { color: inherit; }

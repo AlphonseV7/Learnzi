@@ -8,6 +8,7 @@ const NAV_MENUS = {
     { zh: "卡", label: "My decks", sub: () => "Flashcard decks and word lists", run: () => go("decks") },
     { zh: "片", label: "My cards", sub: () => { const n = state.saved.length; return n ? n + (n === 1 ? " saved word and its cards" : " saved words and their cards") : "Saved words and their flashcards"; }, run: () => go("mycards") },
     { zh: "查", label: "Look up", sub: () => "Characters, pinyin or English", run: () => go("lookup") },
+    { zh: "法", label: "Grammar", sub: () => "Patterns and how to use them, A1 to C1", run: () => go("grammar") },
   ],
   tools: [
     { zh: "读", label: "Reader", sub: () => "Paste or import Chinese, tap any word", run: () => go("reader") },
@@ -18,7 +19,7 @@ const NAV_MENUS = {
   ],
 };
 // Which tab lights up for each page.
-const NAV_TAB = { home: "home", lookup: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", mycards: "myzi", stats: "myzi", me: "myzi" };
+const NAV_TAB = { home: "home", lookup: "study", grammar: "study", gpoint: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", mycards: "myzi", stats: "myzi", me: "myzi" };
 
 function closeNavMenu() {
   const m = $("#navmenu");

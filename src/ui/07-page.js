@@ -17,6 +17,8 @@ const PAGES = {
   mycards: () => ({ title: "My cards", zh: "我的卡片", py: "wo3 de5 ka3 pian4", desc: "Every word I've saved and how its flashcards are going.", back: ["My Zì", "myzi"] }),
   stats: () => ({ title: "My progress", zh: "我的进步", py: "wo3 de5 jin4 bu4", desc: "How my studying is going.", back: ["My Zì", "myzi"] }),
   me: () => ({ title: "Customise", zh: "装扮", py: "zhuang1 ban4", desc: "Dress up my avatar, choose my clock and pick my theme.", back: ["My Zì", "myzi"] }),
+  grammar: () => ({ title: "Grammar", zh: "语法", py: "yu3 fa3", desc: "About 500 grammar points, from beginner to advanced: how each pattern works, with examples you can tap and hear." }),
+  gpoint: () => { const p = grammar.byId.get(ui.gram); return { title: p ? p.title : "Grammar", back: ["Grammar", "grammar"] }; },
   settings: () => ({ title: "Settings", zh: "设置", py: "she4 zhi4", desc: "How LearnZì looks, sounds and studies." }),
   debug: () => ({ title: "Debug settings", zh: "调试", py: "tiao2 shi4", desc: "Testing tools. Changes made here are real and sync to your other devices, except the clock, which stays on this device.", back: ["Settings", "settings"] }),
 };

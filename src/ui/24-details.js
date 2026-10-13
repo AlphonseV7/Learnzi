@@ -4,7 +4,7 @@
 
 const DETAILS = {
   tips: "Pronunciation tips", write: "Stroke order and writing", story: "Character stories",
-  words: "Words that use this character", freq: "How common a word is", examples: "Example sentences", notes: "My notes",
+  words: "Words that use this character", freq: "How common a word is", grammar: "Grammar points", examples: "Example sentences", notes: "My notes",
 };
 const showDetail = k => state.details[k] !== false;
 

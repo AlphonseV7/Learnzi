@@ -41,7 +41,7 @@ async function loadDict() {
     ui.dict = "error";
   }
   applyAll();
-  if (ui.dict === "ready") setTimeout(() => Engine.warm(), 500);
+  if (ui.dict === "ready") { setTimeout(() => Engine.warm(), 500); setTimeout(loadGrammar, 2500); }
 }
 function start() {
   applyLook();
