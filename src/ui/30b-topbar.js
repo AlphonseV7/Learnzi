@@ -1,7 +1,7 @@
-/* LearnZì UI, part 4a: the top bar's XP bar, and on phones a top bar that follows you down the page.
- * XP bar: a slim bar along the bottom of the top bar showing progress to the next level. When you
- * earn XP, tiny characters (from the word you just studied, or 经验值 "experience points") drift
- * out of the level pill into the bar, and the bar fills with a moving dot shimmer.
+/* LearnZì UI, part 4a: the top bar's XP capsule, and on phones a top bar that follows you down the page.
+ * XP capsule: the level pill fills up (#xpbar, a layer inside it) with your progress to the next level,
+ * with the numbers inside. When you earn XP, tiny characters (from the word you just studied, or 经验值
+ * "experience points") drift into the end of the fill, which shimmers with moving dots.
  * Following bar (phones and tablets, not the desktop layout): it sticks to the top while you scroll,
  * tucks itself away after a few quiet seconds, and comes back when you scroll again, earn XP or
  * your avatar reacts. */
@@ -25,11 +25,8 @@ function xpBarShow(info) {
     if (frac > xpShown.frac) { bar.classList.remove("filling"); void bar.offsetWidth; bar.classList.add("filling"); clearTimeout(bar.fillTimer); bar.fillTimer = setTimeout(() => bar.classList.remove("filling"), 1600); }
   }
   xpShown = { level: info.level, frac, mle };
-  // The numbers: beside the bar on a computer, printed on the bar on phones (less room there).
-  const txt = info.into + "/" + info.need;
-  const num = $("#xpnum"), inBar = bar.querySelector(".xpbar-num");
-  if (num) num.textContent = txt;
-  if (inBar) inBar.textContent = txt;
+  const num = $("#xpnum");
+  if (num) num.textContent = info.into + "/" + info.need;
 }
 /** Tiny characters drift from the level pill into the end of the bar. */
 function xpFlow(chars, gained) {

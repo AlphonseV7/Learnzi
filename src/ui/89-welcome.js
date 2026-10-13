@@ -112,7 +112,7 @@ const navBtn = key => document.querySelector('.nav [data-view="' + key + '"], .n
 const TOUR = [
   { say: () => [h("b", null, "Hi" + (state.nickname ? " " + state.nickname : "") + ", I'm your " + AV.animal[wornAvatar().animal].label.toLowerCase() + "."), " I'll show you around. It takes about a minute."] },
   { at: () => $("#me"), say: () => ["That's me, up here with your name. Tap me any time to dress me up, change the clock or pick a theme."] },
-  { at: () => [$("#lvl"), $("#xpbar")], say: () => ["Your Zì level and XP. The bar fills as you study, every level unlocks something, and you'll climb the old imperial exam ranks on the way."] },
+  { at: () => [$("#lvl"), $("#xpbar")], say: () => ["Your Zì level and XP. The capsule fills up as you study, every level unlocks something, and you'll climb the old imperial exam ranks on the way."] },
   ...TAB_WORDS.map(([key, c, p, en, text]) => ({ at: () => navBtn(key), nav: true, word: { c, p, en }, say: () => [text] })),
   { at: () => document.querySelector(".wotd .glyph"), wait: "panel", say: () => [h("b", null, "Try it: "), "tap the word of the day."] },
   { at: () => $("#panel"), say: () => ["Every word opens like this: the meaning, a voice to hear it, stroke order and examples. Tap ☆ to save it to My cards."], leave: () => closePanel() },
@@ -217,7 +217,7 @@ function finishTour(done) {
   tour = null;
   commit({ toured: true });
   if (done) { earnBadge("begin"); setMood("happy", 2500); }
-  else toast("Tour skipped. Replay it any time in Settings → Profile.");
+  else toast("Tour skipped. Replay it any time in Settings → Reset.");
   return !!layer;
 }
 const closeTour = () => ($("#tour") ? finishTour(false) : false);

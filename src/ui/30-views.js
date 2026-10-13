@@ -19,7 +19,7 @@ function updateTopbar() {
   if (seal) {
     const a = wornAvatar();
     const key = JSON.stringify(a) + avStyle();
-    if (seal.dataset.key !== key) { seal.dataset.key = key; seal.classList.add("avatar-mini"); seal.replaceChildren(avatarSvg(a, 40, "Your avatar")); }
+    if (seal.dataset.key !== key) { seal.dataset.key = key; seal.classList.add("avatar-mini"); seal.replaceChildren(avatarSvg(a, 50, "Your avatar")); }
   }
   const name = $("#me-name");
   if (name) name.textContent = state.nickname || "LearnZì";
@@ -74,7 +74,7 @@ function viewHome() {
     }
   } else v.append(h("div", { class: "card" }, loadingBlock()));
 
-  if (ui.dict === "ready") v.append(dailyBox(), decksBox());
+  if (ui.dict === "ready") v.append(dailyBox(), grammarDayBox(), decksBox());
   const action = (title, sub, onclick) => h("button", { class: "action", type: "button", onclick }, h("b", null, title), h("span", { class: "muted small" }, sub));
   v.append(h("div", { class: "actions" },
     action("Look up a word", "Type characters, pinyin or English", () => go("lookup")),

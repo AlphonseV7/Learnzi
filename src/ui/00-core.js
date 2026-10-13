@@ -198,6 +198,10 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Top bar: bigger avatar and name; your level is a capsule that fills up with XP"],
+  ["13 Oct", "Home: Grammar point of the day; the word pop-up's Grammar box sits right after the meaning"],
+  ["13 Oct", "Computer: the side bars start below the top bar; their edges show an arrow and a sheen until you've found them"],
+  ["13 Oct", "Settings: Text and fonts, Stroke order and Box layout boxes; Replay the tour moved to Reset"],
   ["13 Oct", "HSK 3.0 decks (the 2025 syllabus, bands 1 to 7–9, about 10,900 words); the older lists are now HSK 2.0 · 1–6; words show both levels"],
   ["13 Oct", "Storage: the dictionary, sentences, stroke shapes, grammar and photo reader are stored compressed (about 31 MB smaller, exactly the same data)"],
   ["13 Oct", "Grammar: about 500 grammar points from the AllSet Learning Chinese Grammar Wiki in Study → Grammar, and a Grammar box in the word pop-up"],

@@ -180,6 +180,7 @@ function renderPanel() {
   const shown = entries.slice(0, 8);
   const meanings = h("div", { class: "meanings" }, h("span", { class: "eyebrow" }, shown.length > 1 ? "Meanings" : "Meaning"));
   addBox(meanings);
+  if (showDetail("grammar")) addBox(grammarSection(e0));
   shown.forEach((e, k) => {
     const mws = Engine.measureWords(e);
     meanings.append(h("section", { class: "reading" },
@@ -196,7 +197,6 @@ function renderPanel() {
   addBox(charactersSection(e0));
   if (showDetail("words")) addBox(wordsWithSection(e0));
   addBox(clipBlock(e0, true));
-  if (showDetail("grammar")) addBox(grammarSection(e0));
   if (showDetail("examples")) addBox(examplesSection(e0));
   if (showDetail("notes")) addBox(notesSection(e0));
   // Every part is its own box that folds away; the longer ones start folded.

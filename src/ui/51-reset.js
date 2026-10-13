@@ -1,11 +1,13 @@
-/* LearnZì UI, part 6b: Settings → Reset. Put boxes back how they were, or reset LearnZì to how it
- * was the first time you opened it. A factory reset asks first, then plays a wipe: a glitch, a brush
+/* LearnZì UI, part 6b: Settings → Reset. Replay the tour, or reset LearnZì to how it was the first
+ * time you opened it (the box layout buttons have their own box, see boxLayoutRow in 50-settings). A factory reset asks first, then plays a wipe: a glitch, a brush
  * sweeping the screen clean, and 清 (qīng, clear) before a fresh Home. It erases this device's copy and
  * the synced copy (otherwise sync would bring everything straight back). */
 
 function resetBox() {
   return h("div", { class: "card set reset-card" }, h("h2", { class: "h-card" }, "Reset"),
-    boxLayoutRow(),
+    h("div", { class: "stack-tight" }, h("b", null, "The tour"),
+      h("span", { class: "muted small" }, "The one-minute tour of LearnZì with your avatar."),
+      h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => { closePanel(); startTour(); } }, "Replay the tour"))),
     h("div", { class: "stack-tight" }, h("b", null, "Factory reset"),
       h("span", { class: "muted small" }, "Start again from scratch: every setting, saved word, deck, flashcard and level, on every device you sync with."),
       h("div", { class: "row" }, h("button", { class: "btn danger", type: "button", onclick: askFactoryReset }, icon("rotate"), "Reset to factory settings"))));

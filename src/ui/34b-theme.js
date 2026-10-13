@@ -1,6 +1,6 @@
 /* LearnZì UI, part 5d: Customise → Theme. The theme, light or dark, colours, background scene, shapes
  * and whether your avatar matches the theme (moved here from Settings, next to the other unlocks).
- * Fonts, text size and box layout stay in Settings → Text and layout. */
+ * Fonts and text size stay in Settings → Text and fonts; box layout in Settings → Box layout. */
 
 function themeEditor(v) {
   const sw = h("div", { class: "swatches", role: "group", "aria-label": "Theme" });

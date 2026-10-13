@@ -103,7 +103,7 @@
 :root[data-shape="silver"] .view.enter > :nth-child(n + 5) { animation-delay: .24s; }
 @keyframes silverFocus { from { opacity: 0; filter: blur(5px); transform: scale(.985); } to { opacity: 1; filter: blur(0); transform: none; } }
 /* starlight in the filled part of the XP bar and the level bars */
-:root[data-shape="silver"] :is(.xpbar, .bar) > i { position: relative; overflow: hidden; }
+:root[data-shape="silver"] .bar > i { position: relative; overflow: hidden; }
 :root[data-shape="silver"] :is(.xpbar, .bar) > i::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(circle at 3px 2px, #fff 0 .6px, transparent 1.2px) 0 0 / 13px 100%,
@@ -120,7 +120,8 @@
   box-shadow: 0 0 0 1px rgb(255 255 255 / .12) inset, 0 6px 22px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 :root[data-shape="silver"] .lvl { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
-:root[data-shape="silver"] :is(.bar > i, .xpbar > i) { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); }
+:root[data-shape="silver"] .bar > i { background: linear-gradient(90deg, var(--accent), var(--aurora, #5fe6ff)); }
+:root[data-shape="silver"] .xpbar > i { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--aurora, #5fe6ff) 34%, transparent)); box-shadow: inset 0 -3px 0 var(--aurora, #5fe6ff); }
 :root[data-shape="silver"] .nav { background: color-mix(in srgb, var(--surface) 70%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 :root[data-shape="silver"] .seal { background: linear-gradient(135deg, var(--accent), var(--aurora, #5fe6ff)); color: #0d0626; }
 

@@ -62,3 +62,6 @@
 
 /* the older HSK 2.0 level beside the HSK 3.0 band: quieter */
 .badge.hsk.old { background: var(--surface-2); color: var(--ink-soft); }
+/* Home: grammar point of the day */
+.g-day-title { display: flex; gap: 8px; align-items: baseline; text-align: left; font-size: 1.08rem; padding: 0; }
+.g-day .g-exs { margin-top: 2px; }

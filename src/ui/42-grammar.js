@@ -215,3 +215,32 @@ function grammarSection(e) {
     pts.length > 6 ? h("button", { class: "btn small", type: "button", onclick: () => { ui.gramQ = e.s; ui.gramLevel = ""; closePanel(); go("grammar"); } }, "All " + pts.length + " grammar points") : null,
     h("p", { class: "muted small g-credit" }, "From the ", h("a", { href: GRAMMAR_SRC, target: "_blank", rel: "noopener noreferrer" }, "AllSet Learning Chinese Grammar Wiki"), " (CC BY-NC-SA 3.0)"));
 }
+
+// ---------- Home: grammar point of the day ----------
+// Points at your level (Settings → Profile → My Chinese), one a day, the same all day on every device.
+const GDAY_LEVELS = { new: ["A1"], little: ["A1", "A2"], middle: ["A2", "B1"], high: ["B2", "C1"] };
+function grammarDayBox() {
+  const body = h("div", { class: "stack-tight" }, h("div", { class: "loading" }, h("span", { class: "spin" }), h("span", null, "Loading…")));
+  const box = h("div", { class: "card stack g-day" }, h("span", { class: "eyebrow" }, "Grammar point of the day"), body);
+  loadGrammar().then(list => {
+    const pool = (list || []).filter(p => !p.cmp && (GDAY_LEVELS[state.level] || ["A1"]).includes(p.level));
+    if (!pool.length) { body.replaceChildren(h("p", { class: "muted small" }, "Couldn't load today's grammar point.")); return; }
+    const day = Math.floor((clock() - 4 * 3600e3 - new Date(clock()).getTimezoneOffset() * 60e3) / 86400e3);
+    // a fixed shuffle of the pool, so neighbouring days aren't neighbouring titles
+    const p = pool[(day * 7919) % pool.length];
+    const more = h("button", { class: "btn small", type: "button", onclick: () => openGrammar(p.id) }, "Read more", icon("next"));
+    body.replaceChildren(
+      h("button", { class: "plain-btn g-day-title", type: "button", onclick: () => openGrammar(p.id) }, levelChip(p.level), h("b", null, p.title)),
+      p.pattern ? h("div", { class: "g-pat" }, h("div", { class: "g-pat-line" }, p.pattern)) : null);
+    loadGrammarLevel(p.level).then(arts => {
+      const blocks = (arts && arts[p.id]) || [];
+      const exBlock = blocks.find(b => Array.isArray(b) && b[0] === "ex" && Array.isArray(b[1]) && b[1].some(x => x && x.m !== "x"));
+      const ex = exBlock ? exBlock[1].find(x => x && x.m !== "x" && Array.isArray(x.z)) : null;
+      const exEl = ex ? h("ul", { class: "g-exs" }, gExample(ex)) : null;
+      if (exEl) exEl.addEventListener("click", ev => { const b = ev.target.closest(".w"); if (b) openWord(b.dataset.form); });
+      body.append(exEl || "", h("div", { class: "row spread" }, more,
+        h("a", { class: "small muted", href: GRAMMAR_SRC + p.id, target: "_blank", rel: "noopener noreferrer", title: "AllSet Learning Chinese Grammar Wiki (CC BY-NC-SA 3.0)" }, "AllSet Grammar Wiki")));
+    });
+  });
+  return box;
+}

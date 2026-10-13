@@ -10,7 +10,7 @@
 :root.desk .app .main > .topbar.card .top-right { gap: 8px; }
 /* left: the menu bar, pinned to the screen edge, hidden until the mouse comes near */
 :root.desk .nav {
-  position: fixed; inset: 0 auto 0 0; width: var(--rail); height: 100vh; z-index: 45; padding-top: 18px;
+  position: fixed; inset: var(--side-top, 0px) auto 0 0; width: var(--rail); height: auto; z-index: 45; padding-top: 18px;
   display: grid; grid-template-columns: 1fr; align-content: start; gap: 6px;
   background: var(--surface); border: 0; border-right: 1px solid var(--line);
   transform: translateX(-100%); transition: transform .28s var(--ease), box-shadow .28s;
@@ -18,24 +18,43 @@
 :root.desk .nav.shown { transform: none; box-shadow: 10px 0 34px rgb(0 0 0 / .2); }
 /* right: word details, the same way */
 :root.desk .panel {
-  position: fixed; inset: 0 0 0 auto; width: min(var(--panel), 92vw); height: 100vh; max-height: none; z-index: 46;
+  position: fixed; inset: var(--side-top, 0px) 0 0 auto; width: min(var(--panel), 92vw); height: auto; max-height: none; z-index: 46;
   overflow-y: auto; visibility: visible; border-radius: 0; border: 0; border-left: 1px solid var(--line);
   padding: 22px 22px 32px; box-shadow: none; transform: translateX(105%); transition: transform .3s var(--ease), box-shadow .3s;
 }
 :root.desk .panel.shown { transform: none; box-shadow: -10px 0 34px rgb(0 0 0 / .2); }
 :root.desk .scrim, :root.desk .grab { display: none; }
 :root.desk .panel .panel-close { display: inline-flex; }
-/* the hover strips at each edge, with a faint glowing line as a hint */
-:root.desk .edge { display: block; position: fixed; top: 0; bottom: 0; width: 18px; z-index: 44; }
+/* the hover strips at each edge: a glowing line with a small arrow; a sheen runs down it every 20 s
+   until you've opened that side a few times (edge-known-*, see 33-desk) */
+:root.desk .edge { display: block; position: fixed; top: var(--side-top, 0px); bottom: 0; width: 20px; z-index: 44; }
 :root.desk .edge-left { left: 0; }
 :root.desk .edge-right { right: 0; }
 :root.desk .edge::after {
-  content: ""; position: absolute; top: 50%; width: 4px; height: 72px; margin-top: -36px; border-radius: 4px;
-  background: var(--accent); opacity: .35; transition: opacity .2s, height .2s, margin .2s, box-shadow .2s;
+  content: ""; position: absolute; top: 50%; width: 4px; height: 96px; margin-top: -48px; border-radius: 4px; opacity: .45;
+  background: linear-gradient(180deg, var(--accent) 0 38%, color-mix(in srgb, var(--accent) 25%, #fff) 50%, var(--accent) 62% 100%) 0 0 / 100% 300%;
+  transition: opacity .2s, height .2s, margin .2s, box-shadow .2s;
+  animation: edgeSheen 20s ease-in-out infinite 4s;
 }
+:root.desk .edge-right::after { animation-delay: 4.6s; }
+:root.desk .edge::before {
+  position: absolute; top: 50%; margin-top: -.6em; font: 700 .85rem/1.2 var(--font-body); color: var(--accent); opacity: .55; transition: opacity .2s, transform .2s;
+}
+:root.desk .edge-left::before { content: "›"; left: 9px; }
+:root.desk .edge-right::before { content: "‹"; right: 9px; }
+@keyframes edgeSheen {
+  0% { background-position: 0 0; opacity: .45; box-shadow: none; }
+  3% { opacity: 1; box-shadow: 0 0 10px var(--accent); }
+  7% { background-position: 0 100%; opacity: .45; box-shadow: none; }
+  100% { background-position: 0 100%; opacity: .45; }
+}
+:root.edge-known-nav .edge-left::after, :root.edge-known-panel .edge-right::after { animation: none; }
 :root.desk .edge-left::after { left: 3px; }
 :root.desk .edge-right::after { right: 3px; }
-:root.desk .edge:hover::after { opacity: .9; height: 120px; margin-top: -60px; box-shadow: 0 0 12px var(--accent); }
+:root.desk .edge:hover::after { animation: none; opacity: .95; height: 132px; margin-top: -66px; box-shadow: 0 0 12px var(--accent); }
+:root.desk .edge:hover::before { opacity: 1; }
+:root.desk .edge-left:hover::before { transform: translateX(2px); }
+:root.desk .edge-right:hover::before { transform: translateX(-2px); }
 /* menus fly out beside the bar */
 :root.desk .navmenu { z-index: 60; }
 /* theme touches for the side bars */

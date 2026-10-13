@@ -49,7 +49,7 @@ function viewSettings() {
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Profile"),
     row("nickname", "Nickname", nick),
     row("level", "My Chinese", select("level", LEVELS, state.level, k => { commit({ level: k }); }), "Sets the word of the day and the Reader's sample text. Decks and new words a day are under Flashcards."),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => { closePanel(); startTour(); } }, "Replay the tour"), syncBtn()),
+    h("div", { class: "row" }, syncBtn()),
     syncInfo));
 
   // Reading
@@ -60,15 +60,13 @@ function viewSettings() {
       h("span", { class: "tone-demo" }, pyEl("ma1 ma2 ma3 ma4 ma5"))),
     toneEditor()));
 
-  // Text and layout (themes, colours, scenes and shapes are in Customise → Theme)
+  // Text and fonts (themes, colours, scenes and shapes are in Customise → Theme)
   const scaleOut = h("span", { class: "muted small num" }, Math.round(state.scale * 100) + "%");
   const scale = h("input", { type: "range", id: "scale", min: "85", max: "130", step: "5" });
   scale.value = String(Math.round(state.scale * 100));
   scale.addEventListener("input", () => { scaleOut.textContent = scale.value + "%"; document.documentElement.style.setProperty("--scale", String(scale.value / 100)); });
   scale.addEventListener("change", () => commit({ scale: scale.value / 100 }));
-  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Text and layout"),
-    h("p", { class: "muted small" }, "Themes, colours, light or dark, background scenes and shapes are in ",
-      h("button", { class: "plain-btn build-link", type: "button", onclick: () => { ui.meTab = "theme"; go("me"); } }, "Customise → Theme"), "."),
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Text and fonts"),
     row("font", "Chinese font", select("font", FONTS, state.font, k => { commit({ font: k }); applyLook(); }),
       h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
     row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),
@@ -90,10 +88,10 @@ function viewSettings() {
   // Word details
   const details = h("div", { class: "detail-toggles" }, Object.entries(DETAILS).map(([k, label]) =>
     row("d-" + k, label, toggleCtl("d-" + k, showDetail(k), on => { const d = { ...state.details }; if (on) delete d[k]; else d[k] = false; commit({ details: d }); renderPanel(); }))));
-  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Word details"),
-    h("p", { class: "muted small" }, "What the word panel shows. Turn off anything you don't need."),
-    details,
-    h("span", { class: "eyebrow" }, "Stroke order"),
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Word details"), details));
+
+  // Stroke order
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Stroke order"),
     row("strokespeed", "Animation speed", seg("strokespeed", [[0.5, "Slow"], [1, "Normal"], [2, "Fast"]], state.strokeSpeed, k => commit({ strokeSpeed: k }))),
     row("radical", "Highlight the radical", toggleCtl("radical", state.radical, on => commit({ radical: on })), "Draws the radical (the part that hints at meaning) in your accent colour")));
 
@@ -110,7 +108,8 @@ function viewSettings() {
     h("div", { class: "row" }, withVoice(h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"), { text: "你好，我在学习汉语。" }),
       h("span", { class: "muted small", id: "voice-note" }, voiceNote()))));
 
-  // Reset: box layout and factory reset (51-reset)
+  // Box layout, then Reset: replay the tour and the factory reset (51-reset)
+  v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Box layout"), boxLayoutRow()));
   v.append(resetBox());
 
   // About
@@ -178,9 +177,9 @@ function toneEditor() {
 }
 
 /** The current theme's main colours as hex, used to start a custom theme. */
-/** Settings → Text and layout: put boxes back how they were. */
+/** Settings → Box layout: put boxes back how they were. */
 function boxLayoutRow() {
-  return h("div", { class: "stack-tight box-layout" }, h("b", null, "Box layout"),
+  return h("div", { class: "stack-tight box-layout" },
     h("span", { class: "muted small" }, "Applies to every page and the word pop-up."),
     h("div", { class: "row" },
       h("button", { class: "btn small", type: "button", onclick: () => { commit({ order: {} }); render(false); renderPanel(); toast("Every box is back in its original place"); } }, "Original order"),

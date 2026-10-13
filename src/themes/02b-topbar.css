@@ -1,37 +1,51 @@
 /* ---------- top bar: XP bar, flying characters, and following you down the page on phones ---------- */
 .app .main > .topbar.card { position: relative; }
-/* the XP bar sits in the row, just after the level pill */
-.xpbar {
-  flex: none; align-self: center; width: 52px; height: 8px; border-radius: 999px; pointer-events: none; overflow: hidden;
-  background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
-}
-:root.desk .xpbar { width: 120px; }
+/* Your level and XP in one capsule: the level pill itself fills up with XP towards the next level,
+   with the numbers inside it (the bright line along the bottom is the edge of the fill). */
+.topbar .lvl { position: relative; isolation: isolate; height: 40px; min-width: 128px; padding: 0 14px; gap: 6px; justify-content: center; font-size: .9rem; }
+.topbar .lvl .hz { font-size: 1.12rem; }
+.topbar .lvl > :not(.xpbar) { position: relative; z-index: 1; }
+:root.desk .topbar .lvl { height: 42px; min-width: 180px; padding: 0 16px; }
+:root:not(.desk) .topbar .lvl { min-width: 0; padding: 0 14px; }
+/* phones: the numbers sit under the level, so the capsule stays narrow and your name has room */
+:root:not(.desk) .topbar .lvl { display: grid; grid-template-columns: auto auto; align-content: center; justify-content: center; column-gap: 4px; row-gap: 1px; line-height: 1; }
+:root:not(.desk) .topbar .lvl .xp-num { grid-column: 1 / -1; justify-self: center; margin: 0; font-size: .6rem; }
+:root[data-shape="cyber"]:not(.desk) .topbar .lvl { letter-spacing: 0; }
+.xp-num { flex: none; font-size: .72rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; letter-spacing: -.01em; margin-left: 2px; }
+.xpbar { position: absolute; inset: 0; z-index: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
 .xpbar > i {
-  position: relative; display: block; height: 100%; width: 0; border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--surface)), var(--accent));
+  position: absolute; left: 0; top: 0; bottom: 0; display: block; width: 0;
+  background: color-mix(in srgb, var(--accent) 26%, transparent); box-shadow: inset 0 -3px 0 var(--accent);
   transition: width .9s var(--ease) .35s;
 }
 .xpbar > i.snap { transition: none; }
-/* the shimmer while it fills: little dots running along the bar */
+/* the shimmer while it fills: little dots running along */
 .xpbar.filling > i, .xpbar.full > i {
-  background-image: radial-gradient(circle, color-mix(in srgb, var(--surface) 85%, transparent) 0 1px, transparent 1.5px),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--surface)), var(--accent));
-  background-size: 7px 8px, 100% 100%; animation: xpDots .5s linear infinite;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--surface) 80%, transparent) 0 1px, transparent 1.5px);
+  background-size: 7px 8px; animation: xpDots .5s linear infinite;
 }
-@keyframes xpDots { to { background-position: 7px 0, 0 0; } }
-/* a glint at the end of the bar each time a character lands */
+@keyframes xpDots { to { background-position: 7px 0; } }
+/* a glint at the end of the fill each time a character lands */
 .xpbar.ping > i::after {
-  content: ""; position: absolute; right: 0; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(0, -50%);
+  content: ""; position: absolute; right: -5px; top: 50%; width: 12px; height: 12px; border-radius: 50%; transform: translate(0, -50%);
   background: radial-gradient(circle, var(--surface) 0 20%, var(--accent) 45%, transparent 70%); animation: xpPing .45s ease-out forwards;
 }
 @keyframes xpPing { from { opacity: 1; transform: translate(0, -50%) scale(.6); } to { opacity: 0; transform: translate(0, -50%) scale(1.8); } }
-.xpbar.full { box-shadow: 0 0 0 2px var(--accent-soft), 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent); }
+.lvl:has(.xpbar.full) { box-shadow: 0 0 0 2px var(--accent-soft), 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent); }
+/* a bigger avatar, name and cog */
+.topbar .seal.avatar-mini { width: 46px; height: 46px; }
+.topbar .seal.avatar-mini > svg { width: 100%; height: 100%; }
+:root.desk .topbar .seal.avatar-mini { width: 50px; height: 50px; }
+.topbar .me-name { font-size: 1.3rem; }
+:root.desk .topbar .me-name { font-size: 1.45rem; }
+@media (max-width: 480px) { .topbar.card .me-name { font-size: 1.15rem; } }
+.topbar .gear { width: 44px; height: 44px; }
+.topbar .gear svg { width: 20px; height: 20px; }
 .xp-glyph {
   position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; opacity: 0;
   font-size: .82rem; font-weight: 700; line-height: 1; color: var(--accent); text-shadow: 0 0 6px var(--surface);
 }
 :root[data-shape="arcade"] .xpbar, :root[data-shape="arcade"] .xpbar > i { border-radius: 0; }
-:root[data-shape="ends"] .xpbar { border: 1px solid #000; }
 
 /* phones and tablets: the bar sticks to the top, tucks away when you stop scrolling, returns when you scroll */
 :root:not(.desk) .app .main > .topbar.card {
@@ -77,11 +91,3 @@
 .rank-ladder .is-secret .rank-zh { color: var(--ink-soft); opacity: .35; letter-spacing: .1em; }
 .rank-ladder .is-secret .rank-row:disabled { cursor: default; }
 #reader-input::placeholder { font-family: var(--font-body); font-size: 1rem; letter-spacing: 0; }
-/* XP numbers, e.g. 430/1150: printed on a taller bar on phones, beside the bar on a computer */
-.xp-num { display: none; flex: none; font-size: .8rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
-:root.desk .xp-num { display: inline; }
-.xpbar { position: relative; }
-.xpbar-num { position: absolute; inset: 0; display: grid; place-items: center; font-size: .6rem; font-weight: 800; line-height: 1; letter-spacing: -.01em;
-  color: var(--ink); text-shadow: 0 0 3px var(--surface), 0 0 2px var(--surface); pointer-events: none; }
-:root:not(.desk) .xpbar { width: 78px; height: 16px; }
-:root.desk .xpbar-num { display: none; }
