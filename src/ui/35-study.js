@@ -162,7 +162,11 @@ const DRAW = { speed: 5, gap: 15, wait: 900 };
 function drawSoon(ruby, animate = true) {
   if (!state.drawChars || !writerReady()) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) animate = false;
-  setTimeout(() => { if (ruby.isConnected) drawChars(ruby, animate); }, 0);
+  // Hidden from the very start, and drawn as soon as the card is on the page (before the screen
+  // repaints), so the font's version of the characters never flashes up first.
+  ruby.classList.add("drawing");
+  const go = () => { if (ruby.isConnected) drawChars(ruby, animate); else ruby.classList.remove("drawing"); };
+  queueMicrotask(() => (ruby.isConnected ? go() : setTimeout(go, 0)));
 }
 function drawChars(ruby, animate) {
   const hz = ruby.querySelector(".hz");
@@ -171,7 +175,9 @@ function drawChars(ruby, animate) {
   if (!hz.children.length) { const t = hz.textContent; hz.replaceChildren(...[...t].map(c => h("span", null, c))); }
   const spans = [...hz.children].filter(sp => Engine.isCJK(sp.textContent));
   if (!spans.length) return;
-  const colors = spans.map(sp => getComputedStyle(sp).color);   // tone colours, before hiding
+  // tone colours, read with the text briefly unhidden (no repaint happens in between)
+  ruby.classList.remove("drawing");
+  const colors = spans.map(sp => getComputedStyle(sp).color);
   ruby.classList.add("drawing");   // the text waits hidden while the stroke shapes load
   const late = new Promise(r => setTimeout(() => r(null), DRAW.wait));
   Promise.race([Promise.all(spans.map(sp => CharData.strokes(sp.textContent))), late]).then(datas => {

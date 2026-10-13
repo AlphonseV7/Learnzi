@@ -198,7 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
-  ["13 Oct", "Flashcards: drawn characters now stay drawn instead of switching to the font"],
+  ["13 Oct", "Flashcards: drawn characters now stay drawn instead of switching to the font, with no flicker"],
   ["13 Oct", "Flashcards: characters draw themselves stroke by stroke (Settings → Flashcards to turn off); +XP counts up; new cards glow"],
   ["13 Oct", "Home: Recent lookups above the shortcuts; Show English on the Greeting; All decks is a button"],
   ["13 Oct", "Top bar: bigger avatar and name; your level is a capsule that fills up with XP"],
