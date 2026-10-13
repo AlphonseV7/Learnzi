@@ -433,11 +433,12 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
 
 .study .study-top { gap: 8px; }
 .flashcard { position: relative; display: grid; gap: 14px; padding: 22px 18px; min-height: 22rem; align-content: start; }
-/* characters drawing themselves (35-study): the text waits underneath, then fades in as the strokes fade */
+/* characters drawing themselves (35-study): each character becomes its own drawing, the size of the
+   glyph it replaces; the text waits hidden while the stroke shapes load */
 .rz.drawing .hz > span { color: transparent !important; }
-.rz .hz > span { transition: color .25s; }
-.fc-draw { position: absolute; z-index: 2; pointer-events: none; transition: opacity .25s; }
-.fc-draw.out { opacity: 0; }
+.hz > span.drawn { display: inline-block; vertical-align: -0.14em; position: relative; }
+.fc-draw { position: absolute; inset: 0; pointer-events: none; }
+.fc-draw > svg { display: block; }
 /* the session's +XP: a pop and a count-up, with the gain floating away */
 .study-xp { position: relative; }
 .study-xp.bump { animation: xpBadgePop .5s var(--ease); }

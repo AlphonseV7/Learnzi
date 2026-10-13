@@ -90,7 +90,7 @@ function cardView({ k, e }) {
     const hz = rubyHz(disp(e), e.p, "fc-hz");
     card.append(h("div", { class: "fc-front" }, hz),
       h("p", { class: "muted small" }, "What does it mean?"));
-    if (!study.revealed) drawSoon(hz);
+    drawSoon(hz, !study.revealed);   // after answering, the drawn characters just stay
   } else if (type === "l") {
     card.append(h("div", { class: "fc-front tone-play-row" },
       h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play")),
@@ -153,51 +153,45 @@ function xpBadge() {
 }
 
 /* Characters drawing themselves (Settings → Flashcards → Draw characters on cards): when a card shows
- * its characters, each one is quickly drawn stroke by stroke over the text, which then appears in your
- * font. Display only: it never touches your flashcards. Skipped with reduced motion, without Hanzi
- * Writer, or when a character's stroke shapes aren't loaded within 0.9 s. */
+ * its characters, each one is drawn quickly, stroke by stroke, and stays as the drawn character (no
+ * switch back to the font). The real text stays underneath for screen readers and copying. On the
+ * front of a Meaning card that's already been answered, the drawn characters just appear. Display
+ * only: it never touches your flashcards. Skipped with reduced motion, without Hanzi Writer, or when a
+ * character's stroke shapes aren't loaded within 0.9 s (the text then shows as usual). */
 const DRAW = { speed: 5, gap: 15, wait: 900 };
-function drawSoon(ruby) {
-  if (!state.drawChars || !writerReady() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  setTimeout(() => { if (ruby.isConnected) drawChars(ruby); }, 0);
+function drawSoon(ruby, animate = true) {
+  if (!state.drawChars || !writerReady()) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) animate = false;
+  setTimeout(() => { if (ruby.isConnected) drawChars(ruby, animate); }, 0);
 }
-function drawChars(ruby) {
+function drawChars(ruby, animate) {
   const hz = ruby.querySelector(".hz");
-  const card = ruby.closest(".flashcard");
-  if (!hz || !card) return;
+  if (!hz) return;
   // one span per character (they already exist when the pinyin matches; otherwise make them)
   if (!hz.children.length) { const t = hz.textContent; hz.replaceChildren(...[...t].map(c => h("span", null, c))); }
   const spans = [...hz.children].filter(sp => Engine.isCJK(sp.textContent));
   if (!spans.length) return;
-  // The text waits hidden while the stroke shapes load (usually instant: the next cards' shapes are
-  // fetched ahead); if they take too long it simply appears.
-  ruby.classList.add("drawing");
+  const colors = spans.map(sp => getComputedStyle(sp).color);   // tone colours, before hiding
+  ruby.classList.add("drawing");   // the text waits hidden while the stroke shapes load
   const late = new Promise(r => setTimeout(() => r(null), DRAW.wait));
   Promise.race([Promise.all(spans.map(sp => CharData.strokes(sp.textContent))), late]).then(datas => {
     if (!datas || datas.some(d => !d) || !ruby.isConnected) { ruby.classList.remove("drawing"); return; }
-    const cr = card.getBoundingClientRect();
-    const boxes = [];
-    let left = spans.length;
-    const finish = () => {
-      ruby.classList.remove("drawing");
-      boxes.forEach(b => b.classList.add("out"));
-      setTimeout(() => boxes.forEach(b => b.remove()), 300);
-    };
-    const safety = setTimeout(finish, 2600);
     spans.forEach((sp, i) => {
-      const r = sp.getBoundingClientRect(), size = Math.round(Math.min(r.width * 1.02, r.height));
-      const box = h("div", { class: "fc-draw", "aria-hidden": "true" });
-      box.style.cssText = "left:" + Math.round(r.left - cr.left + (r.width - size) / 2) + "px;top:" + Math.round(r.top - cr.top + (r.height - size) / 2) + "px;width:" + size + "px;height:" + size + "px";
-      card.append(box);
-      boxes.push(box);
-      const w = window.HanziWriter.create(box, sp.textContent, {
-        width: size, height: size, padding: Math.round(size * 0.04), showOutline: false, showCharacter: false,
-        strokeColor: getComputedStyle(sp).color, radicalColor: null,
-        strokeAnimationSpeed: DRAW.speed, delayBetweenStrokes: DRAW.gap,
+      const ch = sp.textContent, r = sp.getBoundingClientRect(), size = Math.round(Math.max(r.width, 16));
+      const color = colors[i];
+      const box = h("span", { class: "fc-draw", "aria-hidden": "true" });
+      sp.replaceChildren(h("span", { class: "visually-hidden" }, ch), box);
+      sp.classList.add("drawn");
+      sp.style.width = size + "px"; sp.style.height = size + "px";
+      const w = window.HanziWriter.create(box, ch, {
+        width: size, height: size, padding: Math.round(size * 0.04), showOutline: false, showCharacter: !animate,
+        strokeColor: color, radicalColor: null, strokeAnimationSpeed: DRAW.speed, delayBetweenStrokes: DRAW.gap,
         charDataLoader: (c, onLoad) => onLoad(datas[i]),
       });
-      w.animateCharacter({ onComplete: () => { if (--left === 0) { clearTimeout(safety); finish(); } } });
+      sp.style.color = color;
+      if (animate) w.animateCharacter();
     });
+    ruby.classList.remove("drawing");
   });
 }
 
