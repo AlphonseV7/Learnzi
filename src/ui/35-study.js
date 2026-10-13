@@ -144,10 +144,12 @@ function cardView({ k, e }) {
 }
 
 /** The "+N XP" for this session: counts up with a little pop when you earn XP. */
-function xpBadge() {
-  const el = h("span", { class: "badge hsk num study-xp" }, "+" + study.shownXp + " XP");
-  const from = study.shownXp, to = study.xp;
-  study.shownXp = to;
+/** The "+N XP" badge of a round: counts up with a bump and a floating "+n" when XP was just earned.
+ *  holder: the round (flashcards' study, or the tone trainer's drill) with xp and shownXp. */
+function xpBadge(holder = study) {
+  const el = h("span", { class: "badge hsk num study-xp" }, "+" + (holder.shownXp || 0) + " XP");
+  const from = holder.shownXp || 0, to = holder.xp;
+  holder.shownXp = to;
   if (to > from) requestAnimationFrame(() => {
     el.classList.add("bump");
     el.append(h("span", { class: "xp-gain", "aria-hidden": "true" }, "+" + (to - from)));

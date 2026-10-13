@@ -83,3 +83,24 @@
 .tone-card .fc-front.tone-play-row { min-height: 0; padding-block: 6px; }
 /* Single tones / Tone pairs: the same until pressed */
 .btn.tone-mode:active, .btn.tone-mode.picked { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+/* ---------- tone trainer rounds: 10 questions or 3 lives ---------- */
+.tone-round { align-items: center; gap: 10px; }
+.tone-lives { gap: 6px; align-items: center; }
+.tone-lives-row { align-items: center; }
+.life { display: block; overflow: visible; transition: opacity .3s, transform .3s; }
+.life.lost { opacity: .22; filter: grayscale(1); }
+.life.just-lost { animation: lifeLost .7s var(--ease); }
+@keyframes lifeLost {
+  0% { opacity: 1; filter: none; transform: scale(1); }
+  25% { transform: scale(1.35) rotate(-12deg); }
+  45% { transform: scale(1.1) rotate(10deg); }
+  100% { opacity: .22; filter: grayscale(1); transform: scale(1); }
+}
+.life-neon { filter: drop-shadow(0 0 3px var(--accent)); }
+.tone-over { text-align: center; justify-items: center; display: grid; gap: 10px; }
+.tone-ko { width: 96px; height: 96px; animation: toneKo .8s var(--ease); }
+@keyframes toneKo { 0% { transform: rotate(0) scale(1); } 30% { transform: rotate(-14deg) scale(.92); } 60% { transform: rotate(8deg); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .life.just-lost, .tone-ko { animation: none; } }
+.tone-over > .stats, .tone-over > .row { justify-self: stretch; }
+.tone-over > .row { justify-content: center; }

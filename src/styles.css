@@ -897,6 +897,10 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 @keyframes avOops { 25% { transform: translateX(-1.6px) rotate(-1.5deg); } 75% { transform: translateX(1.6px) rotate(1.5deg); } }
 .av-wink { animation: avBounce 1.4s ease-in-out 1; }
 .av-sweat { transform-box: fill-box; animation: avSweat 1.6s ease-in infinite; }
+/* knocked out (game over in the tone trainer): stars circle the head */
+.av-dizzy { transform-origin: 50px 18px; animation: avDizzy 2.4s linear infinite; }
+@keyframes avDizzy { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .av-dizzy { animation: none; } }
 @keyframes avSweat { 0% { transform: translateY(-2px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
 .av-fin-l, .av-fin-r { transform-box: fill-box; animation: avFin 1.3s ease-in-out infinite alternate; }
 .av-fin-l { transform-origin: 100% 50%; } .av-fin-r { transform-origin: 0 50%; animation-delay: .65s; }

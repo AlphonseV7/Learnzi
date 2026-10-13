@@ -198,6 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Tone trainer: a 3 lives round with lives in your theme's style and a knocked-out avatar at game over; every tone comes up equally; HSK 1–4 words; XP counts up like on flashcards"],
   ["13 Oct", "Ranks: show any rank you've reached as your title (Customise → Avatar → Ranks)"],
   ["13 Oct", "Light looks are softer on the eyes in every theme, with text kept as easy to read; new setups match the device's light or dark"],
   ["13 Oct", "Accent colour: a note that it stays when you change theme; English font: Theme's own; the Glitch box is now in Settings"],
@@ -263,7 +264,7 @@ const UPDATES = [
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", mle: null,
+  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", toneRound: "ten", toneBest: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 /** How My decks and My cards are shown and sorted (state.sorts): each key's allowed values, first is the default. */
@@ -406,6 +407,10 @@ function sanitize(raw) {
   for (const [k, a] of Object.entries(obj(m.act)).slice(-60)) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(a)) ma[k] = [0, 1].map(i => Math.floor(num(a[i], 0, 1e5, 0)));
   s.mle = { on: m.on === true, unlocked: m.unlocked === true, rude: m.rude === true, cards: mc, quizXp: Math.floor(num(m.quizXp, 0, 1e8, 0)), act: ma };
   s.toneSource = ["word", "syllables", "browser"].includes(o.toneSource) ? o.toneSource : "";
+  // the tone trainer: 10 questions or 3 lives, and your best 3-lives score for each kind
+  s.toneRound = o.toneRound === "lives" ? "lives" : "ten";
+  s.toneBest = {};
+  for (const k of ["single", "pairs"]) { const n = Math.floor(num(obj(o.toneBest)[k], 0, 100000, 0)); if (n) s.toneBest[k] = n; }
   // Your voice: Automatic, or one you picked (Settings → Voice, or the voice button beside Listen).
   s.voiceSrc = ["auto", "word", "syllables", "browser"].includes(o.voiceSrc) ? o.voiceSrc : o.voice === "browser" ? "browser" : "auto";
   // The Home clock (checked in full when drawn, see 29-clock).

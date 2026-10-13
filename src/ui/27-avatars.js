@@ -21,7 +21,7 @@ const AV = {
   },
   // Moods, used for drawing only: the avatar shows them by itself (calm, happy on XP, surprised on a
   // level up, sleepy when left alone, wink when tapped, oops on a forgotten card).
-  expr: { calm: { label: "Calm" }, happy: { label: "Happy" }, wink: { label: "Wink" }, sleepy: { label: "Sleepy" }, surprised: { label: "Surprised" }, oops: { label: "Oops" } },
+  expr: { calm: { label: "Calm" }, happy: { label: "Happy" }, wink: { label: "Wink" }, sleepy: { label: "Sleepy" }, surprised: { label: "Surprised" }, oops: { label: "Oops" }, ko: { label: "Knocked out" } },
   eyes: { normal: { label: "Normal", lv: 1 }, glow: { label: "Glowing", lv: 5 }, star: { label: "Starry", streak: 7 } },
   acc: { none: { label: "None", lv: 1 }, scarf: { label: "Red scarf", lv: 2 }, bamboo: { label: "Bamboo sprig", lv: 4 }, lantern: { label: "Lantern", lv: 6 }, phones: { label: "Headphones", lv: 8 }, crown: { label: "Crown", lv: 10 } },
   aura: { none: { label: "None", lv: 1 }, ring: { label: "Gold ring", lv: 7 }, petals: { label: "Falling petals", lv: 9 } },
@@ -325,6 +325,11 @@ function eyesFor(a, eyeColor) {
   if (a.expr === "sleepy") return [arc(L, false), arc(R, false)];
   if (a.expr === "wink") return [openEye(L, false, " av-blink"), openEye(R, false, " av-winker")];
   if (a.expr === "surprised") return [openEye(L, true, " av-blink"), openEye(R, true, " av-blink")];
+  if (a.expr === "ko") {   // game over: little crosses for eyes
+    const x = ([cx, cy]) => sv("path", { d: "M" + (cx - 3.6) + " " + (cy - 3.6) + " l7.2 7.2 M" + (cx + 3.6) + " " + (cy - 3.6) + " l-7.2 7.2", fill: "none",
+      stroke: glow ? "var(--accent)" : eyeColor, "stroke-width": 2.4, "stroke-linecap": "round" });
+    return [x(L), x(R)];
+  }
   if (a.expr === "oops") return [openEye(L, false, " av-blink"), openEye(R, false, " av-blink"),
     sv("path", { d: "M32 45 L42 42 M58 42 L68 45", fill: "none", stroke: a.animal === "panda" ? "#222" : OUT, "stroke-width": 2, "stroke-linecap": "round" })];
   return [openEye(L, false, " av-blink"), openEye(R, false, " av-blink")];
@@ -332,7 +337,7 @@ function eyesFor(a, eyeColor) {
 /** Birds have a beak instead of a mouth: closed, or open when happy, surprised or caught out. */
 function beakFor(a, y, col) {
   const edge = { stroke: "#8a6a1e", "stroke-width": 1, "stroke-linejoin": "round" };
-  if (a.expr === "happy" || a.expr === "surprised" || a.expr === "oops") {
+  if (a.expr === "happy" || a.expr === "surprised" || a.expr === "oops" || a.expr === "ko") {
     const gap = a.expr === "surprised" ? 6 : a.expr === "happy" ? 4.5 : 3;
     return [sv("path", { d: "M45 " + (y + 1) + " L55 " + (y + 1) + " L50 " + (y + 4 + gap) + " Z", fill: "#7a2e2e" }),
       sv("path", Object.assign({ d: "M43.5 " + y + " L56.5 " + y + " L50 " + (y + 5) + " Z", fill: col }, edge)),
@@ -344,6 +349,7 @@ function beakFor(a, y, col) {
 function mouthFor(a, y) {
   const m = { stroke: OUT, "stroke-width": 1.8, fill: "none", "stroke-linecap": "round" };
   if (a.expr === "oops") return [sv("path", Object.assign({ d: "M44 " + (y + 1) + " q2 -3 4 0 q2 3 4 0 q2 -3 4 0" }, m))];
+  if (a.expr === "ko") return [sv("ellipse", { cx: 50, cy: y + 1, rx: 3, ry: 2.4, fill: "#7a2e2e" }), sv("path", { d: "M49 " + (y + 2) + " q2.5 4.5 5 0 Z", fill: "#f08a8a" })];
   if (a.expr === "happy") return [sv("path", { d: "M43 " + (y - 2) + " q7 9 14 0 Z", fill: "#7a2e2e" }), sv("path", { d: "M46.5 " + (y + 2.2) + " q3.5 2.6 7 0 q-3.5 -2 -7 0", fill: "#f08a8a" })];
   if (a.expr === "wink") return [sv("path", Object.assign({ d: "M44 " + (y - 1) + " q6 5 12 0" }, m)), sv("path", { d: "M51 " + (y + 1) + " q2.5 5 5 0 Z", fill: "#f08a8a" })];
   if (a.expr === "sleepy") return [sv("ellipse", { cx: 50, cy: y, rx: 2, ry: 2.4, fill: "#7a2e2e" })];
@@ -440,6 +446,8 @@ function avatarSvg(a, size, label) {
   const face = sv("g", { class: "av-body av-" + a.expr },
     parts, eyesFor(a, eye), beak ? beakFor(a, mouthY, beak) : mouthFor(a, mouthY),
     [sv("ellipse", { cx: 29, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 }), sv("ellipse", { cx: 71, cy: 65, rx: 5, ry: 3, fill: "#ff8fa3", opacity: 0.55 })],
+    a.expr === "ko" ? sv("g", { class: "av-dizzy" }, [0, 120, 240].map(r => sv("path", { transform: "rotate(" + r + " 50 18)",
+      d: "M50 6 L51.2 9.6 L54.8 10.8 L51.2 12 L50 15.6 L48.8 12 L45.2 10.8 L48.8 9.6 Z", fill: "#f5c542", stroke: "#b8862a", "stroke-width": 0.5 }))) : null,
     a.expr === "oops" ? sv("path", { class: "av-sweat", d: "M79 30 q-4 6 0 8 q4 -2 0 -8 Z", fill: "#8cc7e8", stroke: "#4f95bd", "stroke-width": 0.8 }) : null,
     ["scarf", "bamboo", "lantern", "phones", "crown"].filter(x => a.accs.includes(x)).map(x => accessory(x, a.animal)),
     a.halo ? halo(a.animal) : null);
