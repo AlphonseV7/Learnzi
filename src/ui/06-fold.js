@@ -49,7 +49,8 @@ function foldBox(el, prefix, closedByDefault) {
   const remove = removable ? h("button", { class: "fold-remove", type: "button", "aria-label": "Remove the " + text.trim() + " box", title: "Remove this box",
     onclick: () => removeBox(el) }, icon("close")) : null;
   el.replaceChildren(
-    h("div", { class: "fold-head" }, title, extras.length ? h("div", { class: "fold-extras row" }, extras) : null, grip, remove),
+    h("div", { class: "fold-head" }, title,
+      h("div", { class: "fold-tools" }, extras.length ? h("div", { class: "fold-extras row" }, extras) : null, grip, remove)),
     h("div", { class: "fold-body", id: bodyId }, h("div", { class: "fold-inner" }, rest)));
   el.classList.add("fold");
   el.dataset.fold = id;

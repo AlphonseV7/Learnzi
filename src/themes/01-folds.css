@@ -5,8 +5,11 @@
 .fold.tip { --fold-gap: 4px; }
 .fold.examples { --fold-gap: 8px; }
 .fold.write { --fold-gap: 10px; }
-.fold-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.fold-title { flex: 1; min-width: 0; margin: 0; }
+.fold-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+/* the title never shrinks below its longest word: when the buttons beside it don't fit (a narrow phone,
+   a wide theme font), they move together to a second line on the right instead of running over it */
+.fold-title { flex: 1 1 0; min-width: min(100%, min-content); margin: 0; }
+.fold-tools { display: flex; align-items: center; gap: 8px; flex: none; margin-left: auto; max-width: 100%; }
 .fold-btn {
   display: flex; align-items: center; gap: 8px; width: 100%; min-height: 32px; padding: 0; margin: 0;
   border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left;

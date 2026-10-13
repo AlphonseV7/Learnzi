@@ -28,13 +28,19 @@
 @property --sx { syntax: "<percentage>"; inherits: false; initial-value: -40%; }
 :root[data-shape="silver"] { --facet: rgb(255 255 255 / .09); --sheen: rgb(255 255 255 / .075); }
 :root[data-shape="silver"][data-mode="light"] { --facet: color-mix(in srgb, var(--accent) 13%, transparent); --sheen: rgb(255 255 255 / .75); }
+/* The size of each cut is set by --k (1 on panels, smaller on the rows inside them) and capped as a share
+   of the box's own size with min(), so a short box never loses a big bite of its edge. */
+:root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box) { --k: 1; }
+:root[data-shape="silver"] :is(.deck-row, .deck-mini, .pv-box) { --k: .55; }
 :root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box) {
   /* shape 1: a long shallow cut across the top left, a steeper one at the bottom right */
-  --clip: polygon(0 16px, 30% 0, 100% 0, 100% calc(100% - 24px), calc(100% - 52px) 100%, 0 100%);
-  --ring: polygon(evenodd, 0 16px, 30% 0, 100% 0, 100% calc(100% - 24px), calc(100% - 52px) 100%, 0 100%, 0 16px,
-    1.3px 16.8px, 30% 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - 24.6px), calc(100% - 52.4px) calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px 16.8px);
+  --ay: min(calc(16px * var(--k)), 20%); --by: min(calc(24px * var(--k)), 24%); --bx: min(calc(52px * var(--k)), 16%);
+  --clip: polygon(0 var(--ay), 30% 0, 100% 0, 100% calc(100% - var(--by)), calc(100% - var(--bx)) 100%, 0 100%);
+  --ring: polygon(evenodd, 0 var(--ay), 30% 0, 100% 0, 100% calc(100% - var(--by)), calc(100% - var(--bx)) 100%, 0 100%, 0 var(--ay),
+    1.3px calc(var(--ay) + .8px), 30% 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - var(--by) - .6px), calc(100% - var(--bx) - .4px) calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px calc(var(--ay) + .8px));
   --facet-img: linear-gradient(to bottom right, transparent 50%, var(--facet) 50%, transparent);
-  --facet-at: 0 0 / 30% 16px;
+  --facet-at: 0 0 / 30% var(--ay);
+  --star-x: 30%;
   position: relative; isolation: isolate; border: 0; border-radius: 0; clip-path: var(--clip);
   background: linear-gradient(110deg, transparent calc(var(--sx) - 14%), var(--sheen) var(--sx), transparent calc(var(--sx) + 14%)),
     var(--facet-img) var(--facet-at) no-repeat, var(--glass);
@@ -43,19 +49,21 @@
 }
 :root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box):nth-child(3n + 2) {
   /* shape 2: the mirror, cut across the top right and the bottom left */
-  --clip: polygon(0 0, calc(100% - 70px) 0, 100% 14px, 100% 100%, 20px 100%, 0 calc(100% - 44px));
-  --ring: polygon(evenodd, 0 0, calc(100% - 70px) 0, 100% 14px, 100% 100%, 20px 100%, 0 calc(100% - 44px), 0 0,
-    1.3px 1.3px, calc(100% - 70.3px) 1.3px, calc(100% - 1.3px) 14.8px, calc(100% - 1.3px) calc(100% - 1.3px), 20.5px calc(100% - 1.3px), 1.3px calc(100% - 44.6px), 1.3px 1.3px);
+  --ax: min(calc(70px * var(--k)), 22%); --ay: min(calc(14px * var(--k)), 18%); --bx: min(calc(20px * var(--k)), 8%); --by: min(calc(44px * var(--k)), 26%);
+  --clip: polygon(0 0, calc(100% - var(--ax)) 0, 100% var(--ay), 100% 100%, var(--bx) 100%, 0 calc(100% - var(--by)));
+  --ring: polygon(evenodd, 0 0, calc(100% - var(--ax)) 0, 100% var(--ay), 100% 100%, var(--bx) 100%, 0 calc(100% - var(--by)), 0 0,
+    1.3px 1.3px, calc(100% - var(--ax) - .3px) 1.3px, calc(100% - 1.3px) calc(var(--ay) + .8px), calc(100% - 1.3px) calc(100% - 1.3px), calc(var(--bx) + .5px) calc(100% - 1.3px), 1.3px calc(100% - var(--by) - .6px), 1.3px 1.3px);
   --facet-img: linear-gradient(to bottom left, transparent 50%, var(--facet) 50%, transparent);
-  --facet-at: right 0 top 0 / 70px 14px;
+  --facet-at: right 0 top 0 / var(--ax) var(--ay);
 }
 :root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box):nth-child(3n) {
   /* shape 3: a small steep cut at the top left and a slanted bottom edge, like a shard of ice */
-  --clip: polygon(14px 0, 100% 0, 100% calc(100% - 10px), 62% 100%, 0 100%, 0 34px);
-  --ring: polygon(evenodd, 14px 0, 100% 0, 100% calc(100% - 10px), 62% 100%, 0 100%, 0 34px, 14px 0,
-    14.6px 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - 11px), 62% calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px 34.6px, 14.6px 1.3px);
+  --ax: min(calc(14px * var(--k)), 7%); --ay: min(calc(34px * var(--k)), 24%); --by: min(calc(10px * var(--k)), 14%);
+  --clip: polygon(var(--ax) 0, 100% 0, 100% calc(100% - var(--by)), 62% 100%, 0 100%, 0 var(--ay));
+  --ring: polygon(evenodd, var(--ax) 0, 100% 0, 100% calc(100% - var(--by)), 62% 100%, 0 100%, 0 var(--ay), var(--ax) 0,
+    calc(var(--ax) + .6px) 1.3px, calc(100% - 1.3px) 1.3px, calc(100% - 1.3px) calc(100% - var(--by) - 1px), 62% calc(100% - 1.3px), 1.3px calc(100% - 1.3px), 1.3px calc(var(--ay) + .6px), calc(var(--ax) + .6px) 1.3px);
   --facet-img: linear-gradient(to bottom right, transparent 50%, var(--facet) 50%, transparent);
-  --facet-at: 0 0 / 14px 34px;
+  --facet-at: 0 0 / var(--ax) var(--ay);
 }
 :root[data-shape="silver"] :is(.card, .action, .deck-row, .deck-mini, .pv-box)::before {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; clip-path: var(--ring); background: var(--rim);
@@ -77,7 +85,7 @@
   background: var(--ink); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
   animation: silverGlint 4.5s ease-in-out infinite;
 }
-:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n + 2)::after { left: auto; right: 64px; animation-delay: -1.5s; }
+:root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n + 2)::after { left: auto; right: calc(var(--ax) - 6px); animation-delay: -1.5s; }
 :root[data-shape="silver"] :is(.view > .card, .action):nth-child(3n)::after { left: auto; right: 22px; top: 2px; animation-delay: -3s; }
 :root[data-shape="silver"][data-mode="light"] :is(.view > .card, .action)::after { background: var(--accent); }
 @keyframes silverGlint { 0%, 100% { opacity: .3; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
