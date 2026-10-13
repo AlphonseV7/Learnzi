@@ -81,6 +81,7 @@ function viewSettings() {
     row("newperday", "New cards", perDay, "How many new cards to start each day"),
     row("listen", "Listening cards", toggleCtl("listen", state.listen, on => commit({ listen: on })), "Turn off where you can't play sound"),
     row("writing", "Writing cards", toggleCtl("writing", state.writing, on => commit({ writing: on })), "Write words from memory once you know them (12 days)"),
+    row("drawchars", "Draw characters on cards", toggleCtl("drawchars", state.drawChars, on => commit({ drawChars: on })), "Each card's characters quickly draw themselves, stroke by stroke"),
     row("autoplay", "Play sound automatically", toggleCtl("autoplay", state.autoplay, on => commit({ autoplay: on })), "When a card's answer is shown"),
     row("sounds", "Level-up sound", toggleCtl("sounds", state.sounds, on => commit({ sounds: on })), "A soft gong when you reach a new Zì level"),
     h("p", { class: "muted small" }, "Meaning cards come first. Listening cards unlock once you remember a word for 3 days, Recall cards (English to Chinese) at 8 days, and Writing cards (if switched on) at 12 days.")));

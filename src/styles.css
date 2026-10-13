@@ -432,7 +432,21 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
 .zrow { grid-template-columns: minmax(0, 1fr) auto auto; }
 
 .study .study-top { gap: 8px; }
-.flashcard { display: grid; gap: 14px; padding: 22px 18px; min-height: 22rem; align-content: start; }
+.flashcard { position: relative; display: grid; gap: 14px; padding: 22px 18px; min-height: 22rem; align-content: start; }
+/* characters drawing themselves (35-study): the text waits underneath, then fades in as the strokes fade */
+.rz.drawing .hz > span { color: transparent !important; }
+.rz .hz > span { transition: color .25s; }
+.fc-draw { position: absolute; z-index: 2; pointer-events: none; transition: opacity .25s; }
+.fc-draw.out { opacity: 0; }
+/* the session's +XP: a pop and a count-up, with the gain floating away */
+.study-xp { position: relative; }
+.study-xp.bump { animation: xpBadgePop .5s var(--ease); }
+@keyframes xpBadgePop { 40% { transform: scale(1.22); box-shadow: 0 0 0 4px var(--accent-soft), 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); } }
+.xp-gain { position: absolute; right: 4px; top: -2px; font-size: .78rem; font-weight: 800; color: var(--accent); pointer-events: none; animation: xpGain .9s var(--ease) forwards; }
+@keyframes xpGain { from { opacity: 0; transform: translateY(4px); } 25% { opacity: 1; } to { opacity: 0; transform: translateY(-18px); } }
+/* a new card: "new" glows softly a couple of times */
+.fc-new { animation: fcNew 1.4s ease-in-out 2; }
+@keyframes fcNew { 50% { color: var(--accent); text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent); } }
 .fc-front { display: grid; place-items: center; min-height: 9rem; text-align: center; padding-block: 8px; }
 .fc-hz { font-size: clamp(3.2rem, 14vw, 5rem); line-height: 1.15; }
 .fc-hz rt { font-size: .28em; }

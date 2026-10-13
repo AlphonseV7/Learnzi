@@ -198,6 +198,8 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["13 Oct", "Flashcards: characters draw themselves stroke by stroke (Settings → Flashcards to turn off); +XP counts up; new cards glow"],
+  ["13 Oct", "Home: Recent lookups above the shortcuts; Show English on the Greeting; All decks is a button"],
   ["13 Oct", "Top bar: bigger avatar and name; your level is a capsule that fills up with XP"],
   ["13 Oct", "Home: Grammar point of the day; the word pop-up's Grammar box sits right after the meaning"],
   ["13 Oct", "Computer: the side bars start below the top bar; their edges show an arrow and a sheen until you've found them"],
@@ -252,7 +254,7 @@ const UPDATES = [
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
   scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
-  zen: true, shapes: true, avMatch: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
+  zen: true, shapes: true, avMatch: true, drawChars: true, mode: "theme", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
 const num = (v, lo, hi, d) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
@@ -362,6 +364,7 @@ function sanitize(raw) {
   s.subSize = ["s", "m", "l", "xl"].includes(o.subSize) ? o.subSize : "m";
   s.shapes = o.shapes !== false;
   s.writing = o.writing === true;
+  s.drawChars = o.drawChars !== false;
   s.strokeSpeed = [0.5, 1, 2].includes(o.strokeSpeed) ? o.strokeSpeed : 1;
   s.radical = o.radical !== false;
   s.details = {};

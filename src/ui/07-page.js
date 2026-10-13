@@ -99,5 +99,13 @@ function greetingBox() {
     h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, "Greeting"),
       withVoice(h("button", { class: "btn icon", type: "button", "aria-label": "Listen to " + zh, onclick: () => speak(zh, py) }, icon("play")), { text: zh, p: py, compact: true })),
     h("p", { class: "greeting-zh" }, rubyHz(zh, py), name ? h("span", { class: "greeting-name" }, "，" + name) : null),
-    h("p", { class: "muted" }, en + (name ? ", " + name : "") + "."));
+    showEnglish(en + (name ? ", " + name : "") + "."));
+}
+/** An English line hidden behind a Show English button (Greeting box). */
+function showEnglish(text) {
+  const en = h("p", { class: "muted", hidden: true }, text);
+  const btn = h("button", { class: "btn small", type: "button", "aria-expanded": "false", onclick: () => {
+    en.hidden = !en.hidden; btn.textContent = en.hidden ? "Show English" : "Hide English"; btn.setAttribute("aria-expanded", String(!en.hidden));
+  } }, "Show English");
+  return h("div", { class: "stack-tight" }, h("div", { class: "row" }, btn), en);
 }

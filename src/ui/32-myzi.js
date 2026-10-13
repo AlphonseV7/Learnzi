@@ -163,8 +163,8 @@ function afterDeck() {
 function decksBox(label = "Your decks") {
   const ids = allDeckIds().filter(isActive);
   const box = h("div", { class: "card stack" },
-    h("div", { class: "row spread" }, label === "My decks" ? h("h2", { class: "h-card" }, label) : h("span", { class: "eyebrow" }, label),
-      h("button", { class: "plain-btn build-link small", type: "button", onclick: () => go("decks") }, "All decks")));
+    label === "My decks" ? h("h2", { class: "h-card" }, label) : h("span", { class: "eyebrow" }, label),
+    h("div", { class: "row" }, h("button", { class: "btn small", type: "button", onclick: () => go("decks") }, "All decks", icon("next"))));
   if (!ids.length) { box.append(h("p", { class: "muted" }, "No decks yet. Open Study → My decks to start one.")); return box; }
   for (const id of ids.slice(0, 4)) {
     const sum = deckSummary(id);

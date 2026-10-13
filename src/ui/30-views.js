@@ -75,6 +75,13 @@ function viewHome() {
   } else v.append(h("div", { class: "card" }, loadingBlock()));
 
   if (ui.dict === "ready") v.append(dailyBox(), grammarDayBox(), decksBox());
+  // Recent lookups, above the shortcuts (shown from the start, with a hint until you've looked something up)
+  if (ui.dict === "ready") {
+    const recent = state.recent.slice(0, 10).map(s => [s, Engine.lookup(s)[0]]).filter(([, e]) => e);
+    v.append(h("div", { class: "card stack" }, h("span", { class: "eyebrow" }, "Recent lookups"),
+      recent.length ? h("div", { class: "row chips" }, recent.map(([s, e]) => h("button", { class: "chip", type: "button", onclick: () => openWord(s) }, rubyHz(disp(e), e.p))))
+        : h("p", { class: "muted small" }, "Words you look up appear here.")));
+  }
   const action = (title, sub, onclick) => h("button", { class: "action", type: "button", onclick }, h("b", null, title), h("span", { class: "muted small" }, sub));
   v.append(h("div", { class: "actions" },
     action("Look up a word", "Type characters, pinyin or English", () => go("lookup")),
@@ -82,13 +89,6 @@ function viewHome() {
     action("Tone trainer", "Hear a word, pick its tones", () => { drill.active = false; go("tones"); }),
     action("My Zì", "Decks, flashcards and progress · Zì level " + levelNow().level, () => go("myzi"))));
 
-  if (state.recent.length && ui.dict === "ready") {
-    v.append(h("div", { class: "card stack" }, h("span", { class: "eyebrow" }, "Recent lookups"),
-      h("div", { class: "row chips" }, state.recent.slice(0, 10).map(s => {
-        const e = Engine.lookup(s)[0];
-        return e ? h("button", { class: "chip", type: "button", onclick: () => openWord(s) }, rubyHz(disp(e), e.p)) : null;
-      }))));
-  }
   return v;
 }
 

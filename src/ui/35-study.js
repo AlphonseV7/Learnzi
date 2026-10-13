@@ -14,7 +14,7 @@ function startStudy(deckId = null) {
     for (let i = 0; i < 3 && d < plan.due.length; i++) queue.push(plan.due[d++]);
     if (f < plan.fresh.length) queue.push(plan.fresh[f++]);
   }
-  Object.assign(study, { queue, cur: null, revealed: false, done: 0, again: 0, xp: 0, active: true, deck: deckId });
+  Object.assign(study, { queue, cur: null, revealed: false, done: 0, again: 0, xp: 0, shownXp: 0, active: true, deck: deckId });
   nextCard();
   go("study");
 }
@@ -22,6 +22,8 @@ function nextCard() {
   study.cur = study.queue.shift() || null;
   study.revealed = false;
   study.w = { idx: 0, mistakes: 0, done: false, strokes: 0 };
+  // fetch the stroke shapes of the next few cards now, so their characters can draw themselves at once
+  if (state.drawChars) for (const it of [study.cur, ...study.queue.slice(0, 3)]) if (it) for (const c of it.e.s) if (Engine.isCJK(c)) CharData.strokes(c);
   if (study.cur && study.cur.k.endsWith("|l") && state.autoplay) setTimeout(() => speak(study.cur.e.s, study.cur.e.p), 250);
 }
 function reveal() {
@@ -70,7 +72,7 @@ function viewStudy() {
   v.append(h("div", { class: "row spread study-top" },
     h("button", { class: "btn", type: "button", onclick: leaveStudy }, icon("back"), study.deck ? deckName(study.deck) : "My Zì"),
     h("span", { class: "muted small num" }, study.cur ? Math.min(study.done + 1, total) + " of " + total : "Done"),
-    h("span", { class: "badge hsk num" }, "+" + study.xp + " XP")));
+    xpBadge()));
   const bar = h("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(study.done) }, h("i"));
   bar.firstChild.style.width = (total ? (study.done / total) * 100 : 100) + "%";
   v.append(bar);
@@ -82,11 +84,13 @@ function cardView({ k, e }) {
   const type = k.slice(-1);
   const card = h("div", { class: "card flashcard", "data-type": type });
   const listen = (label) => withVoice(h("button", { class: "btn" + (label ? "" : " icon"), type: "button", "aria-label": "Listen", onclick: () => speak(e.s, e.p) }, icon("play"), label || null), { text: e.s, p: e.p, compact: !label });
-  card.append(h("span", { class: "eyebrow" }, TYPES[type] + (progress.cards[k] ? "" : " · new")));
+  card.append(h("span", { class: "eyebrow" }, TYPES[type], progress.cards[k] ? null : h("span", { class: "fc-new" }, " · new")));
   // Front of the card
   if (type === "m") {
-    card.append(h("div", { class: "fc-front" }, rubyHz(disp(e), e.p, "fc-hz")),
+    const hz = rubyHz(disp(e), e.p, "fc-hz");
+    card.append(h("div", { class: "fc-front" }, hz),
       h("p", { class: "muted small" }, "What does it mean?"));
+    if (!study.revealed) drawSoon(hz);
   } else if (type === "l") {
     card.append(h("div", { class: "fc-front tone-play-row" },
       h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play")),
@@ -107,8 +111,10 @@ function cardView({ k, e }) {
   }
   // Back of the card
   const senses = Engine.senses(e).slice(0, 4).map(plainSense);
+  const answerHz = type !== "m" ? rubyHz(disp(e), e.p, "fc-hz") : null;
+  if (answerHz && type !== "w") drawSoon(answerHz);
   card.append(h("div", { class: "fc-answer" },
-    type !== "m" ? rubyHz(disp(e), e.p, "fc-hz") : null,
+    answerHz,
     h("div", { class: "row" }, pyEl(e.p, "py fc-py"), listen(), starBtn(e)),
     h("ol", { class: "defs" }, senses.map(s => h("li", null, s))),
     h("button", { class: "plain-btn build-link small", type: "button", onclick: () => openWord(e.s, e) }, "More about this word")),
@@ -125,6 +131,74 @@ function cardView({ k, e }) {
       h("b", null, name), h("span", { class: "small" }, labels[i])))),
     h("p", { class: "muted small kbd-hint" }, "Keys 1–4 also work"));
   return card;
+}
+
+/** The "+N XP" for this session: counts up with a little pop when you earn XP. */
+function xpBadge() {
+  const el = h("span", { class: "badge hsk num study-xp" }, "+" + study.shownXp + " XP");
+  const from = study.shownXp, to = study.xp;
+  study.shownXp = to;
+  if (to > from) requestAnimationFrame(() => {
+    el.classList.add("bump");
+    el.append(h("span", { class: "xp-gain", "aria-hidden": "true" }, "+" + (to - from)));
+    const t0 = performance.now(), dur = 450;
+    const step = now => {
+      const f = Math.min(1, (now - t0) / dur);
+      el.firstChild.nodeValue = "+" + Math.round(from + (to - from) * (1 - Math.pow(1 - f, 3))) + " XP";
+      if (f < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  return el;
+}
+
+/* Characters drawing themselves (Settings → Flashcards → Draw characters on cards): when a card shows
+ * its characters, each one is quickly drawn stroke by stroke over the text, which then appears in your
+ * font. Display only: it never touches your flashcards. Skipped with reduced motion, without Hanzi
+ * Writer, or when a character's stroke shapes aren't loaded within 0.9 s. */
+const DRAW = { speed: 5, gap: 15, wait: 900 };
+function drawSoon(ruby) {
+  if (!state.drawChars || !writerReady() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  setTimeout(() => { if (ruby.isConnected) drawChars(ruby); }, 0);
+}
+function drawChars(ruby) {
+  const hz = ruby.querySelector(".hz");
+  const card = ruby.closest(".flashcard");
+  if (!hz || !card) return;
+  // one span per character (they already exist when the pinyin matches; otherwise make them)
+  if (!hz.children.length) { const t = hz.textContent; hz.replaceChildren(...[...t].map(c => h("span", null, c))); }
+  const spans = [...hz.children].filter(sp => Engine.isCJK(sp.textContent));
+  if (!spans.length) return;
+  // The text waits hidden while the stroke shapes load (usually instant: the next cards' shapes are
+  // fetched ahead); if they take too long it simply appears.
+  ruby.classList.add("drawing");
+  const late = new Promise(r => setTimeout(() => r(null), DRAW.wait));
+  Promise.race([Promise.all(spans.map(sp => CharData.strokes(sp.textContent))), late]).then(datas => {
+    if (!datas || datas.some(d => !d) || !ruby.isConnected) { ruby.classList.remove("drawing"); return; }
+    const cr = card.getBoundingClientRect();
+    const boxes = [];
+    let left = spans.length;
+    const finish = () => {
+      ruby.classList.remove("drawing");
+      boxes.forEach(b => b.classList.add("out"));
+      setTimeout(() => boxes.forEach(b => b.remove()), 300);
+    };
+    const safety = setTimeout(finish, 2600);
+    spans.forEach((sp, i) => {
+      const r = sp.getBoundingClientRect(), size = Math.round(Math.min(r.width * 1.02, r.height));
+      const box = h("div", { class: "fc-draw", "aria-hidden": "true" });
+      box.style.cssText = "left:" + Math.round(r.left - cr.left + (r.width - size) / 2) + "px;top:" + Math.round(r.top - cr.top + (r.height - size) / 2) + "px;width:" + size + "px;height:" + size + "px";
+      card.append(box);
+      boxes.push(box);
+      const w = window.HanziWriter.create(box, sp.textContent, {
+        width: size, height: size, padding: Math.round(size * 0.04), showOutline: false, showCharacter: false,
+        strokeColor: getComputedStyle(sp).color, radicalColor: null,
+        strokeAnimationSpeed: DRAW.speed, delayBetweenStrokes: DRAW.gap,
+        charDataLoader: (c, onLoad) => onLoad(datas[i]),
+      });
+      w.animateCharacter({ onComplete: () => { if (--left === 0) { clearTimeout(safety); finish(); } } });
+    });
+  });
 }
 
 function summaryView() {
