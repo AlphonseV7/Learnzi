@@ -492,15 +492,22 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); box-shado
   0% { transform: rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
   100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(.3); opacity: 0; }
 }
-.search-row { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-off, 0px)); transition: top .3s var(--ease); z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--bg); padding-block: 6px; }
+.search-row { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-off, 0px)); transition: top .3s var(--ease); z-index: 5; display: flex; gap: 8px; align-items: center; }
+.search-row:not(.card) { background: var(--bg); padding-block: 6px; }
 .search-row .search { position: relative; flex: 1; min-width: 0; padding: 0; top: auto; }
+.search-row.card .search { background: none; }
 /* the camera and dice buttons: a matching pair of squares as tall as the search field */
 .search-row { align-items: stretch; }
 .search-row > .btn { flex: none; height: auto; min-height: 44px; aspect-ratio: 1; width: auto; padding: 0; justify-content: center; margin: 0; }
 .search-row > .btn svg { width: 24px; height: 24px; }
 .random { gap: 8px; }
 @media (min-width: 481px) { .search-row > .random { aspect-ratio: auto; padding: 0 18px; } }
-@media (max-width: 480px) { .random { font-size: 0; font-size-adjust: none; } }
+/* phones: just the dice, centred (the word is hidden, and takes no space) */
+@media (max-width: 480px) { .random { gap: 0; } .random-label { display: none; } }
+/* Look up's search row is a box in the theme's own style, and stays at the top as you scroll */
+:root .app .search-row.card { position: sticky; z-index: 5; margin: 0; padding: 10px; }
+:root[data-shape="porcelain"] .app .search-row.card { padding: 16px 18px; }
+:root[data-shape="imperial"] .app .search-row.card { padding: 14px 16px; }
 .phrase { display: grid; gap: 10px; }
 .phrase-chip { display: inline-grid; justify-items: center; gap: 0; padding: 6px 12px; border-radius: 12px; }
 .phrase-chip.missing { color: var(--ink-soft); border-style: dashed; }

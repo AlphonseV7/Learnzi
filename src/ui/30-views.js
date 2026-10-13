@@ -112,10 +112,10 @@ function viewLookup() {
   input.addEventListener("keydown", ev => {
     if (ev.key === "Enter") { clearTimeout(searchTimer); fillResults(results); const first = results.querySelector(".res"); if (first) first.click(); }
   });
-  v.append(h("div", { class: "search-row" },
+  v.append(h("div", { class: "card search-row" },
     h("div", { class: "search", role: "search" }, h("span", { class: "mag" }, icon("search")), input),
     h("button", { class: "btn icon photo-go", type: "button", title: "Photo to words: read Chinese in a photo", "aria-label": "Photo to words", onclick: () => go("photo") }, icon("camera")),
-    h("button", { class: "btn random", type: "button", title: "Look up a random common word", onclick: randomWord }, icon("dice"), "Random")));
+    h("button", { class: "btn random", type: "button", title: "Look up a random common word", onclick: randomWord }, icon("dice"), h("span", { class: "random-label" }, "Random"))));
   v.append(h("p", { class: "muted small hint" }, "Search by characters (simplified or traditional), pinyin with or without tones (ni3hao3, nǐ hǎo, nihao) or English."));
   v.append(results);
   fillResults(results);

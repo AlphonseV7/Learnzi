@@ -201,7 +201,7 @@ const UPDATES = [
   ["13 Oct", "Top bar: the XP capsule keeps one size; tap your avatar or name for Customise, your level for My Zì"],
   ["13 Oct", "Review: tap the character on a card to hear it again"],
   ["13 Oct", "My decks: a Progress box (words learned, the week ahead) and Show and sort; My cards: sorting, and each word in its own box"],
-  ["13 Oct", "Look up: Recent lookups in one box; the camera and dice buttons match"],
+  ["13 Oct", "Look up: the search bar and Recent lookups sit in boxes in your theme's style; the camera and dice buttons match"],
   ["13 Oct", "Silver River: smaller cuts on small boxes, so none gets squeezed; a box's buttons move under its title when they don't fit beside it"],
   ["13 Oct", "Flashcards: drawn characters now stay drawn instead of switching to the font, with no flicker"],
   ["13 Oct", "Flashcards: characters draw themselves stroke by stroke (Settings → Flashcards to turn off); +XP counts up; new cards glow"],
