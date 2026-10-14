@@ -9,15 +9,15 @@ const PAGES = {
   study: () => ({ title: "Review", zh: "复习", py: "fu4 xi2", desc: "Today's flashcards, with new words mixed in." }),
   reader: () => ({ title: "Reader", zh: "阅读", py: "yue4 du2", desc: "Paste Chinese text or import a text file. Tap a word to see its meaning; tap it again to hear it." }),
   watch: () => (isAudio()
-    ? { title: "Listen", zh: "听书", py: "ting1 shu1", desc: "Play an audiobook or recording from your device with its Chinese text. Tap any word to pause and look it up. Each sentence you hear earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Watch)." }
-    : { title: "Watch", zh: "看视频", py: "kan4 shi4 pin2", desc: "Play a video from your device with its Chinese subtitles. Tap any word to pause and look it up. Each line you watch earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Listen)." }),
+    ? { title: "Watch & listen", zh: "视听", py: "shi4 ting1", desc: "Play an audiobook or recording from your device with its Chinese text. Tap any word to pause and look it up. Each sentence you hear earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Watch)." }
+    : { title: "Watch & listen", zh: "视听", py: "shi4 ting1", desc: "Play a video from your device with its Chinese subtitles. Tap any word to pause and look it up. Each line you watch earns 1 XP (up to " + MEDIA_CAP + " a day, shared with Listen)." }),
   photo: () => ({ title: "Photo to words", zh: "拍照识字", py: "pai1 zhao4 shi2 zi4", desc: "Read the Chinese in a photo or screenshot, then make flashcards from its words." }),
   tones: () => ({ title: "Tone trainer", zh: "声调", py: "sheng1 diao4", desc: "Listen, then pick the tone. Every correct answer earns 2 XP (up to " + TONE_CAP + " a day) and grows your water garden." }),
   myzi: () => ({ title: "My Zì", zh: "我的字", py: "wo3 de5 zi4", desc: "My level, my cards, my decks and my progress." }),
   mycards: () => ({ title: "My cards", zh: "我的卡片", py: "wo3 de5 ka3 pian4", desc: "Every word I've saved and how its flashcards are going.", back: ["My Zì", "myzi"] }),
   stats: () => ({ title: "My progress", zh: "我的进步", py: "wo3 de5 jin4 bu4", desc: "How my studying is going.", back: ["My Zì", "myzi"] }),
-  journey: () => ({ title: "Journey", zh: "旅程", py: "lv3 cheng2", desc: "Quests that teach you the app and the language. Each one finds you a scroll.", back: ["My Zì", "myzi"] }),
-  scrolls: () => ({ title: "Scrolls", zh: "卷轴", py: "juan4 zhou2", desc: "The scrolls you've found on your journey: short notes about Chinese and its culture.", back: ["Journey", "journey"] }),
+  journey: () => ({ title: "My journey", zh: "我的旅程", py: "wo3 de5 lv3 cheng2", desc: "Quests that teach you the app and the language. Each one finds you a scroll." }),
+  scrolls: () => ({ title: "Scrolls", zh: "卷轴", py: "juan4 zhou2", desc: "The scrolls you've found on my journey: short notes about Chinese and its culture.", back: ["My journey", "journey"] }),
   scroll: () => ({ title: "Scroll", zh: "卷轴", py: "juan4 zhou2", desc: "", back: ["Scrolls", "scrolls"] }),
   me: () => ({ title: "Customise", zh: "装扮", py: "zhuang1 ban4", desc: "Dress up my avatar, choose my clock and pick my theme.", back: ["My Zì", "myzi"] }),
   grammar: () => ({ title: "Grammar", zh: "语法", py: "yu3 fa3", desc: "About 500 grammar points, from beginner to advanced: how each pattern works, with examples you can tap and hear." }),

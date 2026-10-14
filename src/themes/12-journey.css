@@ -98,3 +98,29 @@
 :root .app .jbar.card { position: sticky; margin: 0; }
 /* wide screens: a comfortable column rather than a giant map */
 .journey .jm-wrap:not(.full) { max-width: 560px; margin-inline: auto; }
+/* the quest pop-up: a little scroll in the Journey's ink-wash look, the same in every theme */
+.questpop { position: fixed; left: 50%; bottom: calc(var(--tabbar) + 14px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: min(92vw, 420px);
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 14px 12px; color: #2b241c;
+  background: linear-gradient(#f1e7cf, #e8dbbd); border-radius: 3px; box-shadow: 0 12px 30px rgb(0 0 0 / .4);
+  transform: translateX(-50%); animation: qpIn .45s var(--ease); font-family: var(--font-body); }
+.questpop::before, .questpop::after { content: ""; position: absolute; left: -8px; right: -8px; height: 10px; border-radius: 5px; background: linear-gradient(#6b4423, #a8743d 45%, #5a3519); }
+.questpop::before { top: -6px; }
+.questpop::after { bottom: -6px; }
+:root.desk .questpop { bottom: 28px; }
+.questpop.out { animation: qpOut .26s ease-in forwards; }
+@keyframes qpIn { from { opacity: 0; transform: translate(-50%, 24px) scale(.96); } }
+@keyframes qpOut { to { opacity: 0; transform: translate(-50%, 16px); } }
+.questpop-seal { display: grid; padding: 5px 6px; background: #b8322a; color: #f6eedd; border-radius: 3px; font-size: 1rem; line-height: 1.15; text-align: center;
+  transform: rotate(-4deg); animation: qpStamp .5s .15s var(--ease) backwards; font-family: var(--font-hanzi); }
+@keyframes qpStamp { from { transform: rotate(-4deg) scale(1.8); opacity: 0; } }
+.questpop-body { display: grid; gap: 3px; min-width: 0; }
+.questpop-kicker { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: #8a6d45; font-weight: 800; }
+.questpop-title { font-size: 1.02rem; line-height: 1.3; overflow-wrap: anywhere; }
+.questpop-line { font-size: .86rem; color: #5a4a35; }
+.questpop-extra { color: #a3271d; font-weight: 700; }
+.questpop-btns { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.questpop-go { border: 0; border-radius: 999px; padding: 7px 16px; background: #b8322a; color: #f6eedd; font: inherit; font-weight: 800; cursor: pointer; }
+.questpop-go:hover, .questpop-go:focus-visible { background: #9a2820; }
+.questpop-x { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgb(0 0 0 / .06); color: #5a4a35; display: grid; place-items: center; cursor: pointer; }
+.questpop-x svg { width: 14px; height: 14px; }
+@media (prefers-reduced-motion: reduce) { .questpop, .questpop-seal { animation: none; } }

@@ -64,7 +64,7 @@ function start() {
   setupTopbar();
   silverSheen();
   firstRun();
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeJSheet() && !closeTour() && !closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeQuestPop() && !closeJSheet() && !closeTour() && !closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);
   ui.view = VIEWS.includes(first) ? first : "home";

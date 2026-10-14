@@ -105,7 +105,7 @@ function finishWelcome() {
 const TAB_WORDS = [
   ["home", "家", "jiā", "home", "Home: your day at a glance."],
   ["study", "学", "xué", "study", "Study: Review today's flashcards, My decks, My cards, Look up and Grammar."],
-  ["tools", "具", "jù", "tool", "Tools: the Reader, Watch and Listen, Photo to words and the Tone trainer."],
+  ["tools", "具", "jù", "tool", "Tools: the Reader, Watch & listen, Photo to words, the Tone trainer and My journey."],
   ["myzi", "字", "zì", "character", "My Zì: my cards, decks, badges and progress."],
 ];
 const navBtn = key => document.querySelector('.nav [data-view="' + key + '"], .nav [data-menu="' + key + '"]');

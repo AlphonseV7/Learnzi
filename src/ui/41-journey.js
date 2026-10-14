@@ -83,14 +83,41 @@ function checkJourney(quiet) {
   commit({ journey: { ...state.journey, done } });
   const chapters = [...new Set(fresh.map(i => Math.floor(i / 4) + 1))].filter(c => QUESTS.slice((c - 1) * 4, c * 4).every(q => done[q.id]));
   if (!quiet) {
-    const reward = chapters.length ? " Chapter reward: " + J_CHAPTERS[chapters[chapters.length - 1] - 1].reward + "." : "";
-    if (fresh.length === 1) actionToast("Quest complete! You found a scroll: " + scrollById(fresh[0] + 1).title + "." + reward, "Read", () => openScroll(fresh[0] + 1));
-    else actionToast(fresh.length + " quests complete! " + fresh.length + " scrolls found." + reward, "Journey", () => go("journey"));
+    const reward = chapters.length ? "Chapter reward: " + J_CHAPTERS[chapters[chapters.length - 1] - 1].reward + "." : null;
+    if (fresh.length === 1) questPop("Quest complete!", QUESTS[fresh[0]].title, "Scroll found: " + scrollById(fresh[0] + 1).title, reward, scrollById(fresh[0] + 1).zh);
+    else questPop(fresh.length + " quests complete!", fresh.map(i => QUESTS[i].title).join(" · "), fresh.length + " scrolls found", reward, "旅程");
     if (state.sounds) try { chime(0.05); } catch { /* sound is optional */ }
     setMood("happy", 2200);
   }
   if (["journey", "home", "myzi", "scrolls"].includes(ui.view)) setTimeout(() => render(false), 50);
   return fresh.length;
+}
+/** The quest pop-up: a little ink-wash scroll in the Journey's own look (the same in every theme, so it
+ *  stands out), with a red seal and a button to the My journey page. Stays 8 seconds; × or Escape closes. */
+let questPopTimer = 0;
+function closeQuestPop() {
+  const el = $("#questpop");
+  if (!el) return false;
+  clearTimeout(questPopTimer);
+  el.classList.add("out");
+  setTimeout(() => el.remove(), 260);
+  return true;
+}
+function questPop(kicker, title, line, extra, seal) {
+  const old = $("#questpop"); if (old) old.remove();
+  clearTimeout(questPopTimer);
+  const el = h("div", { class: "questpop", id: "questpop", role: "status", "aria-live": "polite" },
+    h("span", { class: "questpop-seal hz", "aria-hidden": "true" }, [...(seal || "旅程")].slice(0, 2).map(c => h("span", null, c))),
+    h("div", { class: "questpop-body" },
+      h("span", { class: "questpop-kicker" }, kicker),
+      h("b", { class: "questpop-title" }, title),
+      h("span", { class: "questpop-line" }, line),
+      extra ? h("span", { class: "questpop-line questpop-extra" }, extra) : null,
+      h("div", { class: "questpop-btns" },
+        h("button", { class: "questpop-go", type: "button", onclick: () => { closeQuestPop(); closePanel(); go("journey"); } }, "My journey"),
+        h("button", { class: "questpop-x", type: "button", "aria-label": "Close", onclick: closeQuestPop }, icon("close")))));
+  document.body.append(el);
+  questPopTimer = setTimeout(closeQuestPop, 8000);
 }
 function openScroll(id) {
   ui.scrollId = id;
@@ -241,7 +268,7 @@ function journeyMap(onStop) {
     o.push(sv("text", { x: JW / 2, y: bottom - 40, "text-anchor": "middle", class: "jm-mist" }, document.createTextNode("MIST LIFTS WHEN YOU FINISH CHAPTER " + (lockedFrom - 1))));
   }
   o.push(sv("rect", { width: JW, height: JH, filter: u("paper"), "pointer-events": "none" }));
-  return sv("svg", { viewBox: "0 0 " + JW + " " + JH, class: "jm-svg", role: "group", "aria-label": "Journey map: " + doneCount() + " of " + J_TOTAL + " quests done" }, o);
+  return sv("svg", { viewBox: "0 0 " + JW + " " + JH, class: "jm-svg", role: "group", "aria-label": "My journey map: " + doneCount() + " of " + J_TOTAL + " quests done" }, o);
 }
 function jRidge(seed, y0, amp, peaks, base) {
   const r = gRand(seed), pts = [];
@@ -358,7 +385,7 @@ function viewJourney() {
   const tool = (zh, label, run, extra) => h("button", Object.assign({ class: "jbar-btn", type: "button", onclick: run }, extra || {}), h("span", { class: "hz jbar-zh", "aria-hidden": "true" }, zh), h("span", null, label));
   const mapWrap = h("div", { class: "jm-wrap" + (ui.jFull ? " full" : "") });
   const token = jAvatarToken();
-  const bar = h("div", { class: "jbar card", role: "toolbar", "aria-label": "Journey" },
+  const bar = h("div", { class: "jbar card", role: "toolbar", "aria-label": "My journey" },
     tool("卷", "Scrolls", () => go("scrolls"), { "aria-label": "Scrolls: " + found + " found" + (unread ? ", " + unread + " unread" : "") }),
     found ? h("span", { class: "jbar-count num", "aria-hidden": "true" }, String(found)) : null,
     tool("宝", "Rewards", rewardsSheet),
@@ -456,18 +483,10 @@ function journeyHomeBox() {
   const slice = h("div", { class: "jm-wrap jm-home" }, map, token);
   token.style.left = (J_STOPS[cur][0] / JW * 100) + "%"; token.style.top = ((y - top) / 170 * 100) + "%";
   return h("div", { class: "card stack j-home" },
-    h("span", { class: "eyebrow" }, "Your journey"),
+    h("span", { class: "eyebrow" }, "My journey"),
     h("div", { class: "row spread" }, h("b", null, "Chapter " + chap + " · " + J_CHAPTERS[chap - 1].en + " ", h("span", { class: "hz" }, J_CHAPTERS[chap - 1].zh)), h("span", { class: "muted small num" }, (cur % 4) + " / 4")),
     slice,
     h("div", { class: "stack-tight" }, h("b", null, q.title), h("span", { class: "muted small" }, questLine(q) + " · Reward: a scroll"), questBar(q)),
     h("div", { class: "row" }, h("button", { class: "btn primary", type: "button", onclick: () => { closePanel(); q.go[1](); } }, q.go[0]),
       h("button", { class: "btn", type: "button", onclick: () => go("journey") }, "See the journey")));
-}
-function journeyMyZiBox() {
-  const cur = currentStop(), n = doneCount();
-  return h("div", { class: "card stack" },
-    h("div", { class: "row spread" }, h("h2", { class: "h-card" }, "Journey ", h("span", { class: "hz" }, "旅程")),
-      h("button", { class: "btn", type: "button", onclick: () => go("journey") }, "Open the map")),
-    h("p", { class: "muted small" }, cur >= J_TOTAL ? "You've finished the journey and found every scroll." : "Next: " + QUESTS[cur].title + ". " + n + " of " + J_TOTAL + " scrolls found."),
-    h("div", { class: "row" }, h("button", { class: "btn small", type: "button", onclick: () => go("scrolls") }, "My scrolls (" + n + ")")));
 }

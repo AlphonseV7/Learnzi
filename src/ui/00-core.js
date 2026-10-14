@@ -198,6 +198,7 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["14 Oct", "My journey moved to Tools (its box now sits lower on Home); quests finish with an ink-wash pop-up; other messages match your theme; Watch and Listen are one tool, Watch & listen"],
   ["14 Oct", "The Journey 旅程: 20 quests on an ink-wash map you climb with your avatar, 20 scrolls about Chinese and its culture, and chapter rewards (My Zì → Journey)"],
   ["13 Oct", "Water garden: repainted as an ink-wash picture that fills its frame, from bare rocks by day to a moonlit night"],
   ["13 Oct", "Tone trainer: a 3 lives round with lives in your theme's style and a knocked-out avatar at game over; every tone comes up equally; HSK 1–4 words; XP counts up like on flashcards"],

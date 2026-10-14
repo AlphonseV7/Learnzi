@@ -68,7 +68,8 @@ function badgesOnStart() {
   const n = checkBadges(true);
   if (n) toast(n === 1 ? "You've earned a badge. See My Zì → My badges." : "You've earned " + n + " badges. See My Zì → My badges.");
   const q = doneCount(), seen = jState().seen;
-  if (q > seen && !mleOn()) setTimeout(() => actionToast("Your journey: " + q + (q === 1 ? " quest" : " quests") + " done and " + q + (q === 1 ? " scroll" : " scrolls") + " found.", "See the map", () => go("journey")), n ? 3200 : 600);
+  if (q > seen && !mleOn()) setTimeout(() => questPop("My journey", q + (q === 1 ? " quest done" : " quests done") + " already",
+    q + (q === 1 ? " scroll" : " scrolls") + " found. Your avatar is waiting to walk on.", null, "旅程"), n ? 3200 : 600);
 }
 
 /** My Zì: the seals, earned ones stamped in red, the rest as shadows. Tap one for its story. */

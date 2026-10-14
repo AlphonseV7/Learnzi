@@ -297,10 +297,19 @@ input[type="color"] { width: 44px; height: 36px; border: 1px solid var(--line); 
 
 .toast {
   position: fixed; left: 50%; bottom: calc(var(--tabbar) + 16px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px);
-  z-index: 60; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: .9rem; max-width: min(92vw, 420px);
+  z-index: 60; background: var(--surface); color: var(--ink); padding: 10px 16px; border-radius: var(--radius); font-size: .9rem; max-width: min(92vw, 420px);
+  border: 1.5px solid var(--accent); box-shadow: var(--shadow), 0 6px 22px rgb(0 0 0 / .18);
   opacity: 0; pointer-events: none; transition: opacity .2s, transform .25s var(--ease);
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* pop-up messages wear the theme: its box colours, accent edge and a few theme shapes */
+:root[data-shape="cyber"] .toast { border-radius: 0; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+:root[data-shape="silver"] .toast { background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-radius: 0; clip-path: polygon(0 8px, 26% 0, 100% 0, 100% calc(100% - 10px), calc(100% - 22px) 100%, 0 100%); }
+:root[data-shape="arcade"] .toast { border-radius: 0; border: 0; }
+:root[data-shape="ink"] .toast { border-radius: 10px 4px 12px 5px / 5px 12px 4px 10px; border-color: var(--ink); }
+:root[data-shape="nightmarket"] .toast { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-shape="imperial"] .toast { border: 3px double var(--accent); border-radius: 3px; }
 .loading { display: inline-flex; gap: 10px; align-items: center; color: var(--ink-soft); }
 .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

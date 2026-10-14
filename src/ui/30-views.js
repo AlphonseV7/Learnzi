@@ -62,8 +62,6 @@ function viewHome() {
         h("b", null, ready ? ready + (ready === 1 ? " card ready" : " cards ready") : "All caught up"),
         h("span", { class: "muted small" }, streak() ? streak() + "-day streak" : "Study today to start a streak")),
       ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Review") : null));
-    const jbox = journeyHomeBox();
-    if (jbox) v.append(jbox);
   }
   if (ui.dict === "ready") {
     const w = Engine.wordOfDay(undefined, (LEVELS[state.level] || LEVELS.new).hsk);
@@ -78,7 +76,7 @@ function viewHome() {
     }
   } else v.append(h("div", { class: "card" }, loadingBlock()));
 
-  if (ui.dict === "ready") v.append(dailyBox(), grammarDayBox(), decksBox());
+  if (ui.dict === "ready") { v.append(dailyBox(), grammarDayBox(), decksBox()); const jbox = journeyHomeBox(); if (jbox) v.append(jbox); }
   // Recent lookups, above the shortcuts (shown from the start, with a hint until you've looked something up)
   if (ui.dict === "ready") {
     const recent = state.recent.slice(0, 10).map(s => [s, Engine.lookup(s)[0]]).filter(([, e]) => e);

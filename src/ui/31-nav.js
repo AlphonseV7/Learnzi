@@ -12,14 +12,14 @@ const NAV_MENUS = {
   ],
   tools: [
     { zh: "读", label: "Reader", sub: () => "Paste or import Chinese, tap any word", run: () => go("reader") },
-    { zh: "看", label: "Watch", sub: () => "Videos with Chinese subtitles", run: () => { setWatchTab("video"); go("watch"); } },
-    { zh: "听", label: "Listen", sub: () => "Audiobooks that follow along", run: () => { setWatchTab("audio"); go("watch"); } },
+    { zh: "看", label: "Watch & listen", sub: () => "Videos and audiobooks with Chinese text", run: () => go("watch") },
     { zh: "拍", label: "Photo to words", sub: () => "Read Chinese in a photo, make a deck", run: () => go("photo") },
     { zh: "声", label: "Tone trainer", sub: () => "Hear a word, pick its tones", run: () => { drill.active = false; go("tones"); } },
+    { zh: "程", label: "My journey", sub: () => { if (ui.dict !== "ready") return "Quests, a map and scrolls"; const c = currentStop(); return c >= J_TOTAL ? "Journey complete: " + J_TOTAL + " scrolls found" : "Next: " + QUESTS[c].title; }, run: () => go("journey") },
   ],
 };
 // Which tab lights up for each page.
-const NAV_TAB = { home: "home", lookup: "study", grammar: "study", gpoint: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", mycards: "myzi", stats: "myzi", me: "myzi", journey: "myzi", scrolls: "myzi", scroll: "myzi" };
+const NAV_TAB = { home: "home", lookup: "study", grammar: "study", gpoint: "study", decks: "study", deck: "study", study: "study", reader: "tools", photo: "tools", watch: "tools", tones: "tools", myzi: "myzi", mycards: "myzi", stats: "myzi", me: "myzi", journey: "tools", scrolls: "tools", scroll: "tools" };
 
 function closeNavMenu() {
   const m = $("#navmenu");

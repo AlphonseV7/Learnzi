@@ -49,7 +49,6 @@ function viewMyZi() {
       h("span", { class: "muted small" }, AV.animal[a.animal].label + " · tap to dress up"),
       levelBar(lv))));
   v.append(studyCard(null, false));
-  v.append(journeyMyZiBox());
   v.append(myCardsBox());
   v.append(decksBox("My decks"));
   v.append(badgesBox());
