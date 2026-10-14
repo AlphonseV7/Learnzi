@@ -198,6 +198,9 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["15 Oct", "Sentence cards: once you've known a word for 5 days, fill the gap in a short, easy sentence (Settings → Flashcards)"],
+  ["15 Oct", "Type your answers: pinyin (tone numbers or marks), characters or the meaning. Small typos count, wrong tones are shown, and the right grade is suggested"],
+  ["15 Oct", "Daily goal: 5–20 minutes of flashcards and the tone trainer, a ring on Home, and your streak grows on days you reach it. Reviews come 20 cards at a time"],
   ["14 Oct", "Full check-up: every page in every theme and every main feature tested. Fixed: a scroll example word, and clearer accent colours in the Lantern, Imperial, Cyber and Peach light themes"],
   ["14 Oct", "My journey moved to Tools (its box now sits lower on Home); quests finish with an ink-wash pop-up; other messages match your theme; Watch and Listen are one tool, Watch & listen"],
   ["14 Oct", "The Journey 旅程: 20 quests on an ink-wash map you climb with your avatar, 20 scrolls about Chinese and its culture, and chapter rewards (My Zì → Journey)"],
@@ -267,7 +270,7 @@ const UPDATES = [
 // ---------- saved state (validated whenever it comes from storage or sync) ----------
 const DEFAULTS = {
   v: 3, nickname: "", script: "s", pinyin: false, tones: false, preset: "ink", accent: "", font: "theme", uiFont: "standard",
-  scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
+  scale: 1, rate: 0.9, voice: "real", voiceSrc: "auto", newPerDay: 10, dailyGoal: 10, sessionSize: 20, typeAnswers: true, sentenceCards: true, listen: true, autoplay: true, sounds: true, tonePalette: "theme", toneColors: [],
   zen: true, shapes: true, avMatch: true, drawChars: true, mode: "auto", subSize: "m", writing: false, strokeSpeed: 1, radical: true, details: {}, notes: {}, folds: {}, clock: {}, order: {}, hidden: {}, sorts: {}, title: "", toneRound: "ten", toneBest: {}, journey: {}, mle: null,
   saved: [], recent: [], decks: [], deckGone: {}, notesAt: 0, activeDecks: ["starred", "welcome"], updatedAt: 0,
 };
@@ -351,6 +354,10 @@ function sanitize(raw) {
   s.scale = num(o.scale, 0.85, 1.3, 1);
   s.rate = num(o.rate, 0.5, 1.3, 0.9);
   s.newPerDay = [5, 10, 15, 20, 30].includes(o.newPerDay) ? o.newPerDay : 10;
+  s.dailyGoal = [0, 5, 10, 15, 20].includes(o.dailyGoal) ? o.dailyGoal : 10;   // minutes a day; 0 = no goal
+  s.sessionSize = [20, 40, 60].includes(o.sessionSize) ? o.sessionSize : 20;  // cards in one review session
+  s.typeAnswers = o.typeAnswers !== false;
+  s.sentenceCards = o.sentenceCards !== false;
   s.listen = o.listen !== false;
   s.autoplay = o.autoplay !== false;
   s.sounds = o.sounds !== false;
@@ -475,8 +482,9 @@ function sanitizeReader(raw) {
 }
 // Study progress: one compact array per card (see srs.js) plus daily activity
 // act["YYYY-MM-DD"] = [bonus XP from lookups and new words, cards reviewed, new cards started, cards forgotten (Again), tone trainer XP,
-//   XP from watching videos].
-const CARD_KEY = /^[^|]{1,32}\|[^|]{1,120}\|[mlrw]$/;
+//   XP from watching videos, seconds of practice (flashcards and the tone trainer), 1 once the day counts for the streak].
+const CARD_KEY = /^[^|]{1,32}\|[^|]{1,120}\|[mlrwc]$/;
+const ACT_LEN = 8;
 function sanitizeProgress(raw) {
   const o = obj(raw), src = obj(o.cards), srcAct = obj(o.act);
   const cards = {}, act = {};
@@ -490,7 +498,7 @@ function sanitizeProgress(raw) {
   }
   for (const k of Object.keys(srcAct).sort().slice(-1000)) {
     const a = srcAct[k];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(a)) act[k] = [0, 1, 2, 3, 4, 5].map(i => Math.floor(num(a[i], 0, 1e6, 0)));
+    if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(a)) act[k] = Array.from({ length: ACT_LEN }, (_, i) => Math.floor(num(a[i], 0, 1e6, 0)));
   }
   // XP adjustment from Debug settings: [when it was set, XP added or removed]. Latest one wins.
   const adj = Array.isArray(o.adj) && o.adj.length === 2 ? [num(o.adj[0], 0, 1e13, 0), Math.round(num(o.adj[1], -1e9, 1e9, 0))] : [0, 0];
@@ -515,7 +523,7 @@ function mergeProgress(a, b) {
     if (!mine || c[3] > mine[3] || (c[3] === mine[3] && c[4] > mine[4])) cards[k] = c;
   }
   const act = { ...a.act };
-  for (const [k, v] of Object.entries(b.act)) act[k] = act[k] ? [0, 1, 2, 3, 4, 5].map(i => Math.max(act[k][i] || 0, v[i] || 0)) : v;
+  for (const [k, v] of Object.entries(b.act)) act[k] = act[k] ? Array.from({ length: ACT_LEN }, (_, i) => Math.max(act[k][i] || 0, v[i] || 0)) : v;
   const adj = b.adj[0] > a.adj[0] ? b.adj : a.adj;
   const garden = [0, 1].map(i => Math.max((a.garden || [0, 0])[i], (b.garden || [0, 0])[i]));
   return sanitizeProgress({ cards, act, adj, garden, epoch: Math.max(a.epoch, b.epoch), updatedAt: Math.max(a.updatedAt, b.updatedAt) });

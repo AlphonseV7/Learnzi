@@ -1,6 +1,5 @@
 /* LearnZì UI, part 6: flashcard study sessions. */
 
-const SESSION_MAX = 60;
 const study = { queue: [], cur: null, revealed: false, done: 0, again: 0, xp: 0, active: false, deck: null };
 
 function startStudy(deckId = null) {
@@ -10,7 +9,8 @@ function startStudy(deckId = null) {
   const queue = [];
   let d = 0, f = 0;
   // Mix new cards in among reviews: three reviews, then one new card.
-  while ((d < plan.due.length || f < plan.fresh.length) && queue.length < SESSION_MAX) {
+  clozeWarm();
+  while ((d < plan.due.length || f < plan.fresh.length) && queue.length < state.sessionSize) {
     for (let i = 0; i < 3 && d < plan.due.length; i++) queue.push(plan.due[d++]);
     if (f < plan.fresh.length) queue.push(plan.fresh[f++]);
   }
@@ -21,7 +21,12 @@ function startStudy(deckId = null) {
 function nextCard() {
   study.cur = study.queue.shift() || null;
   study.revealed = false;
+  study.typed = null; study.draft = ""; study.suggest = 0; study.shownAt = Date.now();
   study.w = { idx: 0, mistakes: 0, done: false, strokes: 0 };
+  // Sentence cards coming up: fetch the sentences now (the card shows "Loading" until they arrive).
+  if (!Cloze.rows && [study.cur, ...study.queue.slice(0, 3)].some(it => it && it.k.endsWith("|c"))) {
+    clozeLoad().then(() => { if (ui.view === "study" && study.cur && study.cur.k.endsWith("|c")) render(false); });
+  }
   // fetch the stroke shapes of the next few cards now, so their characters can draw themselves at once
   if (state.drawChars) for (const it of [study.cur, ...study.queue.slice(0, 3)]) if (it) for (const c of it.e.s) if (Engine.isCJK(c)) CharData.strokes(c);
   if (study.cur && study.cur.k.endsWith("|l") && state.autoplay) setTimeout(() => speak(study.cur.e.s, study.cur.e.p), 250);
@@ -29,7 +34,10 @@ function nextCard() {
 function reveal() {
   if (!study.cur || study.revealed) return;
   study.revealed = true;
-  if (state.autoplay && !study.cur.k.endsWith("|l")) speak(study.cur.e.s, study.cur.e.p);
+  if (state.autoplay && !study.cur.k.endsWith("|l")) {
+    const cz = study.cur.k.endsWith("|c") ? clozePick(study.cur.k, study.cur.e) : null;
+    if (cz) speak(cz.zh); else speak(study.cur.e.s, study.cur.e.p);   // a Sentence card says the whole sentence
+  }
   render(false);
 }
 function grade(g) {
@@ -44,6 +52,7 @@ function grade(g) {
   a[1]++;
   if (!old) a[2]++;
   if (g === 1) a[3]++;
+  practiced(Math.min(cur.k.endsWith("|w") ? 120 : 60, (Date.now() - (study.shownAt || Date.now())) / 1000), true);
   commitProgress();
   if (!state.pinyin) jCount("nopinyin");
   const gained = SRS.XP_FOR[g];
@@ -94,6 +103,14 @@ function sayOnTap(el, e) {
 function cardView({ k, e }) {
   const type = k.slice(-1);
   const card = h("div", { class: "card flashcard", "data-type": type });
+  // Sentence card: its sentence (null while the sentences load, or if none suits the word any more)
+  const cz = type === "c" ? clozePick(k, e) : null;
+  if (type === "c" && !cz && !Cloze.rows && !Cloze.failed) {
+    card.append(h("span", { class: "eyebrow" }, TYPES.c), h("p", { class: "muted fc-center" }, "Loading the sentence…"));
+    clozeLoad().then(() => { if (ui.view === "study" && study.cur && study.cur.k === k) render(false); });
+    return card;
+  }
+  const typing = state.typeAnswers && type !== "w";
   const listen = (label) => withVoice(h("button", { class: "btn" + (label ? "" : " icon"), type: "button", "aria-label": "Listen", onclick: () => speak(e.s, e.p) }, icon("play"), label || null), { text: e.s, p: e.p, compact: !label });
   card.append(h("span", { class: "eyebrow" }, TYPES[type], progress.cards[k] ? null : h("span", { class: "fc-new" }, " · new")));
   // Front of the card
@@ -106,20 +123,33 @@ function cardView({ k, e }) {
     card.append(h("div", { class: "fc-front tone-play-row" },
       h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play")),
       voiceBtn({ text: e.s, p: e.p })),
-      h("p", { class: "muted small" }, "Listen. What's the word, and what does it mean?"));
+      h("p", { class: "muted small" }, typing ? "Listen, then type what you hear" : "Listen. What's the word, and what does it mean?"));
   } else if (type === "w") {
     card.append(h("div", { class: "fc-front fc-meaning" }, shortDef(e, 3)),
       h("div", { class: "row fc-center" }, pyEl(e.p, "py fc-py"), listen()));
     if (!study.revealed) card.append(writingQuiz(e));
+  } else if (cz) {
+    card.append(h("div", { class: "fc-front cz-front" },
+      clozeLine(cz, e, false),
+      h("p", { class: "cz-en muted" }, cz.en),
+      h("p", { class: "cz-hint small" }, h("span", { class: "muted" }, "Missing word: "), shortDef(e, 1))),
+      h("p", { class: "muted small" }, typing ? "Type the missing word" : "What's the missing word?"));
   } else {
     card.append(h("div", { class: "fc-front fc-meaning" }, shortDef(e, 3)),
-      h("p", { class: "muted small" }, "How do you say and write it in Chinese?"));
+      h("p", { class: "muted small" }, typing ? "Type it in pinyin or characters" : "How do you say and write it in Chinese?"));
   }
   if (!study.revealed) {
-    card.append(h("button", { class: "btn primary big-btn", type: "button", onclick: reveal }, "Show answer"),
-      h("p", { class: "muted small kbd-hint" }, "Space to show the answer"));
+    if (typing) card.append(typeBox(e, type));
+    card.append(h("button", { class: "btn big-btn" + (typing ? " ta-skip" : " primary"), type: "button", onclick: reveal }, typing ? "Don't know? Show answer" : "Show answer"),
+      h("p", { class: "muted small kbd-hint" }, typing ? "Enter to check" : "Space to show the answer"));
     return card;
   }
+  if (study.typed) card.append(typedFeedback(e, study.typed));
+  if (cz) card.append(h("div", { class: "cz-back" }, clozeLine(cz, e, true),
+    h("div", { class: "row spread" }, h("span", { class: "muted small" }, cz.en),
+      h("span", { class: "row ex-tools" },
+        withVoice(h("button", { class: "btn icon", type: "button", "aria-label": "Listen to the sentence", onclick: () => speak(cz.zh) }, icon("play")), { text: cz.zh, compact: true }),
+        h("a", { class: "small muted", href: "https://tatoeba.org/en/sentences/show/" + cz.id, target: "_blank", rel: "noopener noreferrer", title: "Sentence from Tatoeba (CC BY 2.0 FR)" }, "Tatoeba")))));
   // Back of the card
   const senses = Engine.senses(e).slice(0, 4).map(plainSense);
   const answerHz = type !== "m" ? sayOnTap(rubyHz(disp(e), e.p, "fc-hz"), e) : null;
@@ -131,7 +161,7 @@ function cardView({ k, e }) {
     h("button", { class: "plain-btn build-link small", type: "button", onclick: () => openWord(e.s, e) }, "More about this word")),
     clipBlock(e) || "");
   const labels = SRS.preview(progress.cards[k], clock());
-  let suggest = 0;
+  let suggest = study.typed ? verdictOf(study.typed.res).grade : 0;
   if (type === "w") {
     const w = study.w;
     suggest = !w.done ? 1 : w.mistakes === 0 ? 3 : w.mistakes <= Math.max(1, Math.floor(w.strokes / 4)) ? 2 : 1;
@@ -140,8 +170,55 @@ function cardView({ k, e }) {
   card.append(h("div", { class: "grades", role: "group", "aria-label": "How well did you know it?" },
     ["Again", "Hard", "Good", "Easy"].map((name, i) => h("button", { class: "grade g" + (i + 1) + (suggest === i + 1 ? " suggested" : ""), type: "button", onclick: () => grade(i + 1) },
       h("b", null, name), h("span", { class: "small" }, labels[i])))),
-    h("p", { class: "muted small kbd-hint" }, "Keys 1–4 also work"));
+    h("p", { class: "muted small kbd-hint" }, "Keys 1–4 also work" + (suggest ? ", Enter for the suggested one" : "")));
+  study.suggest = suggest;
   return card;
+}
+
+/** The answer box on a card (typed answers): Enter or Check marks it and shows the answer. */
+function typeBox(e, type) {
+  const label = type === "m" ? "Type the meaning in English" : type === "l" ? "Type what you hear, in pinyin or characters" : "Type the word, in pinyin or characters";
+  const inp = h("input", { id: "ta-input", class: "ta-input", type: "text", maxlength: "60", autocomplete: "off", autocapitalize: "none", autocorrect: "off",
+    spellcheck: "false", enterkeyhint: "done", "aria-label": label, placeholder: type === "m" ? "Meaning in English" : "Pinyin (ni3hao3) or 汉字" });
+  inp.value = study.draft || "";
+  inp.addEventListener("input", () => { study.draft = inp.value; });
+  const check = ev => {
+    ev.preventDefault();
+    const text = inp.value.trim().slice(0, 60);
+    if (!text) { inp.focus(); return; }
+    study.typed = { text, res: type === "m" ? checkMeaning(text, Engine.senses(e).map(plainSense)) : checkReading(text, e) };
+    reveal();
+  };
+  // Ready to type straight away (the keyboard stays up from card to card).
+  queueMicrotask(() => { if (inp.isConnected && document.activeElement !== inp && !$("#levelup")) inp.focus({ preventScroll: true }); });
+  return h("form", { class: "ta-form", onsubmit: check }, inp, h("button", { class: "btn primary", type: "submit" }, "Check"));
+}
+/** What the typed answer got right or wrong, shown above the answer. */
+function typedFeedback(e, typed) {
+  const res = typed.res, v = verdictOf(res);
+  const box = h("div", { class: "ta-fb ta-" + v.tone, role: "status" });
+  if (v.title) box.append(h("b", null, v.title));
+  box.append(h("div", { class: "small" }, h("span", { class: "muted" }, "You typed: "), h("span", { class: "ta-typed" }, typed.text)));
+  if (res.kind === "tones") {
+    const syl = Engine.syllables(e.p);
+    box.append(h("div", { class: "small" }, h("span", { class: "muted" }, "Tones: "),
+      h("span", { class: "py ta-py" }, syl.map((x, i) => [i ? " " : "", h("span", { class: res.wrong.includes(i) ? "ta-bad" : null }, x.text)]))));
+  } else if (res.kind === "close") {
+    box.append(h("div", { class: "small" }, h("span", { class: "muted" }, "Answer: "),
+      h("span", { class: "hz" }, [...disp(e)].map((c, i) => h("span", { class: res.wrong.includes(i) ? "ta-bad" : null }, c)))));
+  } else if (res.match && res.kind !== "nomatch") box.append(h("div", { class: "small" }, h("span", { class: "muted" }, "Matched: "), res.match));
+  if (v.line) box.append(h("div", { class: "small muted" }, v.line));
+  return box;
+}
+/** A Sentence card's sentence: the word as a gap (front) or highlighted (back). Other words open on tap. */
+function clozeLine(cz, e, shown) {
+  const form = clozeForm(e), n = [...form].length;
+  const part = t => { const sp = h("span", { class: "cz-part" }); if (t) drawReader(sp, t); return sp; };
+  const gap = shown ? h("mark", { class: "cz-word" }, rubyHz(disp(e), e.p))
+    : h("span", { class: "cz-gap", role: "img", "aria-label": "missing word, " + n + (n === 1 ? " character" : " characters") }, Array.from({ length: n }, () => h("span", { class: "cz-box" })));
+  const line = h("div", { class: "cz-line", lang: "zh" }, part(cz.zh.slice(0, cz.at)), gap, part(cz.zh.slice(cz.at + form.length)));
+  line.addEventListener("click", ev => { const b = ev.target.closest(".w"); if (b) openWord(b.dataset.form); });
+  return line;
 }
 
 /** The "+N XP" for this session: counts up with a little pop when you earn XP. */
@@ -232,6 +309,8 @@ function summaryView() {
         stat("+" + study.xp, "XP"),
         stat(streak(), "day streak")));
   }
+  const ring = goalRing();
+  if (ring) box.append(ring);
   box.append(levelBar(lv));
   const more = plan.due.length + plan.fresh.length;
   box.append(h("div", { class: "row" },
@@ -272,6 +351,7 @@ function studyKeys(ev) {
   if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
   if (!study.revealed && (ev.key === " " || ev.key === "Enter")) { ev.preventDefault(); reveal(); }
   else if (study.revealed && /^[1-4]$/.test(ev.key)) { ev.preventDefault(); grade(Number(ev.key)); }
+  else if (study.revealed && ev.key === "Enter" && study.suggest && !(t && t.closest && t.closest("button, a"))) { ev.preventDefault(); grade(study.suggest); }
 }
 
 /** Writing card: write each character of the word from memory, one after another. */

@@ -12,10 +12,12 @@ const pc = sanitizeProgress({ cards: { "a|a1|m": card(900, 1), "c|c1|m": card(80
 const m1 = mergeProgress(phone, pc), m2 = mergeProgress(pc, phone);
 check("merge keeps every card", Object.keys(m1.cards).length === 3);
 check("newest review of a card wins", m1.cards["a|a1|m"][3] === 1000);
-check("daily counts keep the larger value", m1.act["2026-10-11"].join() === "10,3,2,0,0,0" && m1.act["2026-10-10"].join() === "2,5,1,0,0,0");
+check("daily counts keep the larger value", m1.act["2026-10-11"].join() === "10,3,2,0,0,0,0,0" && m1.act["2026-10-10"].join() === "2,5,1,0,0,0,0,0");
 // an older copy without the watching-XP slot must not wipe it out
 const oldCopy = { ...pc, act: { "2026-10-11": [1, 1, 1, 0, 0] } }, newCopy = sanitizeProgress({ ...pc, act: { "2026-10-11": [1, 1, 1, 0, 0, 7] } });
 check("watching XP survives a merge with an older copy", mergeProgress(newCopy, oldCopy).act["2026-10-11"][5] === 7 && mergeProgress(oldCopy, newCopy).act["2026-10-11"][5] === 7);
+const goalA = sanitizeProgress({ ...pc, act: { "2026-10-15": [0, 9, 1, 0, 0, 0, 420, 0] } }), goalB = sanitizeProgress({ ...pc, act: { "2026-10-15": [0, 20, 2, 0, 0, 0, 640, 1] } });
+check("practice time and goal days survive a merge", mergeProgress(goalA, goalB).act["2026-10-15"].slice(6).join() === "640,1" && mergeProgress(goalB, oldCopy).act["2026-10-15"].slice(6).join() === "640,1");
 check("merge order doesn't matter", progressSig(m1) === progressSig(m2));
 check("merging twice changes nothing", progressSig(mergeProgress(m1, pc)) === progressSig(m1));
 const bad = sanitizeProgress({ cards: { "x|y|m": "oops", "no-pipes": card(1, 1), "d|d1|z": card(1, 1), "e|e1|m": [1, 2, 3] }, act: { "nope": [1, 2, 3] } });

@@ -83,7 +83,7 @@ const liveDecks = () => deckDocs().filter(d => d.deck).map(d => d.deck.id).sort(
   check("old copy: every card reaches the phone", Object.keys(A.progress.cards).length === 2000);
   check("old copy: cards moved into the card documents", cardsInStore() === 2000);
   check("old copy: the activity document no longer holds cards", headCards() === 0);
-  check("old copy: daily activity kept", JSON.stringify(A.progress.act["2026-10-01"]) === "[5,40,10,2,0,0]");
+  check("old copy: daily activity kept", JSON.stringify(A.progress.act["2026-10-01"]) === "[5,40,10,2,0,0,0,0]");
   check("cards are spread over all 32 documents", cardDocs().length === 32);
   check("decks moved to their own documents", liveDecks() === "uaaaa1,uaaaa2" && A.state.decks.length === 2);
   check("notes moved to their own document", store.has(P + "notes") && JSON.parse(store.get(P + "notes")).notes["吃|chi1"] === "eat");
@@ -105,7 +105,7 @@ const liveDecks = () => deckDocs().filter(d => d.deck).map(d => d.deck.id).sort(
   A.progress = a; A.commitProgress(); B.progress = b; B.commitProgress();
   await sleep(4000);
   check("reviews from both devices reach both", !!A.progress.cards["旧|jiu4|m"] && !!B.progress.cards["新|xin1|m"]);
-  check("daily counts merge", JSON.stringify(A.progress.act["2026-10-12"]) === "[2,5,1,0,4,0]" && JSON.stringify(B.progress.act["2026-10-12"]) === "[2,5,1,0,4,0]");
+  check("daily counts merge", JSON.stringify(A.progress.act["2026-10-12"]) === "[2,5,1,0,4,0,0,0]" && JSON.stringify(B.progress.act["2026-10-12"]) === "[2,5,1,0,4,0,0,0]");
 
   // One more review saves only the documents that changed (the activity document and one card document).
   const before = writes, one = A.sanitizeProgress(A.progress);

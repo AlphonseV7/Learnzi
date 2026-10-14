@@ -77,14 +77,28 @@ function viewSettings() {
   const perDay = h("select", { id: "newperday" });
   for (const n of [5, 10, 15, 20, 30]) { const o = h("option", { value: String(n) }, n + " a day"); if (n === state.newPerDay) o.selected = true; perDay.append(o); }
   perDay.addEventListener("change", () => commit({ newPerDay: Number(perDay.value) }));
+  const pick = (id, opts, cur, key) => {
+    const sel = h("select", { id });
+    for (const [val, label] of opts) { const o = h("option", { value: String(val) }, label); if (val === cur) o.selected = true; sel.append(o); }
+    sel.addEventListener("change", () => commit({ [key]: Number(sel.value) }));
+    return sel;
+  };
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Flashcards"),
+    row("dailygoal", "Daily goal", pick("dailygoal", [[0, "No goal"], [5, "5 minutes"], [10, "10 minutes"], [15, "15 minutes"], [20, "20 minutes"]], state.dailyGoal, "dailyGoal"),
+      "Practice time to aim for each day: flashcards and the tone trainer. Your streak grows on days you reach it (with no goal, any review counts)."),
+    row("sessionsize", "Session length", pick("sessionsize", [[20, "20 cards (about 5 min)"], [40, "40 cards"], [60, "60 cards"]], state.sessionSize, "sessionSize"),
+      "Cards in one review. The most overdue come first; you can always keep going after."),
     row("newperday", "New cards", perDay, "How many new cards to start each day"),
+    row("typeanswers", "Type your answers", toggleCtl("typeanswers", state.typeAnswers, on => commit({ typeAnswers: on })),
+      "Type the pinyin, characters or meaning, then check. Small typos still count; wrong tones are shown"),
+    row("sentencecards", "Sentence cards", toggleCtl("sentencecards", state.sentenceCards, on => commit({ sentenceCards: on })),
+      "Fill the gap in a short sentence once you've known a word for 5 days"),
     row("listen", "Listening cards", toggleCtl("listen", state.listen, on => commit({ listen: on })), "Turn off where you can't play sound"),
     row("writing", "Writing cards", toggleCtl("writing", state.writing, on => commit({ writing: on })), "Write words from memory once you know them (12 days)"),
     row("drawchars", "Draw characters on cards", toggleCtl("drawchars", state.drawChars, on => commit({ drawChars: on })), "Each card's characters quickly draw themselves, stroke by stroke"),
     row("autoplay", "Play sound automatically", toggleCtl("autoplay", state.autoplay, on => commit({ autoplay: on })), "When a card's answer is shown"),
     row("sounds", "Level-up sound", toggleCtl("sounds", state.sounds, on => commit({ sounds: on })), "A soft gong when you reach a new Zì level"),
-    h("p", { class: "muted small" }, "Meaning cards come first. Listening cards unlock once you remember a word for 3 days, Recall cards (English to Chinese) at 8 days, and Writing cards (if switched on) at 12 days.")));
+    h("p", { class: "muted small" }, "Meaning cards come first. Listening cards unlock once you remember a word for 3 days, Sentence cards (fill the gap) at 5 days, Recall cards (English to Chinese) at 8 days, and Writing cards (if switched on) at 12 days.")));
 
   // Word details
   const details = h("div", { class: "detail-toggles" }, Object.entries(DETAILS).map(([k, label]) =>

@@ -2,7 +2,7 @@
  * types it has (Meaning, Listening, Recall, Writing), how each is going, and when it's next due.
  * Filter by deck (only the saved words in that deck show) and by how well each word is known. */
 
-const CARD_LETTER = { m: "M", l: "L", r: "R", w: "W" };
+const CARD_LETTER = { m: "M", l: "L", c: "S", r: "R", w: "W" };
 const CARD_FILTERS = [["all", "All"], ["due", "Due"], ["new", "New"], ["learning", "Learning"], ["familiar", "Familiar"], ["known", "Known"]];
 
 /** The decks that hold at least one saved word: [id, name, keys of saved words in it]. */
@@ -19,7 +19,7 @@ function savedByDeck(saved) {
 /** One small badge per card the word has: letter, coloured by how it's going, with when it's due. */
 function cardBadges(e, nowMs) {
   const base = cardBase(e), out = [];
-  for (const t of ["m", "l", "r", "w"]) {
+  for (const t of ["m", "l", "c", "r", "w"]) {
     const c = progress.cards[base + "|" + t];
     if (!c) { if (t === "m") out.push(h("span", { class: "cb cb-new", title: TYPES[t] + ": not started yet" }, CARD_LETTER[t])); continue; }
     const due = SRS.isDue(c, nowMs), learning = SRS.isLearning(c);
@@ -73,7 +73,7 @@ function viewMyCards() {
   v.append(h("div", { class: "card stack" }, h("div", { class: "row spread" }, h("h2", { class: "h-card" }, saved.length + (saved.length === 1 ? " saved word" : " saved words")),
     h("span", { class: "muted small" }, Object.values(progress.cards).length ? countCards(saved) + " cards" : "")),
     strengthBar(sc, saved.length), strengthLegend(sc),
-    h("p", { class: "muted small" }, "Each word has a Meaning card (M). Listening (L), Recall (R) and Writing (W) cards join as you get to know it. Colours: blue new, orange learning, filled due, green known.")));
+    h("p", { class: "muted small" }, "Each word has a Meaning card (M). Listening (L), Sentence (S), Recall (R) and Writing (W) cards join as you get to know it. Colours: blue new, orange learning, filled due, green known.")));
 
   // find, filter and sort
   const q = h("input", { type: "text", id: "cards-q", placeholder: "Search my cards: 字, pinyin or English", value: ui.cardsQ, "aria-label": "Search my cards", spellcheck: "false", autocomplete: "off" });

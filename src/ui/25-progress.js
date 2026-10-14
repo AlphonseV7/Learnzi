@@ -1,15 +1,15 @@
 /* LearnZì UI, part 4: XP, Zì level, streak and which flashcards are ready. */
 
 const BONUS_CAP = 50;               // most XP a day from lookups and new words (cards have no cap)
-const TYPES = { m: "Meaning", l: "Listening", r: "Recall", w: "Writing" };
-const UNLOCK = { l: 3, r: 8, w: 12 };      // days of memory stability on the Meaning card before these unlock
+const TYPES = { m: "Meaning", l: "Listening", c: "Sentence", r: "Recall", w: "Writing" };
+const UNLOCK = { l: 3, c: 5, r: 8, w: 12 };      // days of memory stability on the Meaning card before these unlock
 
 const todayKey = () => SRS.dayKey(clock());
-const getAct = (k = todayKey()) => progress.act[k] || [0, 0, 0, 0, 0, 0];
+const getAct = (k = todayKey()) => progress.act[k] || new Array(ACT_LEN).fill(0);
 function dayAct() {
   const k = todayKey();
-  if (!progress.act[k]) progress.act[k] = [0, 0, 0, 0, 0, 0];
-  while (progress.act[k].length < 6) progress.act[k].push(0);
+  if (!progress.act[k]) progress.act[k] = new Array(ACT_LEN).fill(0);
+  while (progress.act[k].length < ACT_LEN) progress.act[k].push(0);
   return progress.act[k];
 }
 function rawXp() {
@@ -54,13 +54,55 @@ function rankChip(level, cls) {
     "aria-label": "Rank: " + rank.en + ", " + rank.s + ". Open the word", onclick: ev => { ev.stopPropagation(); openWord(rank.s); } },
     h("span", { class: "hz rank-zh" }, rank.s), h("span", { class: "rank-py" }, Engine.toMarks(rank.p)), h("span", { class: "rank-en" }, rank.en));
 }
+/* Streak and daily goal. A day counts for the streak once you reach your daily goal (minutes of
+ * flashcards and tone trainer), or with any flashcard review when there's no goal. The day is marked
+ * when it happens (act[7]), so changing the goal later never rewrites old days. Days before the goal
+ * arrived count the old way: any review. */
+const GOAL_SINCE = "2026-10-15";
+const streakDay = k => { const a = progress.act[k] || []; return a[7] > 0 || (k < GOAL_SINCE && a[1] > 0); };
 function streak() {
   const d = new Date(clock() - 4 * 3600e3);
   const key = () => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-  if (!((progress.act[key()] || [])[1] > 0)) d.setDate(d.getDate() - 1); // not studied yet today: count up to yesterday
+  if (!streakDay(key())) d.setDate(d.getDate() - 1); // today doesn't count yet: count up to yesterday
   let n = 0;
-  while ((progress.act[key()] || [])[1] > 0 && n < 3650) { n++; d.setDate(d.getDate() - 1); }
+  while (streakDay(key()) && n < 3650) { n++; d.setDate(d.getDate() - 1); }
   return n;
+}
+const todaySecs = () => getAct()[6] || 0;
+const goalMet = () => getAct()[7] > 0;
+/** Count practice time (seconds) for today; `review` is true for a flashcard. Marks the day for the
+ *  streak when the goal is reached (or on any review without a goal), with a little moment the first time. */
+function practiced(sec, review) {
+  const a = dayAct();
+  a[6] = Math.min(86400, (a[6] || 0) + Math.max(0, Math.round(sec)));
+  const goal = (state.dailyGoal || 0) * 60;
+  if (a[7] > 0 || !(goal ? a[6] >= goal : review)) return;
+  a[7] = 1;
+  commitProgress();
+  if (goal) {
+    const n = streak();
+    toast("Daily goal reached: " + state.dailyGoal + " minutes today" + (n > 1 ? ". " + n + "-day streak!" : "!"));
+    setMood("happy", 2600);
+  }
+}
+/** "4 of 10 min today", or "Goal reached" ("" without a goal). */
+function goalText() {
+  if (!state.dailyGoal) return "";
+  return goalMet() || todaySecs() >= state.dailyGoal * 60 ? "Goal reached" : Math.floor(todaySecs() / 60) + " of " + state.dailyGoal + " min today";
+}
+/** A ring that fills with today's practice minutes towards the daily goal (null without a goal). */
+function goalRing(size = 46) {
+  const goal = state.dailyGoal;
+  if (!goal) return null;
+  const secs = todaySecs(), met = goalMet() || secs >= goal * 60;
+  const mins = Math.floor(secs / 60), f = met ? 1 : Math.min(1, secs / (goal * 60));
+  const r = 19, len = 2 * Math.PI * r;
+  const ring = sv("svg", { viewBox: "0 0 46 46", width: size, height: size, class: "goal-ring" + (met ? " met" : ""), "aria-hidden": "true" },
+    sv("circle", { cx: 23, cy: 23, r, class: "gr-track" }),
+    sv("circle", { cx: 23, cy: 23, r, class: "gr-fill", "stroke-dasharray": (f * len).toFixed(1) + " " + len.toFixed(1), transform: "rotate(-90 23 23)" }),
+    met ? sv("path", { d: "M15 23.5l5.5 5.5L31.5 18", class: "gr-tick" }) : sv("text", { x: 23, y: 27.5, "text-anchor": "middle", class: "gr-num" }, String(Math.min(mins, 99))));
+  const label = met ? "Daily goal reached" : mins + " of " + goal + " min today";   // shown at the end of a review
+  return h("div", { class: "goal", role: "img", "aria-label": label + (met ? "" : ", daily goal " + goal + " minutes") }, ring, h("span", { class: "goal-label small" }, label));
 }
 
 // ---------- earning XP ----------
@@ -103,7 +145,7 @@ function rewardLookup(s) {
 
 // ---------- cards ----------
 const cardBase = e => e.s + "|" + e.p;
-/** The cards a saved word has right now: Meaning always; Listening and Recall once it's known.
+/** The cards a saved word has right now: Meaning always; Listening, Sentence, Recall and Writing once it's known.
  *  Unlocks only count reviews from earlier days, so a word learnt today waits until tomorrow. */
 function cardKeys(e) {
   const base = cardBase(e);
@@ -111,6 +153,7 @@ function cardKeys(e) {
   const keys = [base + "|m"];
   const known = m && m[7] === 2 && SRS.dayKey(m[3] * 60000) !== todayKey() ? SRS.stability(m) : 0;
   if (state.listen && (known >= UNLOCK.l || progress.cards[base + "|l"])) keys.push(base + "|l");
+  if (state.sentenceCards && (progress.cards[base + "|c"] || (known >= UNLOCK.c && clozeReady(e)))) keys.push(base + "|c");
   if (known >= UNLOCK.r || progress.cards[base + "|r"]) keys.push(base + "|r");
   if (state.writing && (known >= UNLOCK.w || progress.cards[base + "|w"])) keys.push(base + "|w");
   return keys;
@@ -129,7 +172,7 @@ function studyPlan(nowMs = clock(), deckId = null) {
     }
   }
   due.sort((a, b) => a.due - b.due);
-  const rank = k => "mlrw".indexOf(k.slice(-1));
+  const rank = k => "mlcrw".indexOf(k.slice(-1));
   fresh.sort((a, b) => rank(a.k) - rank(b.k));
   const newLeft = Math.max(0, state.newPerDay - getAct()[2]);
   return { due, fresh: fresh.slice(0, newLeft), freshWaiting: fresh.length, nextDue };

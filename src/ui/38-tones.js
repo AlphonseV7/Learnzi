@@ -59,7 +59,7 @@ function startDrill(mode) {
   if (ui.dict !== "ready") { toast("The dictionary is still loading."); return; }
   if (!tonePools) tonePools = buildTonePools();
   Object.assign(drill, { mode, round: state.toneRound, qs: [], i: 0, picked: null, right: 0, xp: 0, shownXp: 0, run: 0, best: 0,
-    lives: TONE_LIVES, lost: false, over: false, newBest: false, active: true, used: new Set() });
+    lives: TONE_LIVES, lost: false, over: false, newBest: false, active: true, used: new Set(), askedAt: Date.now() });
   const n = drill.round === "lives" ? 1 : 10;                         // 3 lives: one at a time, as long as you last
   while (drill.qs.length < n) drill.qs.push(makeQuestion(mode));
   go("tones");
@@ -81,6 +81,7 @@ function answerDrill(k) {
   const q = drill.qs[drill.i];
   if (!q || drill.picked !== null) return;
   drill.picked = k;
+  practiced(Math.min(30, (Date.now() - (drill.askedAt || Date.now())) / 1000), false);   // counts towards the daily goal
   const right = q.options[k].join() === q.tones.join();
   if (right) {
     drill.right++; drill.run++; drill.best = Math.max(drill.best, drill.run);
@@ -99,6 +100,7 @@ function answerDrill(k) {
     }
   } else {
     drill.run = 0;
+    commitProgress();   // keeps the practice time
     if (drill.round === "lives") {
       drill.lives = Math.max(0, drill.lives - 1); drill.lost = true;
       if (!drill.lives) setMood("ko", 0);                       // game over: knocked out until the results
@@ -108,7 +110,7 @@ function answerDrill(k) {
   render(false);
 }
 function nextDrill() {
-  drill.i++; drill.picked = null; drill.lost = false;
+  drill.i++; drill.picked = null; drill.lost = false; drill.askedAt = Date.now();
   const finished = drill.round === "lives" ? !drill.lives : drill.i >= drill.qs.length;
   if (finished && drill.mode === "pairs") jCount("pairs");
   if (drill.round === "lives") {

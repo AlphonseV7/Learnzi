@@ -58,9 +58,10 @@ function viewHome() {
     const plan = studyPlan();
     const ready = plan.due.length + plan.fresh.length;
     v.append(h("div", { class: "card study-prompt" }, h("span", { class: "eyebrow" }, "Today's flashcards"),
-      h("div", { class: "stack-tight" },
-        h("b", null, ready ? ready + (ready === 1 ? " card ready" : " cards ready") : "All caught up"),
-        h("span", { class: "muted small" }, streak() ? streak() + "-day streak" : "Study today to start a streak")),
+      h("div", { class: "row sp-main" }, goalRing(),
+        h("div", { class: "stack-tight" },
+          h("b", null, ready ? ready + (ready === 1 ? " card ready" : " cards ready") : "All caught up"),
+          h("span", { class: "muted small" }, [goalText(), streak() ? streak() + "-day streak" : state.dailyGoal ? "reach it to start a streak" : "Study today to start a streak"].filter(Boolean).join(" · ")))),
       ready ? h("button", { class: "btn primary", type: "button", onclick: () => startStudy() }, "Review") : null));
   }
   if (ui.dict === "ready") {

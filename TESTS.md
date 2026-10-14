@@ -10,6 +10,7 @@ browser runners in `tools/qa/`); the rest is a short hands-on checklist at the e
 4. Sync: per-deck documents, card shards, size limits, write-before-read guard, old-format migration (`test_sync.js`)
 5. Packed data: every packed file unpacks byte-for-byte to the original (`test_packed.js`)
 6. Audio processing (`test_dsp.js`)
+7. Typed answers: pinyin with numbers, marks or no tones, ü as v, tone changes, typos, characters, English meanings (`test_answers.js`)
 
 ## B. Build and safety
 1. The build runs and the page loads with no errors
@@ -43,6 +44,10 @@ themes, light and dark, on a phone and a computer:
 12. Glitch → secret lock → MLE mode → back to normal
 13. Factory reset clears everything, then the welcome shows again
 14. Every menu item in Study and Tools opens its page without errors
+15. Daily goal: the ring on Home fills, reaching the goal says so and counts for the streak; days before the goal keep their streak
+16. Typed answers: right, typo, wrong tone (marked) and wrong each give the right message and suggested grade; Enter takes it; switching off brings back Show answer
+17. Sentence cards: unlock at 5 days, show a gap the size of the word with the English, the answer marks the word; the setting switches them off
+18. A review session holds at most the chosen number of cards (20 by default)
 
 ## E. My journey
 1. Quests complete in order, chapter by chapter, and only once
