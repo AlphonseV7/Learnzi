@@ -826,7 +826,7 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 /* ---------- bonus themes (unlocked by level) ---------- */
 :root[data-preset="peach"] {
   --bg: #f2e6e5; --surface: #faf1f0; --surface-2: #eddcdd; --ink: #27161b; --ink-soft: #74545c;
-  --line: #e2cbcf; --accent: #bb3f65; --accent-ink: #ffffff; --accent-soft: #f7dbe3;
+  --line: #e2cbcf; --accent: #b53a60; --accent-ink: #ffffff; --accent-soft: #f7dbe3;
   --t1: #c5332c; --t2: #c17400; --t3: #59841e; --t4: #3969af; --t5: #897c81;
   --shadow: 0 1px 2px rgb(80 30 40 / .06), 0 8px 24px rgb(80 30 40 / .08);
   color-scheme: light;

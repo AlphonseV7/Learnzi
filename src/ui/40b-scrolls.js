@@ -38,7 +38,7 @@ const SCROLLS = [
     "Some tones change depending on the syllable that comes next.",
     "Two 3rd tones in a row: the first one becomes a 2nd tone. [[你好]] is written nǐ hǎo but said ní hǎo.",
     "[[不]] bù becomes bú before a 4th tone: [[不是]] búshì, [[不要]] búyào.",
-    "[[一]] yī becomes yí before a 4th tone, as in [[一个]] yí ge, and yì before the other tones, as in [[一天]] yì tiān. When you're counting or reading out a number, it stays yī.",
+    "[[一]] yī becomes yí before a 4th tone, as in [[一个]] yí ge, and yì before the other tones, as in [[一起]] yìqǐ. When you're counting or reading out a number, it stays yī.",
     "The Pronunciation tips box in LearnZì's word pop-up points these out for you.",
   ] },
   { id: 7, zh: "同音", cat: "Tones", title: "Same sound, different meaning", body: [

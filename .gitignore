@@ -1,4 +1,8 @@
-dist/
-node_modules/
-__pycache__/
+*.log
 *.zip
+__pycache__/
+dist/
+dist/t.html
+node_modules/
+qa_*.json
+tools/qa/fonts/
