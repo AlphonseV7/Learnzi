@@ -32,6 +32,13 @@ async function loadDict() {
   applyAll();
   if (ui.dict === "ready") { setTimeout(() => Engine.warm(), 500); setTimeout(loadGrammar, 2500); setTimeout(clozeWarm, 4000); }
 }
+/** Close whatever pop-up is on top (Escape, or Back). True if something closed. */
+function closeTopLayer() {
+  if (closeJSheet() || closeTour() || closeResetAsk() || closeSecret() || closeNavMenu() || endGlitch() || closeLevelUp()) return true;
+  const panel = $("#panel");
+  if (panel && panel.classList.contains("open")) { closePanel(); return true; }
+  return false;
+}
 function start() {
   applyLook();
   updateTopbar();
@@ -39,6 +46,9 @@ function start() {
   setupDesk();
   setupPanelSwipe();
   $("#gear").append(icon("gear"));
+  $("#jtop").addEventListener("click", () => { closePanel(); go("journey"); });
+  window.addEventListener("resize", fitName);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
   let lastGear = 0;
   $("#gear").addEventListener("click", () => {
     // Double-tap the cog while already on Settings to open the hidden Debug settings.
@@ -51,7 +61,14 @@ function start() {
   $("#me").addEventListener("click", () => go("me"));   // avatar and name: Customise; level and XP: My Zì
   $("#lvl").addEventListener("click", () => go("myzi"));
   $("#scrim").addEventListener("click", closePanel);
-  window.addEventListener("hashchange", () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== ui.view) go(v); });
+  // Back (Android's back swipe or button): close the top pop-up if one is open and stay on the page,
+  // otherwise show the page we came from.
+  window.addEventListener("popstate", () => {
+    if (closeTopLayer()) { try { history.pushState(null, "", "#" + ui.view); } catch { /* fine */ } return; }
+    const v = location.hash.slice(1);
+    if (VIEWS.includes(v) && v !== ui.view) go(v, true);
+  });
+  window.addEventListener("hashchange", () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== ui.view) go(v, true); });
   document.addEventListener("paste", photoPaste);
   // Your avatar dozes off when you leave the app alone, wakes when you come back, and winks when tapped.
   for (const t of ["keydown", "wheel", "touchstart", "scroll"]) document.addEventListener(t, nudgeAvatar, { passive: true, capture: true });
@@ -64,7 +81,8 @@ function start() {
   setupTopbar();
   silverSheen();
   firstRun();
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape") { if (!closeQuestPop() && !closeJSheet() && !closeTour() && !closeResetAsk() && !closeSecret() && !closeNavMenu() && !endGlitch() && !closeLevelUp()) closePanel(); } else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
+  document.addEventListener("click", tapChinese);
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") closeTopLayer(); else if (!mleKeys(ev) && !toneKeys(ev) && !watchKeys(ev)) studyKeys(ev); });
   if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }
   const first = (location.hash || "").slice(1);
   ui.view = VIEWS.includes(first) ? first : "home";

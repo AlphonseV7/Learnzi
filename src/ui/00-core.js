@@ -171,7 +171,7 @@ const THEME_FONTS = {
 const HEX = /^#[0-9a-f]{6}$/i;
 // Chinese fonts (characters only).
 const FONTS = {
-  theme: { label: "Theme's own (pixel in Retro Arcade, otherwise Sans)", css: null, stack: null },
+  theme: { label: "Theme's own", css: null, stack: null },
   sans: { label: "Sans", css: null, stack: '"Noto Sans SC", "Noto Sans TC", "PingFang SC", "Microsoft YaHei", sans-serif' },
   serif: { label: "Serif", css: "Noto+Serif+SC:wght@400;600&family=Noto+Serif+TC:wght@400;600", stack: '"Noto Serif SC", "Noto Serif TC", "Songti SC", SimSun, serif' },
   kai: { label: "Kai (handwritten)", css: "LXGW+WenKai+TC", stack: '"LXGW WenKai TC", KaiTi, STKaiti, serif' },
@@ -198,6 +198,10 @@ const UIFONTS = {
 };
 // Recent updates, newest first (Debug settings → Updates). The first date also shows in Settings → About.
 const UPDATES = [
+  ["15 Oct", "Settings: a search box; Check every voice; the font sample is a real word; nothing runs off the screen at 100% text any more. Unlock everything now includes the water garden and My journey"],
+  ["15 Oct", "My journey: a 旅 seal in the top bar glows with a count of new quests (no more pop-ups); the map unrolls like a scroll; its sheets close with × or a pull down"],
+  ["15 Oct", "Review: cards you're still learning come back when their time is up (the time under the button), not 3 cards later. Meaning cards say the word as they appear"],
+  ["15 Oct", "Tap any Chinese anywhere to open it; Android's back swipe goes back a page; one play button (pick the voice in Settings); a slimmer level bar; same-size deck tiles; clock side by side"],
   ["15 Oct", "Sentence cards: once you've known a word for 5 days, fill the gap in a short, easy sentence (Settings → Flashcards)"],
   ["15 Oct", "Type your answers: pinyin (tone numbers or marks), characters or the meaning. Small typos count, wrong tones are shown, and the right grade is suggested"],
   ["15 Oct", "Daily goal: 5–20 minutes of flashcards and the tone trainer, a ring on Home, and your streak grows on days you reach it. Reviews come 20 cards at a time"],
@@ -425,7 +429,9 @@ function sanitize(raw) {
   for (const [k, v] of Object.entries(obj(jo.done)).slice(0, 40)) if (/^[a-z0-9]{2,12}$/.test(k) && Number.isFinite(v)) jd[k] = Math.floor(v);
   for (const [k, v] of Object.entries(obj(jo.counts)).slice(0, 20)) if (/^[a-z]{2,12}$/.test(k)) { const n = Math.floor(num(v, 0, 1000, 0)); if (n) jcn[k] = n; }
   for (const [k, v] of Object.entries(obj(jo.read)).slice(0, 40)) if (/^[0-9]{1,2}$/.test(k) && Number.isFinite(v)) jr[k] = Math.floor(v);
-  s.journey = { done: jd, seen: Math.floor(num(jo.seen, 0, 20, 0)), counts: jcn, read: jr };
+  // noted: how many finished quests you've seen on My journey (the top bar's journey seal counts the rest)
+  const seenStop = Math.floor(num(jo.seen, 0, 20, 0));
+  s.journey = { done: jd, seen: seenStop, counts: jcn, read: jr, noted: Math.floor(num(jo.noted, 0, 20, seenStop)) };
   s.toneBest = {};
   for (const k of ["single", "pairs"]) { const n = Math.floor(num(obj(o.toneBest)[k], 0, 100000, 0)); if (n) s.toneBest[k] = n; }
   // Your voice: Automatic, or one you picked (Settings → Voice, or the voice button beside Listen).

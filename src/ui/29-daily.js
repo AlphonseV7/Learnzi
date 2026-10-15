@@ -14,11 +14,9 @@ function dailyBox() {
   const en = h("p", { class: "daily-en", hidden: true });
   const reveal = h("button", { class: "btn small", type: "button", onclick: () => { en.hidden = !en.hidden; reveal.textContent = en.hidden ? "Show English" : "Hide English"; } }, "Show English");
   const listen = h("button", { class: "btn icon", type: "button", "aria-label": "Listen to the sentence", disabled: true }, icon("play"));
-  let said = "";
-  const voice = voiceBtn({ text: () => said, compact: true });
   const credit = h("a", { class: "small muted", target: "_blank", rel: "noopener noreferrer", title: "Sentence from Tatoeba (CC BY 2.0 FR)" }, "Tatoeba");
   const box = h("div", { class: "card stack daily-card" },
-    h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, "Sentence of the day"), h("span", { class: "listen-pair" }, listen, voice)),
+    h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, "Sentence of the day"), listen),
     line, h("div", { class: "row spread" }, reveal, credit), en);
   loadDaily().then(list => {
     if (!list.length) { line.replaceChildren(h("span", { class: "muted small" }, "No sentence today.")); return; }
@@ -30,7 +28,7 @@ function dailyBox() {
     credit.href = "https://tatoeba.org/en/sentences/show/" + zid;
     listen.disabled = false;
     listen.addEventListener("click", () => speak(zh));
-    said = zh; voice.voiceShow();
+
   });
   return box;
 }

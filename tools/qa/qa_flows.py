@@ -217,17 +217,18 @@ async def main():
         await ready(pg)
         async def e1():
             await pg.evaluate("for (let i = 0; i < 5; i++) __t.jCount('lookups')"); await pg.wait_for_timeout(500)
-            pop = await pg.evaluate("document.querySelector('#questpop')?.innerText || ''")
+            pop = await pg.evaluate("[document.querySelector('#jtop').classList.contains('glow'), document.querySelector('#jt-count').hidden ? '' : document.querySelector('#jt-count').textContent, !!document.querySelector('#questpop')]")
             d1 = await pg.evaluate("Object.keys(__t.getState().journey.done)")
             # chapter 2 quest can't count before chapter 1 is done
             await pg.evaluate("__t.jCount('pairs')"); await pg.wait_for_timeout(200)
             d2 = await pg.evaluate("Object.keys(__t.getState().journey.done)")
-            return ("tour" in d1 and "lookups" in d1 and "pairs" not in d2 and "quest complete" in pop.lower(), f"done={d2} pop={pop[:60]!r}")
-        await step("E", "1 quests complete in order, once, with the pop-up", e1)
+            return ("tour" in d1 and "lookups" in d1 and "pairs" not in d2 and pop[0] and pop[1] == "2" and not pop[2], f"done={d2} seal glow/count/no pop-up={pop}")
+        await step("E", "1 quests complete in order, once; the journey seal glows with a count, no pop-up", e1)
         async def e3():
-            await pg.click(".questpop-go"); await pg.wait_for_timeout(5000)
-            return (await pg.evaluate("location.hash") == "#journey" and await pg.evaluate("__t.getState().journey.seen") == await pg.evaluate("__t.currentStop()"), "opened map and walked")
-        await step("E", "3/4 pop-up opens the map; the avatar walks and stays", e3)
+            await pg.click("#jtop"); await pg.wait_for_timeout(5000)
+            cleared = await pg.evaluate("document.querySelector('#jt-count').hidden")
+            return (await pg.evaluate("location.hash") == "#journey" and cleared and await pg.evaluate("__t.getState().journey.seen") == await pg.evaluate("__t.currentStop()"), f"opened map, walked, count cleared={cleared}")
+        await step("E", "3/4 the journey seal opens the map; the avatar walks and stays; the count clears", e3)
         async def e2():
             bad = []
             for i in range(20):
@@ -249,7 +250,7 @@ async def main():
                 await pg.locator(".jbar-btn", has_text=lab).click(); await pg.wait_for_timeout(500)
                 names.append(lab + ":" + str(await pg.locator("#jsheet").count())); await pg.keyboard.press("Escape"); await pg.wait_for_timeout(350)
             await pg.locator(".jbar-btn", has_text="Full map").click(); await pg.wait_for_timeout(600)
-            full = await pg.evaluate("!!document.querySelector('.jm-wrap.full')")
+            full = await pg.evaluate("!!document.querySelector('.jm-scroll.full')")
             await pg.locator(".jbar-btn", has_text="Find me").click(); await pg.wait_for_timeout(900)
             await pg.locator(".jbar-btn", has_text="Scrolls").click(); await pg.wait_for_timeout(600)
             lib = await pg.evaluate("location.hash")

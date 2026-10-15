@@ -11,6 +11,7 @@ const AUDIO = {
   decoded: new Map(),        // "w|你好" → Promise<AudioBuffer>
   playing: [],
   NW: 48, NS: 8,
+  err: "",                   // why the last recording couldn't play (Settings → Voice → Check voices)
 };
 /** Where each recording sits in the packed audio files: "w|word" or "s|syllable" → [file, start, length]. */
 function audioIndex() {
@@ -39,15 +40,16 @@ async function recording(kind, key) {
   if (AUDIO.decoded.has(id)) return AUDIO.decoded.get(id);
   const job = (async () => {
     const idx = await audioIndex();
+    if (!idx.size) { AUDIO.err = "index"; return null; }
     const at = idx.get(id);
-    if (!at) return null;
+    if (!at) { AUDIO.err = "missing"; return null; }
     const fname = kind + String(at[0]).padStart(2, "0");
     if (!AUDIO.files.has(fname)) AUDIO.files.set(fname, fetch("audio/" + fname + ".mp3").then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null));
     const buf = await AUDIO.files.get(fname);
-    if (!buf) { AUDIO.files.delete(fname); return null; }
+    if (!buf) { AUDIO.files.delete(fname); AUDIO.err = "download"; return null; }
     const ctx = audioCtxNow();
-    if (!ctx) return null;
-    const audio = await ctx.decodeAudioData(buf.slice(at[1], at[1] + at[2]));
+    if (!ctx) { AUDIO.err = "nosound"; return null; }
+    const audio = await ctx.decodeAudioData(buf.slice(at[1], at[1] + at[2])).catch(e => { AUDIO.err = "decode"; throw e; });
     const d = tidySamples(audio.getChannelData(0), audio.sampleRate);
     const out = ctx.createBuffer(1, d.length, audio.sampleRate);
     out.getChannelData(0).set(d);
@@ -170,7 +172,7 @@ function speak(text, p, opts = {}) {
   const seq = ++speakSeq;
   audioCtxNow();   // unlock sound now, while we're still inside the tap
   const order = sourceOrder([...clean].length);
-  const tries = opts.source ? [opts.source, ...order.filter(x => x !== opts.source)] : order;
+  const tries = opts.only ? [opts.only] : opts.source ? [opts.source, ...order.filter(x => x !== opts.source)] : order;
   const slowNote = setTimeout(() => { if (seq === speakSeq) toast("Loading the recording…"); }, 900);
   // Resolves to the source that played (or null), so callers can show it.
   return (async () => {
@@ -183,6 +185,7 @@ function speak(text, p, opts = {}) {
       }
     }
     clearTimeout(slowNote);
+    if (opts.only) return null;
     if (seq === speakSeq) toast(hasTTS() ? "No recording for this, and the browser voice didn't start." : "No recording for this, and this app can't use the browser voice.");
     return null;
   })();
@@ -271,8 +274,9 @@ function voiceBtn(opts) {
 function syncVoiceBtns(text, src) {
   for (const b of document.querySelectorAll(".voice-src")) if (b.dataset.vtext === text && b.dataset.src !== src) drawVoice(b, src);
 }
-/** A Listen button with its voice button beside it. */
-const withVoice = (btn, opts) => h("span", { class: "listen-pair" }, btn, voiceBtn(opts));
+/** A Listen button. (It used to carry a voice button beside it; new learners tapped that instead of
+ *  Play, so the voice is now chosen in Settings → Voice only.) */
+const withVoice = btn => btn;
 
 /** Plays exact numbered pinyin from the syllable recordings (no tone changes), e.g. "ma3" or "xue2 xi2".
  *  Resolves false when a syllable doesn't exist in Mandarin (there's no recording of it). */

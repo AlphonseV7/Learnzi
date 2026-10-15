@@ -1,5 +1,15 @@
 /* LearnZì UI, part 4: top bar, navigation, Home, Look up and My Zì. */
 
+/** Your name in the top bar shrinks a little (never below 75%) rather than being cut off on narrow phones. */
+function fitName() {
+  const n = $("#me-name");
+  if (!n) return;
+  n.style.fontSize = "";
+  requestAnimationFrame(() => {
+    let size = parseFloat(getComputedStyle(n).fontSize), min = size * 0.75;
+    while (n.scrollWidth > n.clientWidth + 1 && size > min) { size -= 0.5; n.style.fontSize = size + "px"; }
+  });
+}
 function updateTopbar() {
   const lv = levelNow();
   const pill = $("#lvl");
@@ -12,6 +22,8 @@ function updateTopbar() {
     pill.style.setProperty("--xpd", String(String((mleOn() ? mleLevel() : lv).need).length));
   }
   xpBarShow(mleOn() ? mleLevel() : lv);
+  jtopShow();
+  fitName();
   const badge = $("#clock-badge");
   if (badge) {
     badge.hidden = !clockShift;
@@ -41,10 +53,13 @@ function render(animate) {
   if (ui.view === "deck") afterDeck();
   updateTopbar();
 }
-function go(view) {
+/** Open a page. Each new page is a step in the browser's history, so Android's back swipe (and the
+ *  back button) goes back a page; `fromHistory` is set when that's what brought us here. */
+function go(view, fromHistory) {
   if (!VIEWS.includes(view)) view = "home";
+  const step = !fromHistory && view !== ui.view;
   ui.view = view;
-  try { history.replaceState(null, "", "#" + view); } catch { /* not allowed here: fine */ }
+  try { if (step) history.pushState(null, "", "#" + view); else if (!fromHistory) history.replaceState(null, "", "#" + view); } catch { /* not allowed here: fine */ }
   render(true);
   if (!ui.highlight) window.scrollTo({ top: 0 });
   if (view === "lookup") { const q = $("#q"); if (q && window.matchMedia("(pointer: fine)").matches) q.focus(); }

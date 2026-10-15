@@ -1,13 +1,18 @@
-/* LearnZì UI, part 2a: on phones, pull the word pop-up down to close it (only when it's scrolled to the top). */
+/* LearnZì UI, part 2a: on phones, pull the word pop-up (and the journey's sheets) down to close them,
+ * only when they're scrolled to the top. */
 
 function setupPanelSwipe() {
   const p = $("#panel");
   if (!p) return;
+  swipeToClose(p, { isOpen: () => !wide.matches && p.classList.contains("open"), scrim: $("#scrim"), close: closePanel });
+}
+/** Pull a sheet down to close it (only when it's scrolled to the top), on phones. */
+function swipeToClose(p, { isOpen = () => true, scrim = null, close }) {
   let startY = 0, dy = 0, startT = 0, tracking = false, dragging = false;
   const noDrag = "input, textarea, select, .writer-box, .fc-writer, .seg, [contenteditable]";
   p.addEventListener("touchstart", ev => {
     tracking = false; dragging = false; dy = 0;
-    if (wide.matches || !p.classList.contains("open") || ev.touches.length !== 1) return;
+    if (!isOpen() || ev.touches.length !== 1) return;
     if (p.scrollTop > 0 || ev.target.closest(noDrag)) return;
     tracking = true;
     startY = ev.touches[0].clientY;
@@ -24,7 +29,7 @@ function setupPanelSwipe() {
     ev.preventDefault();
     const pull = Math.max(0, dy);
     p.style.transform = "translateY(" + pull + "px)";
-    $("#scrim").style.opacity = String(Math.max(0, 1 - pull / (p.offsetHeight || 600)));
+    if (scrim) scrim.style.opacity = String(Math.max(0, 1 - pull / (p.offsetHeight || 600)));
   }, { passive: false });
   const end = () => {
     if (!tracking) return;
@@ -34,8 +39,8 @@ function setupPanelSwipe() {
     p.classList.remove("dragging");
     const fast = dy > 40 && Date.now() - startT < 250;
     p.style.transform = "";
-    $("#scrim").style.opacity = "";
-    if (dy > Math.min(140, p.offsetHeight * 0.28) || fast) closePanel();
+    if (scrim) scrim.style.opacity = "";
+    if (dy > Math.min(140, p.offsetHeight * 0.28) || fast) close();
   };
   p.addEventListener("touchend", end);
   p.addEventListener("touchcancel", end);

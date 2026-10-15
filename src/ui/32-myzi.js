@@ -216,8 +216,8 @@ function decksBox(label = "Your decks") {
   for (const id of ids.slice(0, 4)) {
     const sum = deckSummary(id);
     box.append(h("button", { class: "deck-mini", type: "button", onclick: () => openDeck(id) },
-      h("div", { class: "row spread" }, h("b", null, deckName(id)),
-        h("span", { class: "muted small" }, (sum.counts[2] + sum.counts[3]) + " / " + sum.total + " learned" + (sum.due ? " · " + sum.due + " due" : ""))),
+      h("b", { class: "dm-name" }, deckName(id)),
+      h("span", { class: "muted small dm-sum" }, (sum.counts[2] + sum.counts[3]) + " / " + sum.total + " learned" + (sum.due ? " · " + sum.due + " due" : "")),
       strengthBar(sum.counts, sum.total)));
   }
   return box;

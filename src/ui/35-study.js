@@ -1,6 +1,7 @@
 /* LearnZì UI, part 6: flashcard study sessions. */
 
-const study = { queue: [], cur: null, revealed: false, done: 0, again: 0, xp: 0, active: false, deck: null };
+const study = { queue: [], waiting: [], cur: null, revealed: false, done: 0, again: 0, xp: 0, active: false, deck: null };
+let waitTimer = 0;
 
 function startStudy(deckId = null) {
   if (ui.dict !== "ready") { toast("The dictionary is still loading."); return; }
@@ -14,12 +15,27 @@ function startStudy(deckId = null) {
     for (let i = 0; i < 3 && d < plan.due.length; i++) queue.push(plan.due[d++]);
     if (f < plan.fresh.length) queue.push(plan.fresh[f++]);
   }
-  Object.assign(study, { queue, cur: null, revealed: false, done: 0, again: 0, xp: 0, shownXp: 0, active: true, deck: deckId });
+  Object.assign(study, { queue, waiting: [], cur: null, revealed: false, done: 0, again: 0, xp: 0, shownXp: 0, active: true, deck: deckId });
   nextCard();
   go("study");
 }
-function nextCard() {
-  study.cur = study.queue.shift() || null;
+/* Cards you're still learning come back when their time is up (the time shown under the button you
+ * pressed), not a few cards later. While one is waiting and nothing else is left, the session shows
+ * how long until it, with a button to review it now. */
+const nowMin = () => Math.floor(clock() / 60000);
+function takeWaiting(force) {
+  if (!study.waiting.length) return null;
+  study.waiting.sort((a, b) => a.at - b.at);
+  return force || study.waiting[0].at <= nowMin() ? study.waiting.shift() : null;
+}
+function nextCard(force) {
+  clearTimeout(waitTimer);
+  study.cur = takeWaiting(force) || study.queue.shift() || null;
+  if (!study.cur && study.waiting.length) {
+    // Wake up when the next one is due (checked every 15 s, so a sleeping phone catches up).
+    const tick = () => { if (!study.active || study.cur || !study.waiting.length) return; if (study.waiting[0].at <= nowMin()) { nextCard(); if (ui.view === "study") render(false); } else waitTimer = setTimeout(tick, 15000); };
+    waitTimer = setTimeout(tick, 15000);
+  }
   study.revealed = false;
   study.typed = null; study.draft = ""; study.suggest = 0; study.shownAt = Date.now();
   study.w = { idx: 0, mistakes: 0, done: false, strokes: 0 };
@@ -29,12 +45,14 @@ function nextCard() {
   }
   // fetch the stroke shapes of the next few cards now, so their characters can draw themselves at once
   if (state.drawChars) for (const it of [study.cur, ...study.queue.slice(0, 3)]) if (it) for (const c of it.e.s) if (Engine.isCJK(c)) CharData.strokes(c);
-  if (study.cur && study.cur.k.endsWith("|l") && state.autoplay) setTimeout(() => speak(study.cur.e.s, study.cur.e.p), 250);
+  // Listening and Meaning cards say the word as soon as it shows (the others say it with the answer,
+  // since hearing it first would give the answer away).
+  if (study.cur && /\|[lm]$/.test(study.cur.k) && state.autoplay) { const c = study.cur; setTimeout(() => { if (study.cur === c && !study.revealed) speak(c.e.s, c.e.p); }, 250); }
 }
 function reveal() {
   if (!study.cur || study.revealed) return;
   study.revealed = true;
-  if (state.autoplay && !study.cur.k.endsWith("|l")) {
+  if (state.autoplay && !/\|[lm]$/.test(study.cur.k)) {
     const cz = study.cur.k.endsWith("|c") ? clozePick(study.cur.k, study.cur.e) : null;
     if (cz) speak(cz.zh); else speak(study.cur.e.s, study.cur.e.p);   // a Sentence card says the whole sentence
   }
@@ -59,8 +77,8 @@ function grade(g) {
   study.xp += gained;
   study.done++;
   if (g === 1) study.again++;
-  // Still learning: show it again a few cards later in this session.
-  if (SRS.isLearning(next)) study.queue.splice(Math.min(3, study.queue.length), 0, cur);
+  // Still learning: it comes back in this session once its time is up.
+  if (SRS.isLearning(next)) study.waiting.push({ k: cur.k, e: cur.e, at: next[2] });
   afterXp(before, gained, false, cur.e.s);
   if (g === 1) setMood("oops", 2200);
   timeBadges();
@@ -78,7 +96,7 @@ function viewStudy() {
     setTimeout(() => startStudy(), 0);
     return v;
   }
-  const total = study.done + study.queue.length + (study.cur ? 1 : 0);
+  const total = study.done + study.queue.length + study.waiting.length + (study.cur ? 1 : 0);
   v.append(h("div", { class: "row spread study-top" },
     h("button", { class: "btn", type: "button", onclick: leaveStudy }, icon("back"), study.deck ? deckName(study.deck) : "My Zì"),
     h("span", { class: "muted small num" }, study.cur ? Math.min(study.done + 1, total) + " of " + total : "Done"),
@@ -86,7 +104,7 @@ function viewStudy() {
   const bar = h("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(study.done) }, h("i"));
   bar.firstChild.style.width = (total ? (study.done / total) * 100 : 100) + "%";
   v.append(bar);
-  v.append(study.cur ? cardView(study.cur) : summaryView());
+  v.append(study.cur ? cardView(study.cur) : study.waiting.length ? waitView() : summaryView());
   return v;
 }
 
@@ -121,8 +139,7 @@ function cardView({ k, e }) {
     drawSoon(hz, !study.revealed);   // after answering, the drawn characters just stay
   } else if (type === "l") {
     card.append(h("div", { class: "fc-front tone-play-row" },
-      h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play")),
-      voiceBtn({ text: e.s, p: e.p })),
+      h("button", { class: "fc-play", type: "button", "aria-label": "Play the word", onclick: () => speak(e.s, e.p) }, icon("play"))),
       h("p", { class: "muted small" }, typing ? "Listen, then type what you hear" : "Listen. What's the word, and what does it mean?"));
   } else if (type === "w") {
     card.append(h("div", { class: "fc-front fc-meaning" }, shortDef(e, 3)),
@@ -291,6 +308,16 @@ function drawChars(ruby, animate) {
   });
 }
 
+/** Only cards that aren't due yet are left: how long to wait, or review the next one now. */
+function waitView() {
+  const mins = Math.max(1, study.waiting[0].at - nowMin()), n = study.waiting.length;
+  return h("div", { class: "card summary wait" },
+    h("h2", null, "Next card in " + mins + (mins === 1 ? " minute" : " minutes")),
+    h("p", { class: "muted" }, (n === 1 ? "One card you're learning comes" : n + " cards you're learning come") + " back when its time is up. Spacing them out helps them stick, but you can go on now."),
+    h("div", { class: "row" },
+      h("button", { class: "btn primary", type: "button", onclick: () => { nextCard(true); render(false); } }, "Review it now"),
+      h("button", { class: "btn", type: "button", onclick: () => { study.waiting = []; render(false); } }, "Finish for now")));
+}
 function summaryView() {
   const box = h("div", { class: "card summary" });
   const lv = levelNow();
@@ -323,11 +350,12 @@ function leaveStudy() {
   if (study.deck) openDeck(study.deck); else go("myzi");
 }
 function stat(value, label) { return h("div", { class: "stat" }, h("b", { class: "num" }, String(value)), h("span", { class: "muted small" }, label)); }
+/** Your level and XP, in the same look as the top bar's: "Lv 39" over a thin rounded bar. */
 function levelBar(lv) {
-  const bar = h("div", { class: "bar" }, h("i"));
+  const bar = h("div", { class: "bar xp-line", role: "progressbar", "aria-label": "XP to the next level", "aria-valuemin": "0", "aria-valuemax": String(lv.need), "aria-valuenow": String(lv.into) }, h("i"));
   bar.firstChild.style.width = Math.round((lv.into / lv.need) * 100) + "%";
   return h("div", { class: "level-box" },
-    h("div", { class: "row spread" }, h("b", null, "Zì level " + lv.level), h("span", { class: "muted small num" }, lv.into + " / " + lv.need + " XP")),
+    h("div", { class: "lb-top" }, h("b", { class: "lb-lv", "aria-label": "Zì level " + lv.level }, "Lv " + lv.level), h("span", { class: "muted small num" }, lv.into + " / " + lv.need + " XP")),
     bar, rankLine(lv.level));
 }
 /** Your rank under the level bar, and how far the next one is. */

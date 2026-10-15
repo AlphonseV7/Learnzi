@@ -105,7 +105,7 @@ function viewDebug() {
       h("span", { class: "muted small" }, "Off: anything you haven't unlocked is a shadow with ??? for a name, plus what unlocks it. On: you can see what's coming.")),
       h("span", { class: "toggle" }, showSw, h("span"))),
     h("div", { class: "set-row" }, h("div", { class: "set-label" }, h("label", { for: "unlock-all" }, "Unlock everything"),
-      h("span", { class: "muted small" }, "Every animal, eye, accessory, aura, extra, bonus theme, clock face and clock effect, whatever your level or streak. Turn it off to go back; your XP isn't changed.")),
+      h("span", { class: "muted small" }, "Every animal, eye, accessory, aura, extra, bonus theme, clock face and clock effect, the finished water garden, and the whole of My journey (every quest, scroll and reward), whatever your level or streak. Turn it off to go back; your real progress isn't changed.")),
       h("span", { class: "toggle" }, unlockSw, h("span")))));
 
   return v;

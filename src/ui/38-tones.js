@@ -69,7 +69,7 @@ function playDrill() {
   const q = drill.qs[drill.i];
   if (!q) return;
   // Your chosen voice (the button beside Play) goes first; if it can't say this one, the next one does.
-  speak(q.e.s, q.e.p, { source: state.toneSource || undefined }).then(src => { if (src) drill.lastSrc = src; });
+  speak(q.e.s, q.e.p).then(src => { if (src) drill.lastSrc = src; });
 }
 /** After answering: hear any option, so you can compare the tones. */
 function playOption(q, tones) {
@@ -216,8 +216,7 @@ function viewTones() {
   }
   const card = h("div", { class: "card flashcard tone-card" },
     h("span", { class: "eyebrow" }, drill.mode === "pairs" ? "Which tones?" : "Which tone?"),
-    h("div", { class: "fc-front tone-play-row" }, h("button", { class: "fc-play", type: "button", "aria-label": "Play again", onclick: playDrill }, icon("play")),
-      voiceBtn({ text: q.e.s, p: q.e.p, pickKey: "toneSource", play: playDrill })),
+    h("div", { class: "fc-front tone-play-row" }, h("button", { class: "fc-play", type: "button", "aria-label": "Play again", onclick: playDrill }, icon("play"))),
     h("p", { class: "muted small fc-center" }, "Tap to hear it again (Space). After answering, tap any option to hear it."));
   const opts = h("div", { class: "tone-opts" + (drill.mode === "pairs" ? " pairs" : "") });
   q.options.forEach((tones, k) => {

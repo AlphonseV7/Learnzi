@@ -44,9 +44,10 @@ const J_TOTAL = QUESTS.length;
 
 function jState() {
   const j = state.journey || {};
-  return { done: j.done || {}, seen: j.seen || 0, counts: j.counts || {}, read: j.read || {} };
+  return { done: j.done || {}, seen: j.seen || 0, counts: j.counts || {}, read: j.read || {}, noted: j.noted || 0 };
 }
-const questDone = i => !!jState().done[QUESTS[i].id];
+/** Debug → Unlock everything shows the whole journey done (display only: nothing is saved while it's on). */
+const questDone = i => state.unlockAll || !!jState().done[QUESTS[i].id];
 const doneCount = () => QUESTS.filter((q, i) => questDone(i)).length;
 /** The stop your avatar stands at: the first quest not done yet (20 when the journey is complete). */
 function currentStop() { for (let i = 0; i < J_TOTAL; i++) if (!questDone(i)) return i; return J_TOTAL; }
@@ -68,7 +69,7 @@ function jCount(key, once) {
 }
 /** Mark quests done that your progress now earns, chapter by chapter, and say so. */
 function checkJourney(quiet) {
-  if (mleOn() || ui.dict !== "ready") return 0;
+  if (mleOn() || state.unlockAll || ui.dict !== "ready") return 0;
   const j = jState(), done = { ...j.done }, fresh = [];
   for (let c = 1; c <= J_CHAPTERS.length; c++) {
     const first = (c - 1) * 4;
@@ -83,41 +84,30 @@ function checkJourney(quiet) {
   commit({ journey: { ...state.journey, done } });
   const chapters = [...new Set(fresh.map(i => Math.floor(i / 4) + 1))].filter(c => QUESTS.slice((c - 1) * 4, c * 4).every(q => done[q.id]));
   if (!quiet) {
-    const reward = chapters.length ? "Chapter reward: " + J_CHAPTERS[chapters[chapters.length - 1] - 1].reward + "." : null;
-    if (fresh.length === 1) questPop("Quest complete!", QUESTS[fresh[0]].title, "Scroll found: " + scrollById(fresh[0] + 1).title, reward, scrollById(fresh[0] + 1).zh);
-    else questPop(fresh.length + " quests complete!", fresh.map(i => QUESTS[i].title).join(" · "), fresh.length + " scrolls found", reward, "旅程");
+    jtopShow(true);   // the journey seal in the top bar glows, with the count of new quests
     if (state.sounds) try { chime(0.05); } catch { /* sound is optional */ }
     setMood("happy", 2200);
-  }
+  } else jtopShow();
   if (["journey", "home", "myzi", "scrolls"].includes(ui.view)) setTimeout(() => render(false), 50);
   return fresh.length;
 }
-/** The quest pop-up: a little ink-wash scroll in the Journey's own look (the same in every theme, so it
- *  stands out), with a red seal and a button to the My journey page. Stays 8 seconds; × or Escape closes. */
-let questPopTimer = 0;
-function closeQuestPop() {
-  const el = $("#questpop");
-  if (!el) return false;
-  clearTimeout(questPopTimer);
-  el.classList.add("out");
-  setTimeout(() => el.remove(), 260);
-  return true;
-}
-function questPop(kicker, title, line, extra, seal) {
-  const old = $("#questpop"); if (old) old.remove();
-  clearTimeout(questPopTimer);
-  const el = h("div", { class: "questpop", id: "questpop", role: "status", "aria-live": "polite" },
-    h("span", { class: "questpop-seal hz", "aria-hidden": "true" }, [...(seal || "旅程")].slice(0, 2).map(c => h("span", null, c))),
-    h("div", { class: "questpop-body" },
-      h("span", { class: "questpop-kicker" }, kicker),
-      h("b", { class: "questpop-title" }, title),
-      h("span", { class: "questpop-line" }, line),
-      extra ? h("span", { class: "questpop-line questpop-extra" }, extra) : null,
-      h("div", { class: "questpop-btns" },
-        h("button", { class: "questpop-go", type: "button", onclick: () => { closeQuestPop(); closePanel(); go("journey"); } }, "My journey"),
-        h("button", { class: "questpop-x", type: "button", "aria-label": "Close", onclick: closeQuestPop }, icon("close")))));
-  document.body.append(el);
-  questPopTimer = setTimeout(closeQuestPop, 8000);
+/* The journey seal in the top bar (旅): a bubble counts finished quests you haven't seen on My journey
+ * yet (each brings a scroll, and the last of a chapter its reward). When one finishes, the seal glows
+ * and bounces for a moment. Opening My journey clears the count. Hidden in MLE mode. */
+const jUnseen = () => (state.unlockAll ? 0 : Math.max(0, doneCount() - (jState().noted || 0)));
+function jtopShow(glow) {
+  const b = $("#jtop");
+  if (!b) return;
+  b.hidden = mleOn();
+  const n = jUnseen(), c = $("#jt-count");
+  if (c) { c.hidden = !n; c.textContent = n > 9 ? "9+" : String(n); }
+  b.setAttribute("aria-label", "My journey" + (n ? ", " + n + (n === 1 ? " new quest done" : " new quests done") : ""));
+  b.setAttribute("aria-pressed", String(["journey", "scrolls", "scroll"].includes(ui.view)));
+  if (glow && !mleOn()) {
+    b.classList.remove("glow"); void b.offsetWidth; b.classList.add("glow");
+    clearTimeout(b.glowTimer); b.glowTimer = setTimeout(() => b.classList.remove("glow"), 4200);
+    revealBar();
+  }
 }
 function openScroll(id) {
   ui.scrollId = id;
@@ -296,6 +286,8 @@ function walkToken(el, from, to, done) {
     const f = Math.min(1, (now - t0) / dur), e = f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
     const at = e * (pts.length - 1), i = Math.floor(at), r = at - i, a = pts[i], b = pts[Math.min(i + 1, pts.length - 1)];
     placeToken(el, a[0] + (b[0] - a[0]) * r, a[1] + (b[1] - a[1]) * r);
+    const view = el.closest(".jm-view");
+    if (view && !el.closest(".jm-scroll.full")) view.scrollTop = el.offsetTop - view.clientHeight / 2;
     if (f < 1) requestAnimationFrame(step); else { el.classList.remove("walking"); done(); }
   };
   requestAnimationFrame(step);
@@ -309,12 +301,17 @@ function closeJSheet() {
   setTimeout(() => s.remove(), 220);
   return true;
 }
+/** A sheet over the map, like the word pop-up: × at the top right, tap outside or pull it down to close. */
 function openJSheet(...content) {
-  closeJSheet(); const old = $("#jsheet"); if (old) old.remove();
-  const sheet = h("div", { class: "jsheet-panel card", role: "dialog", "aria-modal": "true" }, h("span", { class: "jsheet-grab", "aria-hidden": "true" }), ...content);
-  const wrap = h("div", { class: "jsheet", id: "jsheet" }, h("div", { class: "jsheet-scrim", onclick: closeJSheet }), sheet);
+  const old = $("#jsheet"); if (old) old.remove();
+  const close = h("button", { class: "btn icon panel-close jsheet-x", type: "button", "aria-label": "Close", onclick: closeJSheet }, icon("close"));
+  const sheet = h("div", { class: "jsheet-panel card", role: "dialog", "aria-modal": "true" },
+    h("span", { class: "jsheet-grab", "aria-hidden": "true" }), close, ...content);
+  const scrim = h("div", { class: "jsheet-scrim", onclick: closeJSheet });
+  const wrap = h("div", { class: "jsheet", id: "jsheet" }, scrim, sheet);
   document.body.append(wrap);
-  setTimeout(() => { const b = sheet.querySelector("button"); if (b) b.focus({ preventScroll: true }); }, 30);
+  swipeToClose(sheet, { scrim, close: closeJSheet });
+  setTimeout(() => close.focus({ preventScroll: true }), 30);
 }
 function questBar(q) {
   const n = questProgress(q), bar = h("div", { class: "bar" }, h("i"));
@@ -341,7 +338,7 @@ function stopSheet(i) {
     h("div", { class: "row" },
       done ? h("button", { class: "btn primary", type: "button", onclick: () => { closeJSheet(); openScroll(i + 1); } }, "Read the scroll")
         : open ? h("button", { class: "btn primary", type: "button", onclick: () => { closeJSheet(); q.go[1](); } }, q.go[0]) : null,
-      h("button", { class: "btn", type: "button", onclick: closeJSheet }, "Close")));
+      null));
 }
 function rewardSheet(i) {
   const c = J_CHAPTERS[i], got = chapterDone(i + 1);
@@ -349,14 +346,14 @@ function rewardSheet(i) {
   openJSheet(h("span", { class: "eyebrow" }, "Chapter " + (i + 1) + " · " + c.en + " " + c.zh),
     h("h2", null, got ? "Reward earned" : "Chapter reward"),
     h("p", { class: "muted" }, (got ? "You earned " : "Finish the chapter to earn ") + c.reward + "." + (got ? " " + how : "")),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: closeJSheet }, "Close")));
+    null);
 }
 function rewardsSheet() {
   openJSheet(h("h2", null, "Chapter rewards"),
     h("ul", { class: "j-list" }, J_CHAPTERS.map((c, i) => h("li", { class: "j-li" + (chapterDone(i + 1) ? " done" : "") },
       h("span", { class: "j-ic", "aria-hidden": "true" }, chapterDone(i + 1) ? "✓" : String(i + 1)),
       h("span", { class: "stack-tight" }, h("b", null, c.en + " ", h("span", { class: "hz" }, c.zh)), h("span", { class: "muted small" }, c.reward + (chapterDone(i + 1) ? " · earned" : "")))))),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: closeJSheet }, "Close")));
+    null);
 }
 function listSheet() {
   const cur = currentStop();
@@ -371,7 +368,7 @@ function listSheet() {
           done ? h("button", { class: "btn small", type: "button", onclick: () => { closeJSheet(); openScroll(i + 1); } }, "Read")
             : open ? h("button", { class: "btn small", type: "button", onclick: () => { closeJSheet(); q.go[1](); } }, "Go") : null);
       }))))),
-    h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: closeJSheet }, "Close")));
+    null);
 }
 
 // ---------- the Journey page ----------
@@ -380,10 +377,19 @@ function viewJourney() {
   if (ui.dict !== "ready") { v.append(h("div", { class: "card" }, loadingBlock())); return v; }
   checkJourney(true);
   const cur = currentStop(), found = doneCount(), j = jState();
+  if ((j.noted || 0) !== found && !state.unlockAll) setTimeout(() => { commit({ journey: { ...state.journey, noted: found } }); jtopShow(); }, 0);
   const chap = Math.min(J_CHAPTERS.length, Math.floor(cur / 4) + 1);
   const unread = SCROLLS.filter(s => scrollFound(s.id) && !j.read[s.id]).length;
   const tool = (zh, label, run, extra) => h("button", Object.assign({ class: "jbar-btn", type: "button", onclick: run }, extra || {}), h("span", { class: "hz jbar-zh", "aria-hidden": "true" }, zh), h("span", null, label));
-  const mapWrap = h("div", { class: "jm-wrap" + (ui.jFull ? " full" : "") });
+  // The map is a scroll: wooden rollers at each end, the paper unrolling between them to about half the
+  // screen around your avatar (the map scrolls inside it). Full map rolls it all the way open.
+  const paper = h("div", { class: "jm-paper" });
+  const viewport = h("div", { class: "jm-view" }, paper);
+  const mapWrap = h("div", { class: "jm-wrap" }, viewport);
+  const roller = end => h("div", { class: "jm-roller jm-roller-" + end, "aria-hidden": "true" });
+  const firstOpen = ui.jRolledFor !== "journey";
+  ui.jRolledFor = "journey";
+  const scroll = h("div", { class: "jm-scroll" + (ui.jFull ? " full" : "") + (firstOpen ? " rolled" : "") }, roller("top"), mapWrap, roller("bottom"));
   const token = jAvatarToken();
   const bar = h("div", { class: "jbar card", role: "toolbar", "aria-label": "My journey" },
     tool("卷", "Scrolls", () => go("scrolls"), { "aria-label": "Scrolls: " + found + " found" + (unread ? ", " + unread + " unread" : "") }),
@@ -403,22 +409,33 @@ function viewJourney() {
     cur < J_TOTAL ? h("button", { class: "plain-btn j-next", type: "button", onclick: () => stopSheet(cur) }, h("span", { class: "muted small" }, "Next: "), QUESTS[cur].title, h("span", { class: "muted small" }, " · " + questLine(QUESTS[cur]))) : null));
   v.append(bar);
   const map = journeyMap(sel => (sel.reward !== undefined ? rewardSheet(sel.reward) : stopSheet(sel.stop)));
-  mapWrap.append(map, token);
-  v.append(mapWrap);
+  paper.append(map, token);
+  v.append(scroll);
+  if (firstOpen) requestAnimationFrame(() => requestAnimationFrame(() => scroll.classList.remove("rolled")));
   // stand where you last were, then walk on to where you are now
   const from = Math.min(j.seen, cur, J_TOTAL - 1), to = Math.min(cur, J_TOTAL - 1);
   placeToken(token, ...J_STOPS[from]);
   setTimeout(() => {
     if (!token.isConnected) return;
-    if (!ui.jFull) centreOn(token, true);
-    if (to > from) setTimeout(() => walkToken(token, from, to, () => { commit({ journey: { ...state.journey, seen: to } }); }), 500);
-    else if (j.seen !== to) commit({ journey: { ...state.journey, seen: to } });
-  }, 60);
+    // first open: once it has unrolled, bring the toolbar to the top so the paper fills the screen
+    if (firstOpen && !ui.jFull) { const jb = $(".journey .jbar"); if (jb) window.scrollTo({ top: Math.max(0, window.scrollY + jb.getBoundingClientRect().top - 8), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+    centreOn(token, true);
+    const keep = () => { if (!state.unlockAll) commit({ journey: { ...state.journey, seen: to } }); };
+    if (to > from) setTimeout(() => walkToken(token, from, to, keep), 500);
+    else if (j.seen !== to) keep();
+  }, firstOpen ? 1000 : 60);
   return v;
 }
+/** Bring the avatar into view: inside the scroll's paper (close up), or the page (full map). */
 function centreOn(el, instant) {
+  const view = el.closest(".jm-view"), behavior = instant ? "auto" : "smooth";
+  if (view && !el.closest(".jm-scroll.full")) {
+    const top = el.offsetTop - view.clientHeight / 2;
+    view.scrollTo({ top: Math.max(0, top), behavior });
+    return;
+  }
   const r = el.getBoundingClientRect();
-  window.scrollTo({ top: Math.max(0, window.scrollY + r.top - window.innerHeight / 2), behavior: instant ? "auto" : "smooth" });
+  window.scrollTo({ top: Math.max(0, window.scrollY + r.top - window.innerHeight / 2), behavior });
 }
 
 // ---------- scrolls: the library and a scroll ----------
@@ -435,6 +452,7 @@ function scrollText(text) {
   return out;
 }
 function viewScrolls() {
+  ui.jRolledFor = "";
   const v = h("section", { class: "view" });
   const j = jState();
   const list = h("ol", { class: "scroll-list" });

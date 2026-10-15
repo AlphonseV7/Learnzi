@@ -1005,3 +1005,31 @@ textarea.note { min-height: 4.5rem; font-family: var(--font-body); font-size: .9
 .cz-en { margin: 0; font-size: 1rem; }
 .cz-hint { margin: 0; }
 .cz-back { display: grid; gap: 4px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); }
+
+/* Your decks: every tile the same shape (name, then stats, then the bar) */
+.deck-mini { display: grid; gap: 6px; text-align: start; width: 100%; }
+.deck-mini .dm-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.deck-mini .dm-sum { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Settings: nothing wider than the screen (a long option name used to stretch the whole page) */
+.set-row > * { min-width: 0; max-width: 100%; }
+select { max-width: 100%; text-overflow: ellipsis; }
+.font-demo-word { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.font-demo-word .font-demo { font-size: 1.6rem; }
+/* Settings search */
+.set-find { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-block: 10px; }
+.set-find > svg { width: 18px; height: 18px; color: var(--ink-soft); flex: none; }
+.set-find .set-search { flex: 1; width: auto; min-width: 0; font-size: 1rem; border: 0; background: transparent; padding: 6px 2px; color: var(--ink); }
+.set-find .set-search:focus { outline: none; }
+.set-find:focus-within { box-shadow: 0 0 0 3px var(--accent-soft); }
+.set-find .set-none-note { flex-basis: 100%; margin: 0; }
+.settings-view .set-miss, .settings-view .set-hide { display: none !important; }
+.settings-view.searching .fold.closed > .fold-body { grid-template-rows: 1fr; }
+.settings-view.searching .fold.closed > .fold-body > .fold-inner { visibility: visible; }
+/* Check every voice */
+.voice-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.voice-list .vc-ok b { color: #2f8f5b; }
+.voice-list .vc-bad b { color: #c0392b; }
+/* a row of choices that doesn't fit (Voice on a narrow phone) wraps instead of widening the page */
+.set-row .seg { flex-wrap: wrap; max-width: 100%; border-radius: 18px; }
+.set-row .seg button { padding-inline: 11px; }

@@ -18,7 +18,26 @@
 .jm-wrap { position: relative; border-radius: calc(var(--radius) - 2px); overflow: hidden; line-height: 0;
   border: 3px solid color-mix(in srgb, var(--accent) 60%, var(--ink)); box-shadow: 0 3px 12px rgb(0 0 0 / .18); background: #efe7d4; }
 .jm-svg { display: block; width: 100%; height: auto; }
-.jm-wrap.full { width: min(100%, calc((100dvh - 210px) * .36)); margin-inline: auto; }
+/* the map as a scroll: rollers top and bottom; the paper (.jm-view) unrolls to about half the screen
+   and scrolls inside; Full map rolls it all the way open (and narrows it so it all fits) */
+.jm-scroll { position: relative; padding-inline: 4px; }
+.jm-scroll .jm-wrap { border-radius: 2px; border-width: 0 2px; margin-inline: 6px; }
+.jm-view { position: relative; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  max-height: clamp(240px, calc(100dvh - 235px), 600px); transition: max-height .95s cubic-bezier(.3, .7, .2, 1); }
+.jm-paper { position: relative; }
+.jm-scroll.full .jm-view { max-height: calc(100dvh - 190px); overflow: hidden; }
+.jm-scroll.full { width: min(100%, calc((100dvh - 190px) * .36 + 24px)); margin-inline: auto; }
+.jm-scroll.rolled .jm-view { max-height: 0; }
+.jm-roller { position: relative; z-index: 2; height: 16px; border-radius: 8px; margin-inline: -2px;
+  background: linear-gradient(#5a3519, #b07b42 38%, #e0b47a 50%, #a8743d 62%, #4e2d14); box-shadow: 0 3px 6px rgb(0 0 0 / .3); }
+.jm-roller::before, .jm-roller::after { content: ""; position: absolute; top: -3px; width: 12px; height: 22px; border-radius: 4px;
+  background: linear-gradient(90deg, #3d2410, #8a5a2b 50%, #3d2410); }
+.jm-roller::before { left: -8px; } .jm-roller::after { right: -8px; }
+.jm-roller-top { margin-bottom: -6px; } .jm-roller-bottom { margin-top: -6px; }
+.jm-scroll .jm-roller { background-size: 100% 100%; }
+.jm-scroll:not(.rolled) .jm-roller-bottom { animation: jmRoll .95s cubic-bezier(.3, .7, .2, 1); }
+@keyframes jmRoll { from { filter: brightness(1.15); transform: rotateX(30deg); } }
+@media (prefers-reduced-motion: reduce) { .jm-view { transition: none; } .jm-roller-bottom { animation: none !important; } }
 .jm-stop, .jm-reward { cursor: pointer; outline: none; }
 .jm-stop:focus-visible > circle:first-child, .jm-reward:focus-visible rect:first-child { stroke: var(--accent); stroke-width: 2.5; }
 .jm-stop.misty { opacity: .55; }
@@ -48,6 +67,10 @@
   border-radius: 20px 20px 0 0; padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 0px)); animation: jUp .25s var(--ease); }
 .jsheet-panel h2 { margin: 0; }
 .jsheet-grab { width: 40px; height: 4px; border-radius: 2px; background: var(--line); justify-self: center; }
+.jsheet-panel { overscroll-behavior: contain; touch-action: pan-y; }
+.jsheet-panel > .jsheet-x { position: absolute; top: 10px; right: 10px; z-index: 2; }
+.jsheet-panel > h2, .jsheet-panel > .eyebrow:first-of-type { padding-right: 46px; }
+.jsheet-panel.dragging { animation: none; transition: none; }
 .jsheet.out .jsheet-panel { animation: jDown .2s ease-in forwards; }
 .jsheet.out .jsheet-scrim { opacity: 0; transition: opacity .2s; }
 @keyframes jUp { from { transform: translateY(100%); } }
@@ -98,29 +121,3 @@
 :root .app .jbar.card { position: sticky; margin: 0; }
 /* wide screens: a comfortable column rather than a giant map */
 .journey .jm-wrap:not(.full) { max-width: 560px; margin-inline: auto; }
-/* the quest pop-up: a little scroll in the Journey's ink-wash look, the same in every theme */
-.questpop { position: fixed; left: 50%; bottom: calc(var(--tabbar) + 14px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: min(92vw, 420px);
-  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 14px 12px; color: #2b241c;
-  background: linear-gradient(#f1e7cf, #e8dbbd); border-radius: 3px; box-shadow: 0 12px 30px rgb(0 0 0 / .4);
-  transform: translateX(-50%); animation: qpIn .45s var(--ease); font-family: var(--font-body); }
-.questpop::before, .questpop::after { content: ""; position: absolute; left: -8px; right: -8px; height: 10px; border-radius: 5px; background: linear-gradient(#6b4423, #a8743d 45%, #5a3519); }
-.questpop::before { top: -6px; }
-.questpop::after { bottom: -6px; }
-:root.desk .questpop { bottom: 28px; }
-.questpop.out { animation: qpOut .26s ease-in forwards; }
-@keyframes qpIn { from { opacity: 0; transform: translate(-50%, 24px) scale(.96); } }
-@keyframes qpOut { to { opacity: 0; transform: translate(-50%, 16px); } }
-.questpop-seal { display: grid; padding: 5px 6px; background: #b8322a; color: #f6eedd; border-radius: 3px; font-size: 1rem; line-height: 1.15; text-align: center;
-  transform: rotate(-4deg); animation: qpStamp .5s .15s var(--ease) backwards; font-family: var(--font-hanzi); }
-@keyframes qpStamp { from { transform: rotate(-4deg) scale(1.8); opacity: 0; } }
-.questpop-body { display: grid; gap: 3px; min-width: 0; }
-.questpop-kicker { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: #8a6d45; font-weight: 800; }
-.questpop-title { font-size: 1.02rem; line-height: 1.3; overflow-wrap: anywhere; }
-.questpop-line { font-size: .86rem; color: #5a4a35; }
-.questpop-extra { color: #a3271d; font-weight: 700; }
-.questpop-btns { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
-.questpop-go { border: 0; border-radius: 999px; padding: 7px 16px; background: #b8322a; color: #f6eedd; font: inherit; font-weight: 800; cursor: pointer; }
-.questpop-go:hover, .questpop-go:focus-visible { background: #9a2820; }
-.questpop-x { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgb(0 0 0 / .06); color: #5a4a35; display: grid; place-items: center; cursor: pointer; }
-.questpop-x svg { width: 14px; height: 14px; }
-@media (prefers-reduced-motion: reduce) { .questpop, .questpop-seal { animation: none; } }

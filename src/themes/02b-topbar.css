@@ -103,3 +103,62 @@
 .rank-ladder .is-secret .rank-zh { color: var(--ink-soft); opacity: .35; letter-spacing: .1em; }
 .rank-ladder .is-secret .rank-row:disabled { cursor: default; }
 #reader-input::placeholder { font-family: var(--font-body); font-size: 1rem; letter-spacing: 0; }
+
+/* ---------- the level, slimmer (15 Oct): "Lv 39" over a thin rounded XP bar; no capsule, no numbers
+   (they're on My Zì). The bar is the same element, so the flying characters still land on it. ---------- */
+:root .app .topbar .lvl {
+  display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: stretch; row-gap: 5px;
+  height: 44px; min-width: 70px; padding: 0 8px; background: transparent; border-color: transparent; box-shadow: none; --frame: transparent;
+  color: var(--accent); line-height: 1; clip-path: none;
+}
+:root .app .topbar .lvl .hz, :root .app .topbar .lvl .xp-num { display: none; }
+:root .app .topbar .lvl .lvl-num { order: 1; font-size: 1rem; font-weight: 800; letter-spacing: -.01em; text-align: center; }
+:root .app .topbar .lvl .xpbar { order: 2; position: relative; inset: auto; height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+:root .app .topbar .lvl .xpbar > i { border-radius: 99px; background: var(--accent); box-shadow: none; }
+:root .app .topbar .lvl .xpbar.filling > i, :root .app .topbar .lvl .xpbar.full > i { background-color: var(--accent); }
+:root .app .topbar .lvl:hover, :root .app .topbar .lvl:focus-visible { background: var(--accent-soft); }
+:root.desk .app .topbar .lvl { min-width: 96px; }
+:root[data-shape="arcade"] .app .topbar .lvl .xpbar, :root[data-shape="arcade"] .app .topbar .lvl .xpbar > i { border-radius: 0; }
+:root[data-shape="cyber"] .app .topbar .lvl .xpbar { border-radius: 0; transform: skewX(-18deg); }
+:root[data-shape="cyber"] .app .topbar .lvl .xpbar > i { border-radius: 0; box-shadow: 0 0 8px var(--accent); }
+
+/* the journey seal: a little red stamp 旅; a bubble counts new quests; it glows when one is done */
+.topbar .jtop { position: relative; width: 44px; height: 44px; }
+.topbar .jtop[hidden] { display: none; }
+.jt-seal { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 4px; background: #b8322a; color: #f6eedd; font-size: 1rem; line-height: 1; transform: rotate(-4deg); box-shadow: inset 0 0 0 1.5px rgb(246 238 221 / .35); }
+.jt-count {
+  position: absolute; top: -5px; right: -5px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px; display: grid; place-items: center;
+  background: var(--accent); color: var(--accent-ink); font-size: .68rem; font-weight: 800; line-height: 1; box-shadow: 0 0 0 2px var(--surface);
+}
+.jt-count[hidden] { display: none; }
+.topbar .jtop[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.topbar .jtop.glow { animation: jtGlow 1.4s ease-in-out 3; }
+.topbar .jtop.glow .jt-seal { animation: jtHop 1.4s ease-in-out 3; }
+@keyframes jtGlow {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  45% { box-shadow: 0 0 0 4px color-mix(in srgb, #e2b04a 55%, transparent), 0 0 22px 4px color-mix(in srgb, #e2b04a 70%, transparent); }
+}
+@keyframes jtHop { 0%, 100% { transform: rotate(-4deg) translateY(0); } 25% { transform: rotate(6deg) translateY(-4px) scale(1.08); } 50% { transform: rotate(-4deg) translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .topbar .jtop.glow, .topbar .jtop.glow .jt-seal { animation: none; }
+  .topbar .jtop.glow { box-shadow: 0 0 0 3px color-mix(in srgb, #e2b04a 60%, transparent); }
+}
+@media (max-width: 380px) { .topbar .jtop, .topbar .gear { width: 40px; height: 40px; } .top-right { gap: 5px; } }
+
+/* My Zì and the end of a review: the level in the top bar's look */
+.level-box .lb-top { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 10px; flex-wrap: wrap; }
+.level-box .lb-lv { color: var(--accent); font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em; }
+.bar.xp-line { height: 6px; background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+:root[data-shape="arcade"] .bar.xp-line, :root[data-shape="arcade"] .bar.xp-line > i { border-radius: 0; }
+:root[data-shape="cyber"] .bar.xp-line { border-radius: 0; transform: skewX(-18deg); }
+:root[data-shape="cyber"] .bar.xp-line > i { border-radius: 0; box-shadow: 0 0 8px var(--accent); }
+/* narrow phones: room for the name beside the level, the journey seal and the cog */
+@media (max-width: 420px) {
+  :root .app .topbar .lvl { min-width: 54px; padding: 0 4px; }
+  :root .app .topbar .lvl .lvl-num { font-size: .92rem; }
+  .topbar.card .top-right { gap: 4px; }
+  .topbar .jtop, .topbar .gear { width: 40px; height: 40px; }
+  .topbar .seal.avatar-mini { width: 40px; height: 40px; }
+  .topbar.card .me { gap: 8px; }
+}
+@media (max-width: 420px) { :root[data-shape="cyber"] .topbar.card .me-name { font-size: .92rem; letter-spacing: 0; } :root[data-shape="cyber"] .app .main > .topbar.card { padding-inline: 12px 18px; } }

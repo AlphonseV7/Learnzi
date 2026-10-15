@@ -26,8 +26,69 @@ function setSelect(id, table, val, change) {
 
 /* LearnZì UI, part 6: Settings. */
 
+/** Settings search: each row matches on its words (and its box's title); boxes with no match hide,
+ *  and folded boxes open while you search (they fold back when the search is cleared). */
+const SET_WORDS = { voice: "sound audio speech recording listen speaker", "text and fonts": "size font typeface bigger smaller letters", flashcards: "review cards goal daily session typing sentence streak",
+  "stroke order": "writing animation radical", profile: "name sync account", "box layout": "folds move boxes", reset: "factory tour erase start again", "word details": "pop-up panel boxes" };
+function settingsSearch() {
+  const view = $(".view.settings-view");
+  if (!view) return;
+  const terms = (ui.setQ || "").toLowerCase().trim().split(/\s+/).filter(Boolean);
+  view.classList.toggle("searching", terms.length > 0);
+  let shown = 0;
+  for (const card of view.querySelectorAll(":scope > .card:not(.set-find)")) {
+    const title = ((card.querySelector(".fold-label, .h-card") || {}).textContent || "").toLowerCase().trim();
+    const extra = SET_WORDS[title] || "";
+    // A row that matches on its own words shows alone; if none does, a match on the box's title or
+    // its extra words (voice → "sound") shows the whole box.
+    const own = text => terms.every(t => text.toLowerCase().includes(t));
+    const boxWide = terms.length && terms.every(t => (title + " " + extra).includes(t));
+    const rows = [...card.querySelectorAll(".set-row")];
+    let any = false;
+    if (rows.length) {
+      const hits = rows.map(r => !terms.length || own(r.textContent));
+      const whole = !hits.some(Boolean) && boxWide;
+      rows.forEach((r, i) => r.classList.toggle("set-miss", !(hits[i] || whole)));
+      any = hits.some(Boolean) || whole;
+    } else any = !terms.length || boxWide || own(card.textContent);
+    card.classList.toggle("set-hide", !any);
+    if (any) shown++;
+  }
+  const note = view.querySelector(".set-none-note");
+  if (note) note.hidden = !terms.length || shown > 0;
+}
+
+/** Settings → Voice → Check every voice: says 谢谢 with each voice in turn and reports what happened,
+ *  so a voice that doesn't work on this phone shows why (a screenshot of this helps fix it). */
+const VOICE_ERR = {
+  index: "couldn't load the list of recordings", missing: "no recording of this word", download: "couldn't download the recording (network or storage)",
+  nosound: "this browser can't play app sounds", decode: "the phone couldn't open the recording file", blocked: "sound is blocked until you tap the page",
+};
+async function voiceCheck(out) {
+  if (!out) return;
+  out.replaceChildren(h("p", { class: "muted small" }, "Checking… you should hear 谢谢 three times."));
+  const lines = [];
+  for (const [src, label] of [["word", "Recording"], ["syllables", "Syllables"], ["browser", "Browser voice"]]) {
+    AUDIO.err = "";
+    let got = null;
+    try { got = await speak("谢谢", "xie4 xie5", { only: src }); } catch { got = null; }
+    if (got && src !== "browser" && audioCtx && audioCtx.state !== "running") { got = null; AUDIO.err = "blocked"; }
+    const why = src === "browser" ? (hasTTS() ? (zhVoice ? "" : "no Chinese voice installed on this phone") : "this browser has no voice") : VOICE_ERR[AUDIO.err] || "didn't play";
+    lines.push(h("li", { class: got ? "vc-ok" : "vc-bad" }, h("b", null, (got ? "✓ " : "✗ ") + label), got ? " played" + (src === "browser" && why ? " (" + why + ")" : "") : ": " + why));
+    out.replaceChildren(h("ul", { class: "voice-list" }, lines));
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  out.append(h("p", { class: "muted small" }, "Sound context: " + (audioCtx ? audioCtx.state : "none") + " · Recordings listed: " + ((await audioIndex()).size || 0)));
+}
+
 function viewSettings() {
-  const v = h("section", { class: "view" });
+  const v = h("section", { class: "view settings-view" });
+  // Search: shows only the settings that match, opening their boxes while you search.
+  const find = h("input", { type: "search", id: "set-q", class: "set-search", placeholder: "Search settings", "aria-label": "Search settings", autocomplete: "off", enterkeyhint: "search" });
+  find.value = ui.setQ || "";
+  find.addEventListener("input", () => { ui.setQ = find.value; settingsSearch(); });
+  v.append(h("div", { class: "card set-find", "data-keep": "" }, icon("search"), find, h("p", { class: "muted small set-none-note", hidden: true }, "No settings match.")));
+  queueMicrotask(settingsSearch);
   const row = setRow, toggleCtl = setToggle, seg = setSeg, select = setSelect;
 
   // Profile (with sync: the button shows how syncing is going, tap it for the details)
@@ -68,9 +129,8 @@ function viewSettings() {
   scale.addEventListener("change", () => commit({ scale: scale.value / 100 }));
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Text and fonts"),
     row("font", "Chinese font", select("font", FONTS, state.font, k => { commit({ font: k }); applyLook(); }),
-      h("span", { class: "hz font-demo" }, "学习汉字 · 學習漢字")),
-    row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }),
-      "Menus, buttons, headings and meanings. Theme's own: each theme's lettering, like the pixel letters of Retro Arcade; any other font replaces it in every theme."),
+      h("span", { class: "font-demo-word" }, h("span", { class: "hz font-demo" }, state.script === "t" ? "漢字" : "汉字"), h("span", { class: "small" }, "hànzì"), h("span", { class: "muted small" }, "· Chinese characters"))),
+    row("uifont", "English font", select("uifont", UIFONTS, state.uiFont, k => { commit({ uiFont: k }); applyLook(); }), "Menus, buttons, headings and meanings"),
     row("scale", "Text size", h("div", { class: "row" }, scale, scaleOut))));
 
   // Study
@@ -117,11 +177,14 @@ function viewSettings() {
   rate.addEventListener("input", () => { rateOut.textContent = (rate.value / 10).toFixed(1) + "×"; });
   rate.addEventListener("change", () => commit({ rate: rate.value / 10 }));
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Voice"),
-    row("voice", "Voice", seg("voice", [["auto", "Automatic"], ["word", "Recording"], ["syllables", "Syllables"], ["browser", "Browser"]], state.voiceSrc, k => { commit({ voiceSrc: k }); for (const b of document.querySelectorAll(".voice-src")) if (b.voiceShow) b.voiceShow(); }),
-      "Automatic: a native speaker's recording of the whole word when there is one, otherwise the word built from recorded syllables; long sentences use the browser voice when your device has a Chinese one. Pick one to hear it first everywhere. The speaker beside any Listen button flicks through them too."),
+    row("voice", "Voice", seg("voice", [["auto", "Automatic"], ["word", "Recording"], ["syllables", "Syllables"], ["browser", "Browser"]], state.voiceSrc, k => commit({ voiceSrc: k })),
+      "Recording: a native speaker saying the whole word (8,569 HSK words). Syllables: the word built from recorded syllables. Browser: your phone's own voice. Automatic picks the best one for each word. A sentence, or a word with no recording, uses the next voice that can say it."),
     row("rate", "Browser voice speed", h("div", { class: "row" }, rate, rateOut)),
-    h("div", { class: "row" }, withVoice(h("button", { class: "btn", type: "button", onclick: () => speak("你好，我在学习汉语。") }, icon("play"), "Test voice"), { text: "你好，我在学习汉语。" }),
-      h("span", { class: "muted small", id: "voice-note" }, voiceNote()))));
+    h("div", { class: "row" },
+      h("button", { class: "btn", type: "button", onclick: () => speak("谢谢", "xie4 xie5") }, icon("play"), "Test: 谢谢"),
+      h("button", { class: "btn", type: "button", onclick: ev => voiceCheck(ev.currentTarget.parentElement.nextElementSibling) }, "Check every voice")),
+    h("div", { class: "voice-check", "aria-live": "polite" }),
+    h("span", { class: "muted small", id: "voice-note" }, voiceNote())));
 
   // Box layout, Glitch, then Reset: replay the tour and the factory reset (51-reset)
   v.append(h("div", { class: "card set" }, h("h2", { class: "h-card" }, "Box layout"), boxLayoutRow()));

@@ -29,7 +29,8 @@ const GARDEN = [
   ["Fireflies", "萤火虫", "ying2 huo3 chong2", "Fireflies light up the night. Your garden is complete!"],
 ];
 const gardenPoints = () => (progress.garden || [0, 0])[0];
-const gardenStage = (pts = gardenPoints()) => Math.min(GARDEN.length - 1, Math.floor(pts / GARDEN_STEP));
+/** The garden's stage; Debug → Unlock everything shows the finished garden (display only). */
+const gardenStage = pts => (pts === undefined && state.unlockAll ? GARDEN.length - 1 : Math.min(GARDEN.length - 1, Math.floor((pts === undefined ? gardenPoints() : pts) / GARDEN_STEP)));
 
 /** Adds growth points. Returns the new stage if the garden grew. */
 function gardenGrow(points, correct) {

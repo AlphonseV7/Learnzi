@@ -20,7 +20,7 @@ const CLOCK = {
     sparkle: { label: "Sparkles", streak: 3 },
   },
 };
-const CLOCK_DEFAULT = { face: "digital", fx: "none", h24: true, secs: false, zhDate: true, layout: "stack", show: "both" };
+const CLOCK_DEFAULT = { face: "digital", fx: "none", h24: true, secs: false, zhDate: true, layout: "side", show: "both" };
 function sanitizeClock(raw) {
   const o = obj(raw), c = { ...CLOCK_DEFAULT };
   if (Object.hasOwn(CLOCK.face, o.face)) c.face = o.face;
@@ -183,7 +183,7 @@ function clockBox() {
   const c = wornClock();
   return h("div", { class: "card clock-card", "data-fold-id": "home-clock" },   // same box whether it shows the time, the date or both
     h("div", { class: "row spread" }, h("span", { class: "eyebrow" }, c.show === "date" ? "Date" : "Clock"),
-      h("button", { class: "plain-btn build-link small", type: "button", onclick: () => { ui.meTab = "clock"; go("me"); } }, "Change")),
+      null),
     clockBody(c));
 }
 /** The face and the date, stacked or side by side, or just one of them. */

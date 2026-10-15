@@ -48,6 +48,12 @@ themes, light and dark, on a phone and a computer:
 16. Typed answers: right, typo, wrong tone (marked) and wrong each give the right message and suggested grade; Enter takes it; switching off brings back Show answer
 17. Sentence cards: unlock at 5 days, show a gap the size of the word with the English, the answer marks the word; the setting switches them off
 18. A review session holds at most the chosen number of cards (20 by default)
+19. Android back: goes back a page, and closes a pop-up first
+20. Tap any Chinese (page titles, the clock's date, scrolls…) opens the word; tabs and buttons keep their own job
+21. A card you're still learning waits for its time ("Next card in …", Review it now)
+22. One play button everywhere; Settings → Voice → Check every voice reports each voice
+23. Settings search finds single settings, says when nothing matches
+24. Every page, every theme, light and dark, at 360 px and 100% text: nothing wider than the screen
 
 ## E. My journey
 1. Quests complete in order, chapter by chapter, and only once
@@ -57,6 +63,9 @@ themes, light and dark, on a phone and a computer:
 5. Every scroll's tappable words exist in the dictionary
 6. Chapter rewards unlock (brush, flute, seal clock, garden lantern, hat, Traveller title)
 7. Toolbar: Scrolls, Rewards, List, Full map, Find me, Daily
+8. The 旅 seal in the top bar glows with a count when a quest finishes (no pop-up); opening My journey clears it
+9. The map unrolls like a scroll; sheets close with ×, a tap outside or a pull down
+10. Debug → Unlock everything shows the full garden and journey without changing real progress
 
 ## F. Accessibility
 1. Text contrast meets the standard (4.5 : 1) in every theme, light and dark
